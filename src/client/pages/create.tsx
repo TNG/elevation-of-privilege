@@ -258,14 +258,10 @@ class Create extends React.Component<CreateProps, CreateState> {
         return false;
       }
     }
-    if (
-      (this.state.modelType === MODEL_TYPE_THREAT_DRAGON &&
+    return !((this.state.modelType === MODEL_TYPE_THREAT_DRAGON &&
         !this.state.model) ||
-      (this.state.modelType === MODEL_TYPE_IMAGE && !this.state.image)
-    ) {
-      return false;
-    }
-    return true;
+      (this.state.modelType === MODEL_TYPE_IMAGE && !this.state.image));
+
   }
 
   updateModelType(e: ChangeEvent<HTMLInputElement>): void {
@@ -549,7 +545,7 @@ class Create extends React.Component<CreateProps, CreateState> {
                       </a>
                     </td>
                     <td>
-                      <CopyButton text={this.url(`${i}`)} />
+                      <CopyButton textToCopy={this.url(`${i}`)} />
                     </td>
                   </tr>
                 ))}
@@ -565,14 +561,14 @@ class Create extends React.Component<CreateProps, CreateState> {
                   </a>
                 </td>
                 <td>
-                  <CopyButton text={this.url(SPECTATOR)} />
+                  <CopyButton textToCopy={this.url(SPECTATOR)} />
                 </td>
               </tr>
             </tbody>
           </Table>
           <hr />
           <CopyButton
-            text={this.formatAllLinks()}
+            textToCopy={this.formatAllLinks()}
             color="warning"
             block
             size="lg"
