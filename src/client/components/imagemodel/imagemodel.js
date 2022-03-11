@@ -20,7 +20,7 @@ class ImageModel extends React.Component {
     this.updateImage = this.updateImage.bind(this);
     this.onError = this.onError.bind(this);
 
-    // maybe this is better defined in constants (also used by downloadbutton.js)
+    // maybe this is better defined in constants (also used by downloadbutton.tsx)
     this.apiBase =
       process.env.NODE_ENV === 'production'
         ? '/api'
