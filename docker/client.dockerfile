@@ -1,6 +1,7 @@
 FROM node:16.13.1-alpine3.14 AS builder
 ARG EOP_IMPRINT
 ARG EOP_PRIVACY
+ARG EOP_BANNER_TEXT
 WORKDIR /usr/src/app
 COPY package.json ./
 COPY package-lock.json ./
@@ -15,6 +16,7 @@ COPY ./.prettierrc.cjs ./.prettierc.cjs
 COPY ./src ./src
 ENV REACT_APP_EOP_IMPRINT=$EOP_IMPRINT
 ENV REACT_APP_EOP_PRIVACY=$EOP_PRIVACY
+ENV REACT_APP_EOP_BANNER_TEXT=$EOP_BANNER_TEXT
 RUN env
 RUN npm run build:client
 
