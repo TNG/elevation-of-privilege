@@ -16,21 +16,9 @@ This application implements an online version of the card games [Elevation of Pr
                 toggle:get-repo#onDetailsToggle
                 keydown:get-repo#onDetailsKeydown"
     >
-      <summary data-hydro-click="{&quot;event_type&quot;:&quot;repository.click&quot;,&quot;payload&quot;:{&quot;repository_id&quot;:404649362,&quot;target&quot;:&quot;CLONE_OR_DOWNLOAD_BUTTON&quot;,&quot;originating_url&quot;:&quot;https://github.com/tng/elevation-of-privilege/tree/buttontest&quot;,&quot;user_id&quot;:10673021}}" data-hydro-click-hmac="4929f67afb447b45a779c0197c0c6cc6f6fe3531c0a5593d0fd6523b45902e45" data-view-component="true" class="Button--primary Button--medium Button flex-1 d-inline-flex">
         <span class="Button-content">
-          <span class="Button-visual Button-leadingVisual">
-            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-code">
-              <path d="m11.28 3.22 4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L13.94 8l-3.72-3.72a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215Zm-6.56 0a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L2.06 8l3.72 3.72a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L.47 8.53a.75.75 0 0 1 0-1.06Z"></path>
-            </svg>
-          </span>
           <span class="Button-label">Code</span>
         </span>
-        <span class="Button-visual Button-trailingAction">
-          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-triangle-down">
-            <path d="m4.427 7.427 3.396 3.396a.25.25 0 0 0 .354 0l3.396-3.396A.25.25 0 0 0 11.396 7H4.604a.25.25 0 0 0-.177.427Z"></path>
-          </svg>
-        </span>
-      </summary>  
     </details>
   </get-repo>
 </span>
