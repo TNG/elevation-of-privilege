@@ -11,16 +11,9 @@ This application implements an online version of the card games [Elevation of Pr
 **Improve both: your application's security and your developer's awareness!**
 
 <span class="d-none d-md-flex ml-2">     
-  <get-repo class="" data-catalyst="">
-    <details class="position-relative details-overlay details-reset js-codespaces-details-container hx_dropdown-fullscreen" data-action="
-                toggle:get-repo#onDetailsToggle
-                keydown:get-repo#onDetailsKeydown"
-    >
-        <span class="Button-content">
-          <span class="Button-label">Code</span>
-        </span>
-    </details>
-  </get-repo>
+    <span class="Button-content">
+      <span class="Button-label">Code</span>
+    </span>
 </span>
 
 ### Why Threat Modeling?
