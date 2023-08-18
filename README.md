@@ -1,8 +1,6 @@
 Elevation of Privilege
 ======================
 [![Tests](https://github.com/tng/elevation-of-privilege/actions/workflows/checks.yml/badge.svg)](https://github.com/tng/elevation-of-privilege/actions/workflows/checks.yml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/5449a4d61cdfed258204/maintainability)](https://codeclimate.com/github/dehydr8/elevation-of-privilege/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/5449a4d61cdfed258204/test_coverage)](https://codeclimate.com/github/dehydr8/elevation-of-privilege/test_coverage)
 
 Threat Modeling via Serious Games is the easy way to get started and increase the security of your projects. This is a card game that developers, architects or security experts can play.
 
@@ -11,6 +9,8 @@ This application implements an online version of the card games [Elevation of Pr
 ![Example](docs/eop.gif)
 
 **Improve both: your application's security and your developer's awareness!**
+
+<a style="float:right" href="https://github.com/OWASP/cumulus/releases/latest" class="Button--primary Button--medium Button flex-1 d-inline-flex">&#10515; Download</a>
 
 ### Why Threat Modeling?
 
