@@ -2,6 +2,8 @@ Elevation of Privilege
 ======================
 [![Tests](https://github.com/tng/elevation-of-privilege/actions/workflows/checks.yml/badge.svg)](https://github.com/tng/elevation-of-privilege/actions/workflows/checks.yml)
 
+**Improve both: your application's security and your developer's awareness!**
+
 Threat Modeling via Serious Games is the easy way to get started and increase the security of your projects. This is a card game that developers, architects or security experts can play.
 
 This application implements an online version of the card games [Elevation of Privilege](https://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf) and [OWASP Cornucopia](https://owasp.org/www-project-cornucopia/), allowing to play the threat modeling games in remote or geo-distributed developer teams.
@@ -12,10 +14,7 @@ This application implements an online version of the card games [Elevation of Pr
 
 *(Disclaimer: This demo instance is for testing purposes only. Do not add sensitive data!)*
 
-![Example](docs/eop.gif)
-
-**Improve both: your application's security and your developer's awareness!**
-
+[![Example](docs/eop.gif)](https://threats-demo.thenerdgroup.de/)
 
 
 ### Why Threat Modeling?
