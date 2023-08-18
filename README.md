@@ -10,11 +10,8 @@ This application implements an online version of the card games [Elevation of Pr
 
 **Improve both: your application's security and your developer's awareness!**
 
-<span class="d-none d-md-flex ml-2">     
-    <span class="Button-content">
-      <span class="Button-label">Code</span>
-    </span>
-</span>
+[<img style="height:50px;cursor:pointer;float:right" src="docs/img/playit.svg"/>](https://github.com/TNG/cumulus/releases/latest)
+
 
 ### Why Threat Modeling?
 
