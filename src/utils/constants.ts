@@ -1,3 +1,5 @@
+import type { ThreatDragonModel } from '../types/ThreatDragonModel';
+
 export enum ModelType {
   THREAT_DRAGON = 'Threat Dragon',
   PRIVACY_ENHANCED = 'Default',
@@ -11,7 +13,7 @@ export const MIN_NUMBER_PLAYERS = 2;
 export const MAX_NUMBER_PLAYERS = 9;
 export const DEFAULT_TURN_DURATION = 300;
 
-export const DEFAULT_MODEL = {
+export const DEFAULT_MODEL: ThreatDragonModel = {
   summary: {
     title: 'Threat Modelling',
   },
