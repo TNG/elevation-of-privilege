@@ -64,4 +64,4 @@ export const DEFAULT_MODEL: ThreatDragonModel = {
   },
 };
 
-export const SPECTATOR = `spectator`;
+export const SPECTATOR = 'spectator';
