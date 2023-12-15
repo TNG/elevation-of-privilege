@@ -184,7 +184,7 @@ Once the database connector is fully implemented, it can be used instead of a Fl
 ### Migrate to Typescript
 
 Work on migrating to TypeScript has already started but is not complete yet. Most of the server code and the code shared
-between client snd server has already been migrated but a lot of the client is still missing.
+between client and server has already been migrated but a lot of the client is still missing.
 
 In order to migrate a
 component of the client to TypeScript, follow this pattern:
