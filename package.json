@@ -10,7 +10,7 @@
     "@koa/cors": "^5.0.0",
     "basic-auth": "^2.0.1",
     "boardgame.io": "^0.50.2",
-    "bootstrap": "^4.6.0",
+    "bootstrap": "^5.3.2",
     "cornucopia-cards-modified": "file:cornucopiaCards",
     "esm": "^3.2.25",
     "jointjs": "^3.7.4",
