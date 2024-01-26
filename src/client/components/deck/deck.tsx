@@ -4,7 +4,7 @@ import { GameMode, getCardCssClass } from '../../../utils/GameMode';
 import type { Card, Suit } from '../../../utils/cardDefinitions';
 
 interface DeckProps {
-  suit: Suit;
+  suit?: Suit;
   cards: Card[];
   isInThreatStage: boolean;
   round: number;

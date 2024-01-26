@@ -46,12 +46,13 @@ const Board: FC<BoardProps> = ({
       ? '/api'
       : `${window.location.protocol}//${window.location.hostname}:${API_PORT}`;
 
-  const updateName = useCallback(
-    (index: number, name: string) => {
-      setNames([...names].splice(index, 1, name));
-    },
-    [setNames, names],
-  );
+  const updateName = useCallback((index: number, name: string) => {
+    setNames((names) => {
+      const newNames = [...names];
+      newNames[index] = name;
+      return newNames;
+    });
+  }, []);
 
   const apiGetRequest = useCallback(
     async (endpoint: string) => {
@@ -88,15 +89,18 @@ const Board: FC<BoardProps> = ({
     const model = modelResponse?.body as Record<string, unknown> | undefined;
 
     setModel(model);
-  }, [apiGetRequest, setModel]);
+  }, [apiGetRequest]);
 
   // consider using react-query instead
   useEffect(() => {
-    updateNames();
     if (G.modelType !== ModelType.IMAGE) {
       updateModel();
     }
-  }, [updateNames, G.modelType, updateModel]);
+  }, [G.modelType, updateModel]);
+
+  useEffect(() => {
+    updateNames();
+  }, [updateNames]);
 
   const current = playerID === ctx.currentPlayer;
 
@@ -134,7 +138,7 @@ const Board: FC<BoardProps> = ({
           matchID={matchID}
         />
       )}
-      {G.modelType === ModelType.THREAT_DRAGON && (
+      {G.modelType === ModelType.THREAT_DRAGON && model !== undefined && (
         <Model
           model={model}
           selectedDiagram={G.selectedDiagram}
@@ -158,7 +162,7 @@ const Board: FC<BoardProps> = ({
               isInThreatStage={isInThreatStage}
             />
           </div>
-          {playerID && G.suit && (
+          {playerID && (
             <Deck
               cards={G.players[Number.parseInt(playerID)]}
               suit={G.suit}

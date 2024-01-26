@@ -2,27 +2,49 @@ import { render, screen } from '@testing-library/react';
 import { GameMode } from '../../../utils/GameMode';
 import React from 'react';
 import Threatbar from './threatbar';
+import type { GameState } from '../../../game/gameState';
+import type { Ctx } from 'boardgame.io';
+import { ModelType } from '../../../utils/constants';
 
 describe('<Threatbar>', () => {
-  const G = {
+  const G: GameState = {
     gameMode: GameMode.EOP,
     threat: {
       modal: false,
+      new: false,
     },
-    selectedDiagram: 'diagram1',
+    selectedDiagram: 0,
     selectedComponent: 'component1',
     identifiedThreats: {
       diagram1: {
         component1: {
           threat1: {
             title: 'Identified Threat 1',
+            modal: false,
+            new: false,
           },
           threat2: {
             title: 'Identified Threat 2',
+            modal: false,
+            new: false,
           },
         },
       },
     },
+    dealt: [],
+    passed: [],
+    suit: undefined,
+    dealtBy: '',
+    players: [],
+    round: 0,
+    numCardsPlayed: 0,
+    scores: [],
+    lastWinner: 0,
+    maxRounds: 0,
+    selectedThreat: '',
+    startingCard: '',
+    turnDuration: 0,
+    modelType: ModelType.IMAGE,
   };
 
   it('shows identified threats in reverse order', () => {
@@ -57,7 +79,16 @@ describe('<Threatbar>', () => {
     };
 
     render(
-      <Threatbar G={G} ctx={{}} moves={{}} active names={[]} model={model} />,
+      <Threatbar
+        G={G}
+        ctx={{} as Ctx}
+        moves={{}}
+        active
+        names={[]}
+        model={model}
+        isInThreatStage={false}
+        playerID={null}
+      />,
     );
 
     const threats = screen.getAllByText(/^Identified Threat \d+$/);
@@ -98,7 +129,16 @@ describe('<Threatbar>', () => {
     };
 
     render(
-      <Threatbar G={G} ctx={{}} moves={{}} active names={[]} model={model} />,
+      <Threatbar
+        G={G}
+        ctx={{} as Ctx}
+        moves={{}}
+        active
+        names={[]}
+        model={model}
+        isInThreatStage={false}
+        playerID={null}
+      />,
     );
 
     const threats = screen.getAllByText(/^Existing Threat \d+$/);
