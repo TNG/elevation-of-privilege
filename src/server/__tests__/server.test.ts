@@ -7,6 +7,8 @@ import {
   publicApiServer,
   publicApiServerHandle,
 } from '../server';
+import type { Server, State } from 'boardgame.io';
+import type { ThreatDragonModel } from '../../types/ThreatDragonModel';
 
 it('gameServer is not undefined', async () => {
   expect(gameServer).toBeDefined();
@@ -36,7 +38,7 @@ it('retrieves player info for a game', async () => {
     .get(`/game/${response.body.game}/players`)
     .auth('0', response.body.credentials[0]);
   expect(response.body.players.length).toBe(players);
-  response.body.players.forEach((p, i) => {
+  response.body.players.forEach((p: { name: string }, i: number) => {
     expect(p.name).toBe(names[i]);
   });
 });
@@ -118,30 +120,48 @@ it('download the final model for a game', async () => {
         },
       },
     },
-  };
+  } as State;
 
-  const metadata = {
+  const metadata: Server.MatchData = {
+    gameName: 'some game',
     players: {
-      0: { name: 'P1', credentials: 'abc123' },
-      1: { name: 'P2', credentials: '123abc' },
+      0: { id: 0, name: 'P1', credentials: 'abc123' },
+      1: { id: 1, name: 'P2', credentials: '123abc' },
     },
+    createdAt: 0,
+    updatedAt: 0,
   };
 
-  const model = {
+  const model: ThreatDragonModel = {
     summary: {
       title: 'Foo',
     },
     detail: {
       diagrams: [
         {
+          id: 0,
           diagramJson: {
             cells: [
               {
                 id: 'component-1',
+                type: 'tm.Actor',
+                hasOpenThreats: false,
                 threats: [],
+                size: { height: 0, width: 0 },
+                attrs: {},
+                angle: 0,
+                position: { x: 0, y: 0 },
+                z: 0,
               },
               {
                 id: 'component-2',
+                type: 'tm.Actor',
+                hasOpenThreats: false,
+                size: { height: 0, width: 0 },
+                attrs: {},
+                angle: 0,
+                position: { x: 0, y: 0 },
+                z: 0,
               },
             ],
           },
@@ -213,16 +233,17 @@ it('Download threat file', async () => {
         },
       },
     },
-  };
+  } as State;
 
   //Maybe I should put these jsons into a file
-  const model = {
+  const model: ThreatDragonModel = {
     summary: {
       title: '  Demo Threat Model ',
     },
     detail: {
       diagrams: [
         {
+          id: 0,
           diagramJson: {
             cells: [
               {
@@ -238,6 +259,13 @@ it('Download threat file', async () => {
                   },
                 ],
                 hasOpenThreats: true,
+                angle: 0,
+                attrs: {},
+                id: '',
+                position: { x: 0, y: 0 },
+                size: { height: 0, width: 0 },
+                type: 'tm.Actor',
+                z: 0,
               },
               {
                 threats: [
@@ -263,6 +291,13 @@ it('Download threat file', async () => {
                   },
                 ],
                 hasOpenThreats: true,
+                angle: 0,
+                attrs: {},
+                id: '',
+                position: { x: 0, y: 0 },
+                size: { height: 0, width: 0 },
+                type: 'tm.Actor',
+                z: 0,
               },
               {
                 threats: [
@@ -279,14 +314,34 @@ it('Download threat file', async () => {
                   },
                 ],
                 hasOpenThreats: false,
+                angle: 0,
+                attrs: {},
+                id: '',
+                position: { x: 0, y: 0 },
+                size: { height: 0, width: 0 },
+                type: 'tm.Actor',
+                z: 0,
               },
               {
                 hasOpenThreats: false,
+                angle: 0,
+                attrs: {},
+                id: '',
+                position: { x: 0, y: 0 },
+                size: { height: 0, width: 0 },
+                type: 'tm.Actor',
+                z: 0,
               },
               {
                 hasOpenThreats: true,
+                angle: 0,
+                attrs: {},
+                id: '',
+                position: { x: 0, y: 0 },
+                size: { height: 0, width: 0 },
+                type: 'tm.Actor',
+                z: 0,
               },
-              {},
             ],
           },
         },
@@ -294,7 +349,8 @@ it('Download threat file', async () => {
     },
   };
 
-  const metadata = {
+  const metadata: Server.MatchData = {
+    gameName: 'some game',
     players: {
       0: {
         id: 0,
@@ -307,6 +363,8 @@ it('Download threat file', async () => {
         name: 'Player 2',
       },
     },
+    createdAt: 0,
+    updatedAt: 0,
   };
 
   await gameServer.db.setState(matchID, state);
@@ -366,15 +424,15 @@ it('Download threat file', async () => {
 
 describe('authentificaton', () => {
   const endpoints = ['players', 'model', 'download', 'download/text'];
-  let matchID = null;
-  let credentials = null;
-  let spectatorCredential = null;
+  let matchID: string | null = null;
+  let credentials: string[] | null = null;
+  let spectatorCredential: string | null = null;
 
   beforeAll(async () => {
     // first create game
     const players = 3;
 
-    let response = await request(publicApiServer.callback())
+    const response = await request(publicApiServer.callback())
       .post('/game/create')
       .field('players', players)
       .field('names[]', ['P1', 'P2', 'P3'])
@@ -393,7 +451,7 @@ describe('authentificaton', () => {
     async (endpoint) => {
       // Try players
 
-      let response = await request(publicApiServer.callback()).get(
+      const response = await request(publicApiServer.callback()).get(
         `/game/${matchID}/${endpoint}`,
       );
       expect(response.status).toBe(403);
@@ -405,7 +463,7 @@ describe('authentificaton', () => {
     async (endpoint) => {
       // Try players
 
-      let response = await request(publicApiServer.callback())
+      const response = await request(publicApiServer.callback())
         .get(`/game/${matchID}/${endpoint}`)
         .auth('0', '');
       expect(response.status).toBe(403);
@@ -417,9 +475,9 @@ describe('authentificaton', () => {
     async (endpoint) => {
       // Try players
 
-      let response = await request(publicApiServer.callback())
+      const response = await request(publicApiServer.callback())
         .get(`/game/${matchID}/${endpoint}`)
-        .auth('', credentials[0]);
+        .auth('', credentials?.[0] ?? '');
       expect(response.status).toBe(403);
     },
   );
@@ -429,9 +487,9 @@ describe('authentificaton', () => {
     async (endpoint) => {
       // Try players
 
-      let response = await request(publicApiServer.callback())
+      const response = await request(publicApiServer.callback())
         .get(`/game/${matchID}/${endpoint}`)
-        .auth(0, 'thisiswrong');
+        .auth('0', 'thisiswrong');
       expect(response.status).toBe(403);
     },
   );
@@ -441,12 +499,12 @@ describe('authentificaton', () => {
     async (endpoint) => {
       // Try players
 
-      let response = await request(publicApiServer.callback())
+      const response = await request(publicApiServer.callback())
         .get(`/game/${matchID}/${endpoint}`)
         .set(
           'Authorization',
           // missing 'Basic ' prefix
-          btoa(`0:${credentials[0]}`),
+          btoa(`0:${credentials?.[0] ?? ''}`),
         );
       expect(response.status).toBe(403);
     },
@@ -457,12 +515,9 @@ describe('authentificaton', () => {
     async (endpoint) => {
       // Try players
 
-      let response = await request(publicApiServer.callback())
+      const response = await request(publicApiServer.callback())
         .get(`/game/${matchID}/${endpoint}`)
-        .set(
-          'Authorization',
-          'Basic ' + btoa(`0:${credentials[0]}`),
-        );
+        .set('Authorization', 'Basic ' + btoa(`0:${credentials?.[0] ?? ''}`));
       expect(response.status).not.toBe(403);
     },
   );
@@ -470,12 +525,11 @@ describe('authentificaton', () => {
   it.each(endpoints)(
     'is successful for correct spectator credentials provided to %s',
     async (endpoint) => {
-      let response = await request(publicApiServer.callback())
+      const response = await request(publicApiServer.callback())
         .get(`/game/${matchID}/${endpoint}`)
         .set(
           'Authorization',
-          'Basic ' +
-          btoa(`${SPECTATOR}:${spectatorCredential}`),
+          'Basic ' + btoa(`${SPECTATOR}:${spectatorCredential}`),
         );
       expect(response.status).not.toBe(403);
     },
@@ -484,13 +538,9 @@ describe('authentificaton', () => {
   it.each(endpoints)(
     'rejects wrong spectator credentials provided to %s',
     async (endpoint) => {
-      let response = await request(publicApiServer.callback())
+      const response = await request(publicApiServer.callback())
         .get(`/game/${matchID}/${endpoint}`)
-        .set(
-          'Authorization',
-          'Basic ' +
-          btoa(`${SPECTATOR}:wrongCredentials`),
-        );
+        .set('Authorization', 'Basic ' + btoa(`${SPECTATOR}:wrongCredentials`));
       expect(response.status).toBe(403);
     },
   );
