@@ -79,7 +79,7 @@
     "@types/react-dom": "^17.0.14",
     "@types/react-helmet": "^6.1.6",
     "@types/react-router-dom": "^5.3.3",
-    "@types/seedrandom": "^3.0.5",
+    "@types/seedrandom": "^3.0.8",
     "@types/superagent": "^4.1.15",
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^9.0.2",
