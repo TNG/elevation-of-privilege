@@ -26,7 +26,7 @@ describe('Status', () => {
       modal: false,
       new: false,
     },
-    identifiedThreats: {},
+    identifiedThreats: [],
     startingCard: '',
     turnDuration: 0,
     modelType: ModelType.IMAGE,

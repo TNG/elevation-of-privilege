@@ -22,9 +22,9 @@ export const DEFAULT_MODEL: ThreatDragonModel = {
     diagrams: [
       {
         title: 'Threat Modelling',
+        thumbnail: '',
         diagramType: 'STRIDE',
         id: 0,
-        $$hashKey: 'object:14',
         diagramJson: {
           cells: [
             {

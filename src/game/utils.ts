@@ -51,7 +51,7 @@ export function setupGame(
       modal: false,
       new: true,
     },
-    identifiedThreats: {},
+    identifiedThreats: [],
     startingCard: startingCard,
     gameMode: gameMode,
     turnDuration: turnDuration,
@@ -189,12 +189,12 @@ export function onTurnEnd({ G, ctx }: FnContext<GameState>): GameState {
 }
 
 function getWinner(
-  dealtCards: Card[],
+  dealtCards: (Card | null)[],
   currentSuit: Suit,
   gameMode: GameMode,
 ): number {
   const scores = dealtCards.map((card) =>
-    getCardScore(card, currentSuit, gameMode),
+    card !== null ? getCardScore(card, currentSuit, gameMode) : 0,
   );
   const winner = scores.indexOf(Math.max(...scores));
   return winner;

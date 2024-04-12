@@ -11,7 +11,7 @@ it('renders without crashing for a new threat', () => {
     scores: [0, 0, 0],
     selectedComponent: '',
     selectedDiagram: '0',
-    identifiedThreats: {},
+    identifiedThreats: [],
     threat: {
       modal: true,
       owner: '0',
@@ -42,7 +42,7 @@ it('renders without crashing for an existing threat', () => {
     scores: [0, 0, 0],
     selectedComponent: '',
     selectedDiagram: '0',
-    identifiedThreats: {},
+    identifiedThreats: [],
     threat: {
       modal: true,
       new: false,
@@ -75,7 +75,7 @@ describe('for the owner of the threat', () => {
     scores: [0, 0, 0],
     selectedComponent: '',
     selectedDiagram: '0',
-    identifiedThreats: {},
+    identifiedThreats: [],
     threat: {
       modal: true,
       owner: playerID,
@@ -251,7 +251,7 @@ describe('for players other than the owner of the threat', () => {
     scores: [0, 0, 0],
     selectedComponent: '',
     selectedDiagram: '0',
-    identifiedThreats: {},
+    identifiedThreats: [],
     threat: {
       modal: true,
       owner: ownerID,

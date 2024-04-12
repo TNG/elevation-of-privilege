@@ -2,10 +2,11 @@ import type { PlayerID } from 'boardgame.io';
 import type { GameState } from '../game/gameState';
 import type { Card, Suit } from './cardDefinitions';
 import { ModelType } from './constants';
+import type { ThreatDragonComponent } from '../types/ThreatDragonModel';
 
 export function getDealtCard(G: GameState): string {
   if (G.dealt.length > 0 && G.dealtBy) {
-    return G.dealt[Number.parseInt(G.dealtBy)];
+    return G.dealt[Number.parseInt(G.dealtBy)] ?? '';
   }
   return '';
 }
@@ -52,18 +53,18 @@ export function getPlayers(count: number): string[] {
   return players;
 }
 
-// FIXME: Improve typing of model / component
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
-export function getComponentName(component: any): string {
-  if (component === null) return '';
+export function getComponentName(
+  component: ThreatDragonComponent | undefined,
+): string {
+  if (component === undefined) return '';
 
-  const prefix = component.type.substr(3);
+  const prefix = component.type.slice(3);
 
   if (component.type === 'tm.Flow') {
-    return `${prefix}: ${component.labels[0].attrs.text.text}`;
+    return `${prefix}: ${component.labels?.[0].attrs.text.text}`;
   }
 
-  return `${prefix}: ${component.attrs.text.text}`;
+  return `${prefix}: ${component.attrs.text?.text}`;
 }
 
 export function getValidMoves(

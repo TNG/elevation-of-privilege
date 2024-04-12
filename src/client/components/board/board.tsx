@@ -18,6 +18,7 @@ import Imprint from '../footer/imprint';
 import Privacy from '../footer/privacy';
 import Banner from '../banner/banner';
 import type { GameState } from '../../../game/gameState';
+import type { ThreatDragonModel } from '../../../types/ThreatDragonModel';
 
 type BoardProps = Pick<
   BoardgameIOBoardProps<GameState>,
@@ -38,9 +39,7 @@ const Board: FC<BoardProps> = ({
 
   const [names, setNames] = useState(initialNames);
 
-  const [model, setModel] = useState<Record<string, unknown> | undefined>(
-    undefined,
-  );
+  const [model, setModel] = useState<ThreatDragonModel | undefined>(undefined);
   const apiBase =
     process.env.NODE_ENV === 'production'
       ? '/api'
@@ -86,7 +85,7 @@ const Board: FC<BoardProps> = ({
     // TODO: Type with zod and consider using react-query.
     const modelResponse = await apiGetRequest('model');
 
-    const model = modelResponse?.body as Record<string, unknown> | undefined;
+    const model = modelResponse?.body as ThreatDragonModel | undefined;
 
     setModel(model);
   }, [apiGetRequest]);

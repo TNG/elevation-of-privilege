@@ -5,18 +5,20 @@ import Threatbar from './threatbar';
 import type { GameState } from '../../../game/gameState';
 import type { Ctx } from 'boardgame.io';
 import { ModelType } from '../../../utils/constants';
+import type { ThreatDragonModel } from '../../../types/ThreatDragonModel';
 
 describe('<Threatbar>', () => {
+  const selectedDiagram = 0;
   const G: GameState = {
     gameMode: GameMode.EOP,
     threat: {
       modal: false,
       new: false,
     },
-    selectedDiagram: 0,
+    selectedDiagram,
     selectedComponent: 'component1',
-    identifiedThreats: {
-      diagram1: {
+    identifiedThreats: [
+      {
         component1: {
           threat1: {
             title: 'Identified Threat 1',
@@ -30,7 +32,7 @@ describe('<Threatbar>', () => {
           },
         },
       },
-    },
+    ],
     dealt: [],
     passed: [],
     suit: undefined,
@@ -48,33 +50,56 @@ describe('<Threatbar>', () => {
   };
 
   it('shows identified threats in reverse order', () => {
-    const model = {
+    const model: ThreatDragonModel = {
+      summary: {
+        title: 'title',
+      },
       detail: {
-        diagrams: {
-          diagram1: {
+        diagrams: [
+          {
+            id: 0,
             diagramJson: {
               cells: [
                 {
+                  size: { width: 0, height: 0 },
+                  position: { x: 0, y: 0 },
+                  angle: 0,
+                  z: 0,
                   id: 'component1',
-                  type: 'type',
+                  type: 'tm.Actor',
                   attrs: {
                     text: {
                       text: 'text',
                     },
                   },
+                  hasOpenThreats: true,
                   threats: [
                     {
                       title: 'Existing Threat 1',
+                      status: 'Open',
+                      description: '',
+                      mitigation: '',
+                      severity: '',
+                      type: '',
                     },
                     {
                       title: 'Existing Threat 2',
+                      status: 'Open',
+                      description: '',
+                      mitigation: '',
+                      severity: '',
+                      type: '',
                     },
                   ],
                 },
               ],
             },
+            diagramType: 'STRIDE',
+            size: { width: 0, height: 0 },
+            thumbnail: '',
+            title: '',
           },
-        },
+        ],
       },
     };
 
@@ -98,33 +123,56 @@ describe('<Threatbar>', () => {
   });
 
   it('shows existing threats in reverse order', () => {
-    const model = {
+    const model: ThreatDragonModel = {
+      summary: {
+        title: 'title',
+      },
       detail: {
-        diagrams: {
-          diagram1: {
+        diagrams: [
+          {
+            id: 0,
             diagramJson: {
               cells: [
                 {
+                  size: { width: 0, height: 0 },
+                  position: { x: 0, y: 0 },
+                  angle: 0,
+                  z: 0,
                   id: 'component1',
-                  type: 'type',
+                  type: 'tm.Actor',
                   attrs: {
                     text: {
                       text: 'text',
                     },
                   },
+                  hasOpenThreats: true,
                   threats: [
                     {
                       title: 'Existing Threat 1',
+                      status: 'Open',
+                      description: '',
+                      mitigation: '',
+                      severity: '',
+                      type: '',
                     },
                     {
                       title: 'Existing Threat 2',
+                      status: 'Open',
+                      description: '',
+                      mitigation: '',
+                      severity: '',
+                      type: '',
                     },
                   ],
                 },
               ],
             },
+            diagramType: 'STRIDE',
+            size: { width: 0, height: 0 },
+            thumbnail: '',
+            title: '',
           },
-        },
+        ],
       },
     };
 

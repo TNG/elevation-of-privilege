@@ -5,7 +5,7 @@ import type { GameMode } from '../utils/GameMode';
 import type { Threat } from './threat';
 
 export interface GameState {
-  dealt: string[];
+  dealt: (string | null)[];
   passed: PlayerID[];
   suit: Suit | undefined;
   dealtBy: PlayerID;
@@ -19,7 +19,7 @@ export interface GameState {
   selectedComponent: string;
   selectedThreat: string;
   threat: Threat;
-  identifiedThreats: Record<PlayerID, Record<string, Record<string, Threat>>>;
+  identifiedThreats: (Record<string, Record<string, Threat>> | null)[];
   startingCard: string;
   gameMode: GameMode;
   turnDuration: number;

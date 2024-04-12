@@ -27,7 +27,7 @@ describe('Sidebar', () => {
         modal: false,
         new: true,
       },
-      identifiedThreats: {},
+      identifiedThreats: [],
       startingCard: 'the starting card',
       gameMode: DEFAULT_GAME_MODE,
       turnDuration: 0,

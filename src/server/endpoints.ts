@@ -210,49 +210,40 @@ export const downloadThreatDragonModel =
     }
 
     // update the model with the identified threats
-    Object.keys(state.G.identifiedThreats).forEach((diagramIdx) => {
-      Object.keys(state.G.identifiedThreats[diagramIdx]).forEach(
-        (componentIdx) => {
-          const diagram =
-            model.detail.diagrams[Number.parseInt(diagramIdx)].diagramJson;
-          let cell = null;
-          for (let i = 0; i < diagram.cells.length; i++) {
-            const c = diagram.cells[i];
-            if (c.id === componentIdx) {
-              cell = c;
-              break;
-            }
-          }
-          if (cell !== null) {
-            let threats: ThreatDragonThreat[] = [];
-            if (Array.isArray(cell.threats)) {
-              threats = cell.threats;
-            }
-            Object.keys(
-              state.G.identifiedThreats[diagramIdx][componentIdx],
-            ).forEach((threatIdx) => {
-              const t =
-                state.G.identifiedThreats[diagramIdx][componentIdx][threatIdx];
+    state.G.identifiedThreats.forEach((threatsForComponent, diagramIdx) => {
+      if (threatsForComponent === null) {
+        return;
+      }
+      Object.keys(threatsForComponent).forEach((componentIdx) => {
+        const diagram = model.detail.diagrams[diagramIdx].diagramJson;
+        const cell = diagram.cells?.find((c) => c.id === componentIdx);
+
+        if (cell !== undefined) {
+          const threats: ThreatDragonThreat[] = cell.threats ?? [];
+          Object.keys(threatsForComponent[componentIdx]).forEach(
+            (threatIdx) => {
+              const t = threatsForComponent[componentIdx][threatIdx];
               threats.push({
+                description: t.description ?? '',
+                mitigation: t.mitigation ?? '',
+                modelType: getMethodologyName(state.G.gameMode),
+                severity: t.severity ?? '',
                 status: 'Open',
-                severity: t.severity,
-                id: t.id,
-                methodology: getMethodologyName(state.G.gameMode),
+                title: t.title ?? '',
                 type: getSuitDisplayName(state.G.gameMode, t.type),
-                title: t.title,
-                description: t.description,
-                mitigation: t.mitigation,
+
                 owner:
                   t.owner !== undefined
                     ? game.metadata.players[Number.parseInt(t.owner)]?.name
                     : undefined,
+                id: t.id,
                 game: matchID,
               });
-            });
-            cell.threats = threats;
-          }
-        },
-      );
+            },
+          );
+          cell.threats = threats;
+        }
+      });
     });
 
     const modelTitle = model.summary.title.replace(' ', '-');
@@ -356,7 +347,7 @@ function getThreats(
   //add threats from model
   if (model) {
     model.detail.diagrams.forEach((diagram) => {
-      diagram.diagramJson.cells.forEach((cell) => {
+      diagram.diagramJson.cells?.forEach((cell) => {
         if (cell.threats !== undefined) {
           threats.push(...cell.threats);
         }

@@ -17,8 +17,6 @@ import {
   CardText,
   Col,
   Collapse,
-  ListGroup,
-  ListGroupItem,
   Row,
 } from 'reactstrap';
 import confirm from 'reactstrap-confirm';
@@ -28,10 +26,13 @@ import ThreatModal from '../threatmodal/threatmodal';
 import './threatbar.css';
 import type { GameState } from '../../../game/gameState';
 import type { BoardProps } from 'boardgame.io/react';
-import type { Threat } from '../../../game/threat';
+import type {
+  ThreatDragonModel,
+  ThreatDragonThreat,
+} from '../../../types/ThreatDragonModel';
 
 type ThreatbarProps = {
-  model?: Record<string, any>; // TODO: improve
+  model?: ThreatDragonModel;
   active: boolean;
   names: string[];
   isInThreatStage: boolean;
@@ -49,69 +50,29 @@ const Threatbar: FC<ThreatbarProps> = ({
 }) => {
   const getSelectedComponent = () => {
     if (G.selectedComponent === '' || model === undefined) {
-      return null;
+      return undefined;
     }
 
     const diagram = model.detail.diagrams[G.selectedDiagram].diagramJson;
-    for (let i = 0; i < diagram.cells.length; i++) {
-      const cell = diagram.cells[i];
-      if (cell.id === G.selectedComponent) {
-        console.log("Cell:", cell);
-        return cell;
-      }
-    }
-
-    return null;
+    return diagram.cells?.find((cell) => cell.id === G.selectedComponent);
   };
 
-  const getThreatsForSelectedComponent = (): Threat[] => {
-    const threats: Threat[] = [];
-    if (G.selectedComponent === '' || model === undefined) {
-      return threats;
-    }
+  const getThreatsForSelectedComponent = (): ThreatDragonThreat[] => {
+    const component = getSelectedComponent();
 
-    const diagram = model.detail.diagrams[G.selectedDiagram].diagramJson;
-    for (let i = 0; i < diagram.cells.length; i++) {
-      const cell = diagram.cells[i];
-      if (G.selectedComponent !== '') {
-        if (cell.id === G.selectedComponent) {
-          if (Array.isArray(cell.threats)) {
-            // fix threat ids
-            for (let j = 0; j < cell.threats.length; j++) {
-              if (!('id' in cell.threats[j])) {
-                cell.threats[j].id = j + '';
-              }
-            }
-            return cell.threats;
-          }
-        }
-      } else {
-        /*
-        if (Array.isArray(cell.threats)) {
-          threats = threats.concat(cell.threats);
-        }
-        */
-      }
-    }
-    return threats;
+    return (
+      component?.threats?.map((threat, index) => ({
+        ...threat,
+        // add ids if they are missing
+        id: threat.id ?? `${index}`,
+      })) ?? []
+    );
   };
 
-  const getIdentifiedThreatsForSelectedComponent = () => {
-    const threats = [];
-    if (G.selectedDiagram in G.identifiedThreats) {
-      if (G.selectedComponent in G.identifiedThreats[G.selectedDiagram]) {
-        for (const k in G.identifiedThreats[G.selectedDiagram][
-          G.selectedComponent
-        ]) {
-          const t =
-            G.identifiedThreats[G.selectedDiagram][G.selectedComponent][k];
-          threats.push(t);
-        }
-      }
-    }
-
-    return threats;
-  };
+  const getIdentifiedThreatsForSelectedComponent = () =>
+    Object.values(
+      G.identifiedThreats[G.selectedDiagram]?.[G.selectedComponent] ?? {},
+    );
 
   const threats = getThreatsForSelectedComponent().reverse();
   const identifiedThreats =
@@ -145,29 +106,6 @@ const Threatbar: FC<ThreatbarProps> = ({
               <FontAwesomeIcon icon={faPlus} /> Add Threat
             </Button>
           )}
-          <div hidden={component !== null && component.type !== 'tm.Flow'}>
-            <hr />
-            <Card>
-              <CardHeader>Flow Data Elements</CardHeader>
-              <ListGroup flush>
-                {component !== null &&
-                  Array.isArray(component.dataElements) &&
-                  component.dataElements.map((val: any, idx: number) => {
-                    console.log("data elements: ", val, idx);
-                    return (
-                      <ListGroupItem className="thin-list-group-item" key={idx}>
-                        {val}
-                      </ListGroupItem>
-                    );
-                  })}
-                {component !== null && !Array.isArray(component.dataElements) && (
-                  <ListGroupItem>
-                    <em>No data elements defined</em>
-                  </ListGroupItem>
-                )}
-              </ListGroup>
-            </Card>
-          </div>
           <hr />
           {identifiedThreats.map((val, idx) => (
             <Card key={idx}>
@@ -241,7 +179,7 @@ const Threatbar: FC<ThreatbarProps> = ({
             </em>
           )}
           <hr />
-          {threats.map((val: Threat, idx: number) => (
+          {threats.map((val: ThreatDragonThreat, idx: number) => (
             <Card key={idx}>
               <CardHeader
                 className="hoverable"

@@ -21,7 +21,7 @@ const G: GameState = {
   dealt: [],
   players: [['T3', 'T4', 'T5']],
   scores: [0, 0, 0],
-  identifiedThreats: {},
+  identifiedThreats: [],
   selectedDiagram: 0,
   selectedComponent: '',
   threat: {

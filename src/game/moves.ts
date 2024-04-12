@@ -159,7 +159,7 @@ export const deleteThreat: MoveFn<GameState> = (
   scores[Number.parseInt(playerID)]--;
 
   const identifiedThreats = _.cloneDeep(G.identifiedThreats);
-  delete identifiedThreats[G.selectedDiagram][G.selectedComponent][threat.id];
+  delete identifiedThreats[G.selectedDiagram]?.[G.selectedComponent][threat.id];
 
   return {
     ...G,
@@ -191,32 +191,19 @@ export const addOrUpdateThreat: MoveFn<GameState> = ({ G, playerID }) => {
     scores[Number.parseInt(playerID)]++;
   }
 
-  // TODO: have a cleaner or readable approach to updating this object
-  const identifiedThreats = _.cloneDeep(G.identifiedThreats);
-
-  // Are these necessary
-  if (!(G.selectedDiagram in identifiedThreats)) {
-    Object.assign(identifiedThreats, { [G.selectedDiagram]: {} });
-  }
-
-  if (!(G.selectedComponent in identifiedThreats[G.selectedDiagram])) {
-    Object.assign(identifiedThreats[G.selectedDiagram], {
-      [G.selectedComponent]: {},
-    });
-  }
-
-  //is object.assign required here?
-  Object.assign(identifiedThreats[G.selectedDiagram][G.selectedComponent], {
-    [G.threat.id]: {
-      id: G.threat.id,
-      owner: G.threat.owner,
-      title: threatTitle,
-      type: G.threat.type,
-      severity: G.threat.severity,
-      description: threatDescription,
-      mitigation: threatMitigation || 'No mitigation provided.',
+  const identifiedThreats = [...G.identifiedThreats];
+  identifiedThreats[G.selectedDiagram] = {
+    ...identifiedThreats[G.selectedDiagram],
+    [G.selectedComponent]: {
+      ...G.identifiedThreats[G.selectedDiagram]?.[G.selectedComponent],
+      [G.threat.id]: {
+        ...G.threat,
+        title: threatTitle,
+        description: threatDescription,
+        mitigation: threatMitigation || 'No mitigation provided.',
+      },
     },
-  });
+  };
 
   return {
     ...G,
@@ -232,27 +219,25 @@ export const addOrUpdateThreat: MoveFn<GameState> = ({ G, playerID }) => {
 
 export const draw: MoveFn<GameState> = ({ G, ctx, events }, card: string) => {
   const deck = [...G.players[Number.parseInt(ctx.currentPlayer)]];
-  let suit = G.suit;
+  const suit = G.suit;
 
   // check if the move is valid
   if (!getValidMoves(deck, suit, G.round, G.startingCard).includes(card)) {
     return INVALID_MOVE;
   }
 
-  let dealtBy = G.dealtBy;
   const index = deck.indexOf(card);
   deck.splice(index, 1);
 
   const dealt = [...G.dealt];
-  let numCardsPlayed = G.numCardsPlayed;
 
   dealt[parseInt(ctx.currentPlayer)] = card;
-  numCardsPlayed++;
+  const numCardsPlayed = G.numCardsPlayed + 1;
 
   // only update the suit if no suit exists
-  if (!suit) suit = card.slice(0, 1) as Suit;
+  const newSuit = suit ?? (card.slice(0, 1) as Suit);
 
-  dealtBy = ctx.currentPlayer;
+  const dealtBy = ctx.currentPlayer;
 
   // move into threats stage
   events?.setActivePlayers?.({ all: 'threats' });
@@ -260,7 +245,7 @@ export const draw: MoveFn<GameState> = ({ G, ctx, events }, card: string) => {
   return {
     ...G,
     dealt,
-    suit,
+    suit: newSuit,
     numCardsPlayed,
     dealtBy,
     players: {
