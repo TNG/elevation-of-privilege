@@ -62,8 +62,8 @@ class ThreatModal extends React.Component {
       this.props.moves.updateThreat('mitigation', 'No mitigation provided.');
     }
 
-    if (this.isPrivacyEnhancedMode) {
-      this.props.moves.updateThreat('description', 'Threat');
+    if (!this.props.G.threat.description) {
+      this.props.moves.updateThreat('description', 'No description provided.');
     }
   }
 
@@ -81,11 +81,7 @@ class ThreatModal extends React.Component {
   }
 
   get isInvalid() {
-    if (this.isPrivacyEnhancedMode) {
-      return _.isEmpty(this.state.title);
-    }
-
-    return _.isEmpty(this.state.description) || _.isEmpty(this.state.title);
+    return _.isEmpty(this.state.title);
   }
 
   get isOwner() {
