@@ -201,7 +201,6 @@ const Board: FC<BoardProps> = ({
       />
       <Threatbar
         G={G}
-        ctx={ctx}
         playerID={playerID}
         model={model}
         names={names}

@@ -3,7 +3,6 @@ import { GameMode } from '../../../utils/GameMode';
 import React from 'react';
 import Threatbar from './threatbar';
 import type { GameState } from '../../../game/gameState';
-import type { Ctx } from 'boardgame.io';
 import { ModelType } from '../../../utils/constants';
 import type { ThreatDragonModel } from '../../../types/ThreatDragonModel';
 
@@ -106,7 +105,6 @@ describe('<Threatbar>', () => {
     render(
       <Threatbar
         G={G}
-        ctx={{} as Ctx}
         moves={{}}
         active
         names={[]}
@@ -179,7 +177,6 @@ describe('<Threatbar>', () => {
     render(
       <Threatbar
         G={G}
-        ctx={{} as Ctx}
         moves={{}}
         active
         names={[]}

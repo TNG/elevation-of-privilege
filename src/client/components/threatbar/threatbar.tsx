@@ -36,13 +36,12 @@ type ThreatbarProps = {
   active: boolean;
   names: string[];
   isInThreatStage: boolean;
-} & Pick<BoardProps<GameState>, 'G' | 'ctx' | 'moves' | 'playerID'>;
+} & Pick<BoardProps<GameState>, 'G' | 'moves' | 'playerID'>;
 
 const Threatbar: FC<ThreatbarProps> = ({
   playerID,
   model,
   G,
-  ctx,
   moves,
   active,
   names,
@@ -220,7 +219,6 @@ const Threatbar: FC<ThreatbarProps> = ({
       <ThreatModal
         isOpen={G.threat.modal}
         G={G}
-        ctx={ctx}
         playerID={playerID}
         moves={moves}
         names={names}
