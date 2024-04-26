@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ThreatModal from './threatmodal';
 import { DEFAULT_GAME_MODE } from '../../../utils/GameMode';
+import userEvent from '@testing-library/user-event';
 
 it('renders without crashing for a new threat', () => {
   const G = {
@@ -123,7 +124,7 @@ describe('for the owner of the threat', () => {
     screen.getByText('Cancel');
   });
 
-  it('calls the toggleModal move when the close button is clicked', () => {
+  it('calls the toggleModal move when the close button is clicked', async () => {
     // given
     const toggleModal = jest.fn();
     render(
@@ -142,13 +143,13 @@ describe('for the owner of the threat', () => {
     const close = screen.getByText('×');
 
     // when
-    fireEvent.click(close);
+    await userEvent.click(close);
 
     // then
     expect(toggleModal).toHaveBeenCalledTimes(1);
   });
 
-  it('calls the toggleModal move when the cancel button is clicked', () => {
+  it('calls the toggleModal move when the cancel button is clicked', async () => {
     // given
     const toggleModal = jest.fn();
     render(
@@ -167,13 +168,13 @@ describe('for the owner of the threat', () => {
     const cancel = screen.getByText('Cancel');
 
     // when
-    fireEvent.click(cancel);
+    await userEvent.click(cancel);
 
     // then
     expect(toggleModal).toHaveBeenCalledTimes(1);
   });
 
-  it('calls the the updateThreat move when the title is changed and unfocused', () => {
+  it('calls the the updateThreat move when the title is changed and unfocused', async () => {
     // given
     const addOrUpdateThreat = jest.fn();
     const updateThreat = jest.fn();
@@ -192,18 +193,20 @@ describe('for the owner of the threat', () => {
     );
 
     const title = screen.getByLabelText('Title');
+    const description = screen.getByLabelText('Description');
 
     // when
-    fireEvent.focus(title);
-    fireEvent.change(title, { target: { value: 'Some Threat Title' } });
-    fireEvent.blur(title);
+    const user = userEvent.setup();
+    await user.tripleClick(title);
+    await user.keyboard('Some Threat Title');
+    await user.tripleClick(description);
 
     // then
     expect(updateThreat).toHaveBeenCalledTimes(1);
     expect(updateThreat).toHaveBeenCalledWith('title', 'Some Threat Title');
   });
 
-  it('calls the addOrUpdateThreat move when the save button is clicked', () => {
+  it('calls the addOrUpdateThreat move when the save button is clicked', async () => {
     // given
     const addOrUpdateThreat = jest.fn();
     const updateThreat = jest.fn();
@@ -225,17 +228,14 @@ describe('for the owner of the threat', () => {
     const description = screen.getByLabelText('Description');
     const save = screen.getByText('Save');
 
-    fireEvent.focus(title);
-    fireEvent.change(title, { target: { value: 'Some Threat Title' } });
-    fireEvent.blur(title);
-    fireEvent.focus(description);
-    fireEvent.change(description, {
-      target: { value: 'Some Description' },
-    });
-    fireEvent.blur(description);
+    const user = userEvent.setup();
+    await user.tripleClick(title);
+    await user.keyboard('Some Threat Title');
+    await user.tripleClick(description);
+    await user.keyboard('Some Description');
 
     // when
-    fireEvent.click(save);
+    await userEvent.click(save);
 
     // then
     expect(addOrUpdateThreat).toHaveBeenCalledTimes(1);
