@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import fireEvent from '@testing-library/user-event';
+import userEvent from '@testing-library/user-event';
 
 import CopyButton from './copybutton';
 import * as utils from '../../utils/utils';
@@ -30,7 +30,7 @@ describe('CopyButton', () => {
     const button = await screen.findByRole('button', { name: 'Button Text' });
 
     // when
-    await fireEvent.click(button);
+    await userEvent.click(button);
 
     // then
     expect(copyToClipboardSpy).toHaveBeenCalledWith('Hello, world!');
