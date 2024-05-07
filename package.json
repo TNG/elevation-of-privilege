@@ -30,7 +30,7 @@
     "react-scripts": "^5.0.1",
     "reactstrap": "^8.10.1",
     "reactstrap-confirm": "^1.3.2",
-    "superagent": "^8.0.9",
+    "superagent": "^9.0.2",
     "uuid": "^9.0.0"
   },
   "type": "module",
