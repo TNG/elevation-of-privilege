@@ -4,6 +4,7 @@ export enum GameMode {
   EOP = 'Elevation of Privilege',
   CORNUCOPIA = 'OWASP Cornucopia',
   CUMULUS = 'OWASP Cumulus',
+  EOMLSEC = 'Elevation of MLsec',
 }
 
 export const DEFAULT_GAME_MODE = GameMode.EOP;
@@ -17,14 +18,25 @@ export function getCardCssClass(gameMode: GameMode, c: Card): string {
     return `cumulus-card cumulus-card-img-${c.toLowerCase()}`;
   }
 
+  if (isGameModeElevationOfMlSec(gameMode)) {
+    return `eomlsec-card eomlsec-card-img-${c.toLowerCase()}`
+  }
+
   return `eop-card eop-card-img-${c.toLowerCase()}`;
 }
+
 function isGameMode(value: GameMode): value is GameMode {
   return Object.values(GameMode).includes(value);
 }
+
 function isGameModeCornucopia(gameMode: GameMode): boolean {
   return isGameMode(gameMode) && gameMode === GameMode.CORNUCOPIA;
 }
+
 function isGameModeCumulus(gameMode: GameMode): boolean {
   return isGameMode(gameMode) && gameMode === GameMode.CUMULUS;
+}
+
+function isGameModeElevationOfMlSec(gameMode: GameMode): boolean {
+  return isGameMode(gameMode) && gameMode === GameMode.EOMLSEC;
 }

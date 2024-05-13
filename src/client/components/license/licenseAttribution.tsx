@@ -52,6 +52,19 @@ const LicenseAttribution: React.FC<LicenseAttributionProps> = ({
         </div>
       );
 
+      case GameMode.EOMLSEC:
+        return (
+          <div className="license-attribution">
+          The card game <a href="https://github.com/kantega/elevation-of-mlsec">Elevation of MLsec</a> by{' '}
+          <a href="https://www.kantega.no/">
+            Kantega AS
+          </a>{' '}
+          is licensed under{' '}
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0 DEED</a>.
+        </div>
+        );
+      
+
     default:
       return <></>;
   }

@@ -21,4 +21,10 @@ describe('licence attribution', () => {
 
     screen.getByText('CC-BY-4.0');
   });
+
+  it('gives the correct license for Elevation of MLSec', () => {
+    render(<LicenseAttribution gameMode={GameMode.EOMLSEC} />);
+
+    screen.getByText('CC BY-SA 4.0 DEED');
+  });
 });

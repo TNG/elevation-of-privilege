@@ -12,6 +12,7 @@ import '../styles/eop_cards.css';
 import '../styles/cornucopia_cards.css';
 import 'cornucopia-cards-modified/style.css';
 import '../styles/cumulus_cards.css';
+import '../styles/eomlsec_cards.css';
 
 const url =
   window.location.protocol +
