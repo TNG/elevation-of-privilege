@@ -284,8 +284,8 @@ export const downloadThreatsMarkdownFile =
           ? game.model?.summary.title.trim().replaceAll(' ', '-')
           : ``
         : game.state.G.gameMode
-        ? game.state.G.gameMode.trim().replaceAll(' ', '')
-        : ``;
+          ? game.state.G.gameMode.trim().replaceAll(' ', '')
+          : ``;
     const timestamp = new Date().toISOString().replaceAll(':', '-');
     const date = new Date().toLocaleString();
     const filename = `threats-${modelTitle}-${timestamp}.md`;
