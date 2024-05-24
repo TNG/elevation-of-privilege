@@ -84,7 +84,7 @@
     "@types/react-helmet": "^6.1.11",
     "@types/react-router-dom": "^5.3.3",
     "@types/seedrandom": "^3.0.8",
-    "@types/superagent": "^4.1.15",
+    "@types/superagent": "^8.1.7",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^9.0.2",
     "eslint": "^8.38.0",
