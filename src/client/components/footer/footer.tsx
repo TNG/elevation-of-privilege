@@ -25,9 +25,11 @@ const Footer: FC<FooterProps> = ({ short }) => (
           <a href="https://www.tngtech.com/en/">TNG Technology Consulting</a> -
           Elevation of Privilege was originally invented at Microsoft,
           Cornucopia was developed at OWASP, Cumulus was started at{' '}
-          <a href="https://www.tngtech.com/en/">TNG Technology Consulting</a>.
+          <a href="https://www.tngtech.com/en/">TNG Technology Consulting</a>,
+	  Elevation of MLsec was developed at {' '} 
+          <a href="https://www.kantega.no/">Kantega AS</a>.
         </span>
-        <div className="footer-container">
+        <div className='footer-container'>
           <Imprint />
           <Privacy />
         </div>
