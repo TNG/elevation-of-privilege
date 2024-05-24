@@ -10,9 +10,9 @@ import type { GameMode } from '../../../utils/GameMode';
 import './leaderboard.css';
 
 type LeaderboardProps = {
-  scores: Array<number>;
-  names: Array<string>;
-  cards: Array<EOPCard>;
+  scores: number[];
+  names: string[];
+  cards: (EOPCard | null)[];
   playerID: PlayerID;
   passedUsers: Array<PlayerID>;
   gameMode: GameMode;
@@ -57,7 +57,9 @@ const Leaderboard: FC<LeaderboardProps> = ({
                 {hasPassed(idx) && <div className="check-mark">&#10003;</div>}
               </td>
               <td>
-                <strong>{getCardDisplayName(gameMode, cards[idx])}</strong>
+                <strong>
+                  {getCardDisplayName(gameMode, cards[idx] ?? undefined)}
+                </strong>
               </td>
               <td>
                 <Badge>{val}</Badge>

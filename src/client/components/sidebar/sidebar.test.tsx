@@ -1,4 +1,3 @@
-import '@testing-library/jest-dom';
 import React from 'react';
 import Sidebar from './sidebar';
 import { DEFAULT_GAME_MODE } from '../../../utils/GameMode';
@@ -28,7 +27,7 @@ describe('Sidebar', () => {
         modal: false,
         new: true,
       },
-      identifiedThreats: {},
+      identifiedThreats: [],
       startingCard: 'the starting card',
       gameMode: DEFAULT_GAME_MODE,
       turnDuration: 0,

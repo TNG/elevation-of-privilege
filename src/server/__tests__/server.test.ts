@@ -82,8 +82,8 @@ it('download the final model for a game', async () => {
     G: {
       modelType: ModelType.THREAT_DRAGON,
       gameMode: GameMode.EOP,
-      identifiedThreats: {
-        0: {
+      identifiedThreats: [
+        {
           'component-1': {
             'threat-1': {
               id: '0',
@@ -118,7 +118,7 @@ it('download the final model for a game', async () => {
             },
           },
         },
-      },
+      ],
     },
   } as State;
 
@@ -165,6 +165,10 @@ it('download the final model for a game', async () => {
               },
             ],
           },
+          diagramType: 'STRIDE',
+          size: { width: 0, height: 0 },
+          thumbnail: '',
+          title: '',
         },
       ],
     },
@@ -194,8 +198,8 @@ it('Download threat file', async () => {
     G: {
       modelType: ModelType.THREAT_DRAGON,
       gameMode: GameMode.EOP,
-      identifiedThreats: {
-        0: {
+      identifiedThreats: [
+        {
           'component-1': {
             'threat-1': {
               id: '0',
@@ -231,7 +235,7 @@ it('Download threat file', async () => {
             },
           },
         },
-      },
+      ],
     },
   } as State;
 
@@ -344,6 +348,10 @@ it('Download threat file', async () => {
               },
             ],
           },
+          diagramType: 'STRIDE',
+          size: { width: 0, height: 0 },
+          thumbnail: '',
+          title: '',
         },
       ],
     },

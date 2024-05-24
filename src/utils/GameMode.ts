@@ -19,7 +19,7 @@ export function getCardCssClass(gameMode: GameMode, c: Card): string {
   }
 
   if (isGameModeElevationOfMlSec(gameMode)) {
-    return `eomlsec-card eomlsec-card-img-${c.toLowerCase()}`
+    return `eomlsec-card eomlsec-card-img-${c.toLowerCase()}`;
   }
 
   return `eop-card eop-card-img-${c.toLowerCase()}`;

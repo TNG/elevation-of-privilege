@@ -41,10 +41,7 @@ export function setupGame(
     round: 1,
     numCardsPlayed: 0,
     scores,
-    lastWinner: getPlayerHoldingStartingCard(
-      handsPerPlayers,
-      startingCard,
-    ) as number,
+    lastWinner: getPlayerHoldingStartingCard(handsPerPlayers, startingCard),
     maxRounds: getNumberOfCardsPerHand(handsPerPlayers),
     selectedDiagram: 0,
     // as image models or links don't have components, put a dummy id here to treat the entire image as selected
@@ -54,7 +51,7 @@ export function setupGame(
       modal: false,
       new: true,
     },
-    identifiedThreats: {},
+    identifiedThreats: [],
     startingCard: startingCard,
     gameMode: gameMode,
     turnDuration: turnDuration,
@@ -192,12 +189,12 @@ export function onTurnEnd({ G, ctx }: FnContext<GameState>): GameState {
 }
 
 function getWinner(
-  dealtCards: Card[],
+  dealtCards: (Card | null)[],
   currentSuit: Suit,
   gameMode: GameMode,
 ): number {
   const scores = dealtCards.map((card) =>
-    getCardScore(card, currentSuit, gameMode),
+    card !== null ? getCardScore(card, currentSuit, gameMode) : 0,
   );
   const winner = scores.indexOf(Math.max(...scores));
   return winner;

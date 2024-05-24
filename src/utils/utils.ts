@@ -2,10 +2,11 @@ import type { PlayerID } from 'boardgame.io';
 import type { GameState } from '../game/gameState';
 import type { Card, Suit } from './cardDefinitions';
 import { ModelType } from './constants';
+import type { ThreatDragonComponent } from '../types/ThreatDragonModel';
 
 export function getDealtCard(G: GameState): string {
   if (G.dealt.length > 0 && G.dealtBy) {
-    return G.dealt[Number.parseInt(G.dealtBy)];
+    return G.dealt[Number.parseInt(G.dealtBy)] ?? '';
   }
   return '';
 }
@@ -13,12 +14,14 @@ export function getDealtCard(G: GameState): string {
 export function resolvePlayerNames(
   players: PlayerID[],
   names: string[],
-  current: PlayerID,
+  current: PlayerID | null,
 ): string[] {
   const resolved = [];
   for (let i = 0; i < players.length; i++) {
     const c = Number.parseInt(players[i]);
-    resolved.push(c === Number.parseInt(current) ? 'You' : names[c]);
+    resolved.push(
+      current !== null && c === Number.parseInt(current) ? 'You' : names[c],
+    );
   }
   return resolved;
 }
@@ -26,9 +29,10 @@ export function resolvePlayerNames(
 export function resolvePlayerName(
   player: PlayerID,
   names: string[],
-  current: PlayerID,
+  current: PlayerID | null,
 ): string {
-  return Number.parseInt(player) === Number.parseInt(current)
+  return current !== null &&
+    Number.parseInt(player) === Number.parseInt(current)
     ? 'You'
     : names[Number.parseInt(player)];
 }
@@ -49,18 +53,18 @@ export function getPlayers(count: number): string[] {
   return players;
 }
 
-// FIXME: Improve typing of model / component
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
-export function getComponentName(component: any): string {
-  if (component === null) return '';
+export function getComponentName(
+  component: ThreatDragonComponent | undefined,
+): string {
+  if (component === undefined) return '';
 
-  const prefix = component.type.substr(3);
+  const prefix = component.type.slice(3);
 
   if (component.type === 'tm.Flow') {
-    return `${prefix}: ${component.labels[0].attrs.text.text}`;
+    return `${prefix}: ${component.labels?.[0].attrs.text.text}`;
   }
 
-  return `${prefix}: ${component.attrs.text.text}`;
+  return `${prefix}: ${component.attrs.text?.text}`;
 }
 
 export function getValidMoves(

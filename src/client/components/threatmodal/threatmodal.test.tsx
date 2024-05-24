@@ -1,102 +1,83 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import ThreatModal from './threatmodal';
 import { DEFAULT_GAME_MODE } from '../../../utils/GameMode';
-import userEvent from '@testing-library/user-event';
+import type { GameState } from '../../../game/gameState';
+import { ModelType } from '../../../utils/constants';
+
+const baseG: GameState = {
+  dealt: ['T1'],
+  scores: [0, 0, 0],
+  selectedComponent: '',
+  selectedDiagram: 0,
+  identifiedThreats: [],
+  threat: {
+    modal: true,
+    new: true,
+    owner: '0',
+  },
+  gameMode: DEFAULT_GAME_MODE,
+  passed: [],
+  suit: undefined,
+  dealtBy: '',
+  players: [],
+  round: 0,
+  numCardsPlayed: 0,
+  lastWinner: 0,
+  maxRounds: 0,
+  selectedThreat: '',
+  startingCard: '',
+  turnDuration: 0,
+  modelType: ModelType.IMAGE,
+};
+
+const moves = {};
 
 it('renders without crashing for a new threat', () => {
-  const G = {
-    dealt: ['T1'],
-    order: [0, 1, 2],
-    scores: [0, 0, 0],
-    selectedComponent: '',
-    selectedDiagram: '0',
-    identifiedThreats: {},
-    threat: {
-      modal: true,
-      owner: '0',
-    },
-    gameMode: DEFAULT_GAME_MODE,
-  };
-  const ctx = {};
   const moves = {};
 
   render(
     <ThreatModal
-      isOpen
-      G={G}
-      ctx={ctx}
-      model={null}
-      moves={moves}
-      active={true}
-      names={['P1', 'P2', 'P3']}
       playerID="0"
+      G={baseG}
+      moves={moves}
+      names={['P1', 'P2', 'P3']}
+      isOpen
     />,
   );
 });
 
 it('renders without crashing for an existing threat', () => {
-  const G = {
-    dealt: ['T1'],
-    order: [0, 1, 2],
-    scores: [0, 0, 0],
-    selectedComponent: '',
-    selectedDiagram: '0',
-    identifiedThreats: {},
-    threat: {
-      modal: true,
-      new: false,
-      owner: '0',
-    },
-    gameMode: DEFAULT_GAME_MODE,
-  };
-  const ctx = {};
-  const moves = {};
+  const G: GameState = { ...baseG, threat: { ...baseG.threat, new: false } };
 
   render(
     <ThreatModal
-      isOpen
-      G={G}
-      ctx={ctx}
-      model={null}
-      moves={moves}
-      active={true}
-      names={['P1', 'P2', 'P3']}
       playerID="0"
+      G={G}
+      moves={moves}
+      names={['P1', 'P2', 'P3']}
+      isOpen
     />,
   );
 });
 
 describe('for the owner of the threat', () => {
   const playerID = '0';
-  const G = {
-    dealt: ['T1'],
-    order: [0, 1, 2],
-    scores: [0, 0, 0],
-    selectedComponent: '',
-    selectedDiagram: '0',
-    identifiedThreats: {},
-    threat: {
-      modal: true,
-      owner: playerID,
-    },
-    gameMode: DEFAULT_GAME_MODE,
+  const G: GameState = {
+    ...baseG,
+    threat: { ...baseG.threat, owner: playerID },
   };
-  const ctx = {};
-  const moves = {};
 
   it('renders a close button', () => {
     // when
     render(
       <ThreatModal
-        isOpen
-        G={G}
-        ctx={ctx}
-        model={null}
-        moves={moves}
-        active={true}
-        names={['P1', 'P2', 'P3']}
         playerID={playerID}
+        G={G}
+        moves={moves}
+        names={['P1', 'P2', 'P3']}
+        isOpen
       />,
     );
 
@@ -108,14 +89,11 @@ describe('for the owner of the threat', () => {
     // when
     render(
       <ThreatModal
-        isOpen
-        G={G}
-        ctx={ctx}
-        model={null}
-        moves={moves}
-        active={true}
-        names={['P1', 'P2', 'P3']}
         playerID={playerID}
+        G={G}
+        moves={moves}
+        names={['P1', 'P2', 'P3']}
+        isOpen
       />,
     );
 
@@ -129,14 +107,11 @@ describe('for the owner of the threat', () => {
     const toggleModal = jest.fn();
     render(
       <ThreatModal
-        isOpen
-        G={G}
-        ctx={ctx}
-        model={null}
-        moves={{ toggleModal }}
-        active={true}
-        names={['P1', 'P2', 'P3']}
         playerID={playerID}
+        G={G}
+        moves={{ toggleModal }}
+        names={['P1', 'P2', 'P3']}
+        isOpen
       />,
     );
 
@@ -154,14 +129,11 @@ describe('for the owner of the threat', () => {
     const toggleModal = jest.fn();
     render(
       <ThreatModal
-        isOpen
-        G={G}
-        ctx={ctx}
-        model={null}
-        moves={{ toggleModal }}
-        active={true}
-        names={['P1', 'P2', 'P3']}
         playerID={playerID}
+        G={G}
+        moves={{ toggleModal }}
+        names={['P1', 'P2', 'P3']}
+        isOpen
       />,
     );
 
@@ -181,14 +153,11 @@ describe('for the owner of the threat', () => {
 
     render(
       <ThreatModal
-        isOpen
-        G={G}
-        ctx={ctx}
-        model={null}
-        moves={{ addOrUpdateThreat, updateThreat }}
-        active={true}
-        names={['P1', 'P2', 'P3']}
         playerID={playerID}
+        G={G}
+        moves={{ addOrUpdateThreat, updateThreat }}
+        names={['P1', 'P2', 'P3']}
+        isOpen
       />,
     );
 
@@ -213,14 +182,11 @@ describe('for the owner of the threat', () => {
 
     render(
       <ThreatModal
-        isOpen
-        G={G}
-        ctx={ctx}
-        model={null}
-        moves={{ addOrUpdateThreat, updateThreat }}
-        active={true}
-        names={['P1', 'P2', 'P3']}
         playerID={playerID}
+        G={G}
+        moves={{ addOrUpdateThreat, updateThreat }}
+        names={['P1', 'P2', 'P3']}
+        isOpen
       />,
     );
 
@@ -245,58 +211,45 @@ describe('for the owner of the threat', () => {
 describe('for players other than the owner of the threat', () => {
   const playerID = '0';
   const ownerID = '1';
-  const G = {
-    dealt: ['T1'],
-    order: [0, 1, 2],
-    scores: [0, 0, 0],
-    selectedComponent: '',
-    selectedDiagram: '0',
-    identifiedThreats: {},
+
+  const G: GameState = {
+    ...baseG,
     threat: {
-      modal: true,
+      ...baseG.threat,
       owner: ownerID,
     },
-    gameMode: DEFAULT_GAME_MODE,
   };
-  const ctx = {};
-  const moves = {};
 
   it('does not render a close button', () => {
     // when
     render(
       <ThreatModal
-        isOpen
-        G={G}
-        ctx={ctx}
-        model={null}
-        moves={moves}
-        active={true}
-        names={['P1', 'P2', 'P3']}
         playerID={playerID}
+        G={G}
+        moves={moves}
+        names={['P1', 'P2', 'P3']}
+        isOpen
       />,
     );
 
     // then
-    expect(screen.queryByText('×')).toBeNull();
+    expect(screen.queryByText('×')).not.toBeInTheDocument();
   });
 
   it('does not render save and cancel buttons', () => {
     // when
     render(
       <ThreatModal
-        isOpen
-        G={G}
-        ctx={ctx}
-        model={null}
-        moves={moves}
-        active={true}
-        names={['P1', 'P2', 'P3']}
         playerID={playerID}
+        G={G}
+        moves={moves}
+        names={['P1', 'P2', 'P3']}
+        isOpen
       />,
     );
 
     // then
-    expect(screen.queryByText('Save')).toBeNull();
-    expect(screen.queryByText('Cancel')).toBeNull();
+    expect(screen.queryByText('Save')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cancel')).not.toBeInTheDocument();
   });
 });

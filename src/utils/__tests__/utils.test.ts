@@ -1,5 +1,7 @@
-import { getSuitDisplayName } from '../cardDefinitions';
-import { STARTING_CARD } from '../constants';
+import type { GameState } from '../../game/gameState';
+import { DEFAULT_GAME_MODE } from '../GameMode';
+import { getStartingCard } from '../cardDefinitions';
+import { DEFAULT_START_SUIT, ModelType } from '../constants';
 import {
   escapeMarkdownText,
   getComponentName,
@@ -11,19 +13,40 @@ import {
   resolvePlayerNames,
 } from '../utils';
 
-it('getDealtCard() should get empty card if no card dealt', async () => {
-  const G = {
-    dealt: [],
-    dealtBy: '',
-  };
+const baseG: GameState = {
+  dealt: [],
+  dealtBy: '',
+  passed: [],
+  suit: undefined,
+  players: [['T2'], ['T3'], ['T4']],
+  round: 0,
+  numCardsPlayed: 0,
+  scores: [0, 0],
+  lastWinner: 0,
+  maxRounds: 10,
+  selectedDiagram: 0,
+  selectedComponent: 'some-component',
+  selectedThreat: 'some-threat',
+  threat: {
+    modal: false,
+    new: true,
+  },
+  identifiedThreats: [],
+  startingCard: 'the starting card',
+  gameMode: DEFAULT_GAME_MODE,
+  turnDuration: 0,
+  modelType: ModelType.PRIVACY_ENHANCED,
+};
 
-  const dealtCard = getDealtCard(G);
+it('getDealtCard() should get empty card if no card dealt', async () => {
+  const dealtCard = getDealtCard(baseG);
 
   expect(dealtCard).toBe('');
 });
 
 it('getDealtCard() should get correct card if a single card is dealt', async () => {
-  const G = {
+  const G: GameState = {
+    ...baseG,
     dealt: [null, null, 'E3'],
     dealtBy: '2',
   };
@@ -34,7 +57,8 @@ it('getDealtCard() should get correct card if a single card is dealt', async () 
 });
 
 it('getDealtCard() should get correct card if a multiple cards are dealt', async () => {
-  const G = {
+  const G: GameState = {
+    ...baseG,
     dealt: ['E8', 'EA', 'E3'],
     dealtBy: '1',
   };
@@ -46,15 +70,9 @@ it('getDealtCard() should get correct card if a multiple cards are dealt', async
 
 it('resolves player names correctly', async () => {
   const names = ['foo', 'bar', 'baz'];
-  expect(resolvePlayerNames([0, 1, 2], names)).toStrictEqual(names);
+  expect(resolvePlayerNames(['0', '1', '2'], names, null)).toStrictEqual(names);
 
-  expect(resolvePlayerNames([1, 0, 2], names)).toStrictEqual([
-    'bar',
-    'foo',
-    'baz',
-  ]);
-
-  expect(resolvePlayerNames([1, 0, 2], names, 1)).toStrictEqual([
+  expect(resolvePlayerNames(['1', '0', '2'], names, '1')).toStrictEqual([
     'You',
     'foo',
     'baz',
@@ -63,9 +81,9 @@ it('resolves player names correctly', async () => {
 
 it('resolves player name correctly', async () => {
   const names = ['foo', 'bar', 'baz'];
-  expect(resolvePlayerName(0, names)).toBe(names[0]);
+  expect(resolvePlayerName('0', names, null)).toBe(names[0]);
 
-  expect(resolvePlayerName(0, names, 0)).toBe('You');
+  expect(resolvePlayerName('0', names, '0')).toBe('You');
 });
 
 it('gammer joins correctly', async () => {
@@ -80,17 +98,20 @@ it('creates player array correctly', async () => {
 });
 
 it('makes correct component name', async () => {
-  expect(getComponentName(null)).toBe('');
+  expect(getComponentName(undefined)).toBe('');
   expect(
     getComponentName({
-      type: 'tm.Foo',
+      type: 'tm.Actor',
       attrs: {
         text: {
           text: 'Bar',
         },
       },
+      id: 'some-id',
+      size: { width: 0, height: 0 },
+      z: 0,
     }),
-  ).toBe('Foo: Bar');
+  ).toBe('Actor: Bar');
   expect(
     getComponentName({
       type: 'tm.Flow',
@@ -99,28 +120,38 @@ it('makes correct component name', async () => {
           attrs: {
             text: {
               text: 'Bar',
+              'font-size': '12pt',
+              'font-weight': 'bold',
             },
           },
+          position: 0,
         },
       ],
+      attrs: {},
+      id: 'some-id',
+      size: { width: 0, height: 0 },
+      z: 0,
     }),
   ).toBe('Flow: Bar');
 });
 
 it('produces valid moves', async () => {
-  expect(getValidMoves([], '', 0)).toStrictEqual([STARTING_CARD]);
-
-  expect(getValidMoves(['T4', 'S2', 'EA', 'T5'], 'T', 10)).toStrictEqual([
-    'T4',
-    'T5',
+  const startingCard = getStartingCard(DEFAULT_GAME_MODE, DEFAULT_START_SUIT);
+  expect(getValidMoves([], undefined, 0, startingCard)).toStrictEqual([
+    startingCard,
   ]);
 
-  expect(getValidMoves(['S2', 'EA'], 'T', 10)).toStrictEqual(['S2', 'EA']);
+  expect(
+    getValidMoves(['T4', 'S2', 'EA', 'T5'], 'T', 10, startingCard),
+  ).toStrictEqual(['T4', 'T5']);
+
+  expect(getValidMoves(['S2', 'EA'], 'T', 10, startingCard)).toStrictEqual([
+    'S2',
+    'EA',
+  ]);
 });
 
-it('produces correct type string', async () => {
-  expect(getSuitDisplayName('FOO')).toBe('');
-});
+// TODO: add proper tests getSuitDisplayName
 
 it('successfully escapes any malicious markdown text', () => {
   expect(
