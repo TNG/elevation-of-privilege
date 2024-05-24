@@ -467,7 +467,7 @@ const CARD_DECKS: CardDeckDefinitions = {
       ],
       isTrump: true,
       isDefault: false,
-    }
+    },
   },
 };
 
