@@ -6,7 +6,7 @@ Elevation of Privilege
 
 Threat Modeling via Serious Games is the easy way to get started and increase the security of your projects. This is a card game that developers, architects or security experts can play.
 
-This application implements an online version of the card games [Elevation of Privilege](https://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf) and [OWASP Cornucopia](https://owasp.org/www-project-cornucopia/), allowing to play the threat modeling games in remote or geo-distributed developer teams.
+This application implements an online version of the card games [Elevation of Privilege](https://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf), [OWASP Cornucopia](https://owasp.org/www-project-cornucopia/), [OWASP Cumulus](https://owasp.org/www-project-cumulus/) and [Elevation of MLsec](https://github.com/kantega/elevation-of-mlsec), allowing to play the threat modeling games in remote or geo-distributed developer teams.
 
 #### Play a demo!
 
@@ -37,7 +37,7 @@ In [Elevation of Privilege](https://download.microsoft.com/download/F/A/E/FAE143
 
 ## Card decks
 
-Currently, three game modes are supported, reflecting different aspects of modern software development projects:
+Currently, four game modes are supported, reflecting different aspects of modern software development projects:
 
 ### Elevation of Privilege
 
@@ -50,22 +50,22 @@ Inspired by this, the game [Cornucopia](https://owasp.org/www-project-cornucopia
 
 ![card Cornucopia](docs/Cornucopia_cards_attributed.png)
 
-### Cumulus
+### OWASP Cumulus
 
-[Cumulus](https://github.com/TNG/cumulus), developed at [TNG Technology Consulting](https://www.tngtech.com/en/index.html), is a threat modeling game targeting cloud and DevOps setups.
+[Cumulus](https://owasp.org/www-project-cumulus/), developed at [TNG Technology Consulting](https://www.tngtech.com/en/index.html), is a threat modeling game targeting cloud and DevOps setups.
 
 ![card Cumulus](docs/Cumulus_cards_attributed.png)
 
+### Elevation of MLsec
+
+[Elevation of MLsec](https://github.com/kantega/elevation-of-mlsec) has been developed at [Kantega AS](https://www.kantega.no/). It's used to threat model artificial intelligence and ai-aided applications.
+![card EoMLsec](docs/EoMLSec_cards_attributed.png)
+
 ## For users
 
-Currently, the game supports both card decks: 
-    
-* *Elevation of Privilege* and 
-* *Cornucopia*,
+When uploading an architectural model of your system you can choose between different formats:
 
-more are to come. When uploading an architectural model of your system you can choose between different formats:
-
-* an image (`.jpg`, `.png`, ...)
+* an image (`.jpg`, `.png`, `.svg`, ...)
 * JSON model generated with [OWASP Threat Dragon](https://owasp.org/www-project-threat-dragon/)
 * no upload (this might be relevant you must comply to strict confidentiality regulation and want to supply the model via some different channel)
 
@@ -179,37 +179,12 @@ An equivalent to `ModelFlatFile` should also be implemented. This extends the Fl
 
 Once the database connector is fully implemented, it can be used instead of a FlatFile by changing the object used in `config.ts`. Just replace `ModelFlatFile` with the name of the mongoDB database connector.
 
-## TODO
-
-### Migrate to Typescript
-
-Work on migrating to TypeScript has already started but is not complete yet. Most of the server code and the code shared
-between client and server has already been migrated but a lot of the client is still missing.
-
-In order to migrate a
-component of the client to TypeScript, follow this pattern:
-
-* Change the file extension of the file to `tsx`
-* Create an interface for specifying the props of the component
-* Use that interface when declaring the component
-* Go through the rest of the file and fix any TypeScript or linter errors / warnings
-* Change the extension of any accompanying test files to `tsx`
-* Fix any potential errors in there
-
-Among the files `src/client/pages/*.tsx` you will find different examples for how to set up TypeScript components.
-### Other TODOs
-
-* UI fixes (optimizations, smaller screens)
-* Optimize the card sprite sheet (can look at SVGs)
-* Improve test coverage, write tests for possible game states and moves
-* Refactor and have reusable components
-* Optimize component renders through `shouldComponentUpdate`
-* Write contributing guide
-
 ## Credits
 The card game Elevation of Privilege was originally invented by [Adam Shostack](https://adam.shostack.org/) at Microsoft and is licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The [EoP Whitepaper](http://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf) written by Adam can be downloaded which describes the motivation, experience and lessons learned in creating the game.
 
-The card game Cornucopia was originally developed by the [OWASP Foundation](https://owasp.org/). In this application a slightly modified version of the original card game is used. This can be found in the subfolder `cornucopiaCards/`. As the original, the modified version is licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). 
+The card game Cornucopia was originally developed by the [OWASP Foundation](https://owasp.org/). In this application a slightly modified version of the original card game is used. This can be found in the subfolder `cornucopiaCards/`. As the original, the modified version is licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+
+The card game Elevation of MLsec was developed at [Kantega AS](https://www.kantega.no/). This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International license (https://creativecommons.org/licenses/by-sa/4.0/). 
 
 The motivation for creating this online version of the game at Careem was due to a large number of teams working remotely across several geographies and we wanted to scale our method of teaching threat modeling to our engineering teams.
 
