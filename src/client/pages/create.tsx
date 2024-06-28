@@ -437,6 +437,52 @@ class Create extends React.Component<CreateProps, CreateState> {
                     <Input
                       type="radio"
                       name="model-type"
+                      value={ModelType.IMAGE}
+                      onChange={this.updateModelType}
+                      checked={this.state.modelType === ModelType.IMAGE}
+                    />
+                    Provide Model via an image
+                  </Label>
+                  <Input
+                    disabled={this.state.modelType !== ModelType.IMAGE}
+                    type="file"
+                    accept="image/*"
+                    name="model-image"
+                    id="model"
+                    onChange={this.updateImage}
+                    checked={this.state.modelType === ModelType.IMAGE}
+                  />
+                  <FormText color="muted">(Max. 5 MB)</FormText>
+                </FormGroup>
+                <FormGroup>
+                  <Label check>
+                    <Input
+                      id="radio-button-default-model"
+                      type="radio"
+                      value={ModelType.PRIVACY_ENHANCED}
+                      name="model-type"
+                      onChange={this.updateModelType}
+                      checked={
+                        this.state.modelType === ModelType.PRIVACY_ENHANCED
+                      }
+                    />
+                    Privacy enhanced mode.
+                    <Input
+                      disabled={
+                        this.state.modelType !== ModelType.PRIVACY_ENHANCED
+                      }
+                      type="text"
+                      placeholder="Optional: Provide link to model (e.g. in wiki)"
+                      className="text-input-wide"
+                      onChange={(e) => this.onModelRefUpdated(e)}
+                    />
+                  </Label>
+                </FormGroup>
+                <FormGroup>
+                  <Label check>
+                    <Input
+                      type="radio"
+                      name="model-type"
                       value={ModelType.THREAT_DRAGON}
                       onChange={this.updateModelType}
                     />
@@ -472,51 +518,6 @@ class Create extends React.Component<CreateProps, CreateState> {
                     </a>{' '}
                     to try it out.
                   </FormText>
-                </FormGroup>
-                <FormGroup>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      name="model-type"
-                      value={ModelType.IMAGE}
-                      onChange={this.updateModelType}
-                      checked={this.state.modelType === ModelType.IMAGE}
-                    />
-                    Provide Model via an image
-                  </Label>
-                  <Input
-                    disabled={this.state.modelType !== ModelType.IMAGE}
-                    type="file"
-                    accept="image/*"
-                    name="model-image"
-                    id="model"
-                    onChange={this.updateImage}
-                    checked={this.state.modelType === ModelType.IMAGE}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label check>
-                    <Input
-                      id="radio-button-default-model"
-                      type="radio"
-                      value={ModelType.PRIVACY_ENHANCED}
-                      name="model-type"
-                      onChange={this.updateModelType}
-                      checked={
-                        this.state.modelType === ModelType.PRIVACY_ENHANCED
-                      }
-                    />
-                    Privacy enhanced mode.
-                    <Input
-                      disabled={
-                        this.state.modelType !== ModelType.PRIVACY_ENHANCED
-                      }
-                      type="text"
-                      placeholder="Optional: Provide link to model (e.g. in wiki)"
-                      className="text-input-wide"
-                      onChange={(e) => this.onModelRefUpdated(e)}
-                    />
-                  </Label>
                 </FormGroup>
               </Col>
             </FormGroup>
