@@ -437,47 +437,6 @@ class Create extends React.Component<CreateProps, CreateState> {
                     <Input
                       type="radio"
                       name="model-type"
-                      value={ModelType.THREAT_DRAGON}
-                      onChange={this.updateModelType}
-                    />
-                    Provide model via Threat Dragon
-                  </Label>
-                  <Input
-                    disabled={this.state.modelType !== ModelType.THREAT_DRAGON}
-                    type="file"
-                    name="model-json"
-                    id="model"
-                    onChange={this.readJson}
-                    checked={this.state.modelType === ModelType.THREAT_DRAGON}
-                  />
-                  <FormText color="muted">
-                    Select the JSON model produced by{' '}
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://docs.threatdragon.org/"
-                    >
-                      Threat Dragon
-                    </a>
-                    .
-                  </FormText>
-                  <FormText color="muted">
-                    Or download a{' '}
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://raw.githubusercontent.com/mike-goodwin/owasp-threat-dragon-demo/master/ThreatDragonModels/Demo%20Threat%20Model/Demo%20Threat%20Model.json"
-                    >
-                      sample model
-                    </a>{' '}
-                    to try it out.
-                  </FormText>
-                </FormGroup>
-                <FormGroup>
-                  <Label check>
-                    <Input
-                      type="radio"
-                      name="model-type"
                       value={ModelType.IMAGE}
                       onChange={this.updateModelType}
                       checked={this.state.modelType === ModelType.IMAGE}
@@ -517,6 +476,47 @@ class Create extends React.Component<CreateProps, CreateState> {
                       onChange={(e) => this.onModelRefUpdated(e)}
                     />
                   </Label>
+                </FormGroup>
+                <FormGroup>
+                  <Label check>
+                    <Input
+                      type="radio"
+                      name="model-type"
+                      value={ModelType.THREAT_DRAGON}
+                      onChange={this.updateModelType}
+                    />
+                    Provide model via Threat Dragon
+                  </Label>
+                  <Input
+                    disabled={this.state.modelType !== ModelType.THREAT_DRAGON}
+                    type="file"
+                    name="model-json"
+                    id="model"
+                    onChange={this.readJson}
+                    checked={this.state.modelType === ModelType.THREAT_DRAGON}
+                  />
+                  <FormText color="muted">
+                    Select the JSON model produced by{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://docs.threatdragon.org/"
+                    >
+                      Threat Dragon
+                    </a>
+                    .
+                  </FormText>
+                  <FormText color="muted">
+                    Or download a{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://raw.githubusercontent.com/mike-goodwin/owasp-threat-dragon-demo/master/ThreatDragonModels/Demo%20Threat%20Model/Demo%20Threat%20Model.json"
+                    >
+                      sample model
+                    </a>{' '}
+                    to try it out.
+                  </FormText>
                 </FormGroup>
               </Col>
             </FormGroup>
