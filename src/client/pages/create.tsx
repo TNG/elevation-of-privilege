@@ -452,9 +452,7 @@ class Create extends React.Component<CreateProps, CreateState> {
                     onChange={this.updateImage}
                     checked={this.state.modelType === ModelType.IMAGE}
                   />
-                  <FormText color="muted">
-                    (Max. 5mb)
-                  </FormText>
+                  <FormText color="muted">(Max. 5mb)</FormText>
                 </FormGroup>
                 <FormGroup>
                   <Label check>
