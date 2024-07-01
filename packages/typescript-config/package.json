@@ -1,0 +1,16 @@
+{
+  "name": "@eop/typescript-config",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "fixlint": "eslint . --fix",
+    "checkformat": "prettier . --check",
+    "format": "prettier . --write"
+  },
+  "devDependencies": {
+    "@eop/eslint-config": "*",
+    "@eop/prettier-config": "*",
+    "prettier": "^3.3.2"
+  },
+  "private": true
+}

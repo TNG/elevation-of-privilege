@@ -1,0 +1,30 @@
+.threat-bar {
+  position: fixed;
+  right: 330px;
+  max-height: calc(100% - 250px - 3rem);
+  width: 500px;
+  overflow-y: auto;
+  font-size: 0.9em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 5px;
+}
+
+.threat-container .card {
+  margin-bottom: 10px;
+}
+
+.hoverable:hover {
+  cursor: pointer;
+}
+
+.thin-list-group-item {
+  padding: 0.3rem 0.75rem;
+}
+
+.checkbox-item {
+  margin-left: 1.25rem;
+}
+
+.pointer {
+  cursor: pointer;
+}

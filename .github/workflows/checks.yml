@@ -6,22 +6,24 @@ on:
   pull_request:
     branches: [master]
 
-env:
-  node-version: '16.x'
-
 jobs:
   build:
+    strategy:
+      matrix:
+        node-version: ['18.x', '20.x']
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ env.node-version }}
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.node-version }}
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm ci --prefer-offline
-      - run: npm run checkformat
-      - run: npm run lint
-      - run: npm run build
-      - run: npm test
+      - run: npm run checkformat -ws --if-present
+      - run: npm run build -w @eop/shared
+      - run: npm run lint -ws --if-present
+      - run: npm run build -ws --if-present
+      - run: npm test -ws --if-present
