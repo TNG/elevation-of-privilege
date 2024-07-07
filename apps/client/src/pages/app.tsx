@@ -2,6 +2,7 @@ import { ElevationOfPrivilege, SPECTATOR } from '@eop/shared';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { Client } from 'boardgame.io/react';
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
 import '@eop/cornucopia-cards/style.css';
 
@@ -14,7 +15,6 @@ import '../styles/cumulus_cards.css';
 import '../styles/eomlsec_cards.css';
 
 import type { FC } from 'react';
-import type { RouteComponentProps } from 'react-router';
 
 const url =
   window.location.protocol +
@@ -31,25 +31,21 @@ const EOP = Client({
   }),
 });
 
-interface MatchParams {
-  game: string;
-  id: string;
-  secret: string;
-}
+type MatchParams = {
+  matchID: string;
+  playerID: string;
+  credentials: string;
+};
 
-type AppProps = RouteComponentProps<MatchParams>;
-
-const App: FC<AppProps> = ({ match }) => {
-  const { game, id, secret } = match.params;
-
-  const playerId = id.toString();
+const App: FC = () => {
+  const { matchID, playerID, credentials } = useParams<MatchParams>();
 
   return (
     <div className="player-container">
       <EOP
-        matchID={game}
-        credentials={secret}
-        playerID={playerId === SPECTATOR ? undefined : playerId}
+        matchID={matchID}
+        credentials={credentials}
+        playerID={playerID === SPECTATOR ? undefined : playerID}
       />
     </div>
   );

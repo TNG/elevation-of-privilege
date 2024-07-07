@@ -11,15 +11,14 @@ type FooterProps = {
   short?: boolean;
 };
 
-const Footer: FC<FooterProps> = ({ short }) => (
-  <small className="text-muted">
+const Footer: FC<FooterProps> = ({ short = false }) => (
+  <small className="text-white-50">
     v{packageJson.version}
     {!short && (
       <>
         <span>
           {' '}
           - made with{' '}
-          {/* @ts-expect-error @fortawesome/react-fontawesome uses an older version of @fortawesome/fontawesome-svg-core (1.3.0), which makes the types incompatible. It still works correctly at runtime. */}
           <FontAwesomeIcon icon={faHeart} style={{ color: '#00cc00' }} /> at
           Careem and{' '}
           <a href="https://www.tngtech.com/en/">TNG Technology Consulting</a> -
@@ -37,9 +36,5 @@ const Footer: FC<FooterProps> = ({ short }) => (
     )}
   </small>
 );
-
-Footer.defaultProps = {
-  short: false,
-};
 
 export default Footer;
