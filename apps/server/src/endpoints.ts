@@ -7,7 +7,6 @@ import {
   GameState,
   getImageExtension,
   getSuitDisplayName,
-  INTERNAL_API_PORT,
   isSuit,
   logEvent,
   ModelType,
@@ -19,6 +18,7 @@ import { LobbyClient } from 'boardgame.io/client';
 import send from 'koa-send';
 import { v4 as uuidv4 } from 'uuid';
 
+import { INTERNAL_API_PORT } from './config';
 import { getDbImagesFolder } from './filesystem';
 
 import type { GameServer } from './gameServer';

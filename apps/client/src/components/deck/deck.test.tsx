@@ -1,6 +1,7 @@
 import { DEFAULT_START_SUIT, GameMode } from '@eop/shared';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { it } from 'vitest';
 
 import Deck from './deck';
 

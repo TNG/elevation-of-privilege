@@ -1,25 +1,17 @@
 import {
-  API_PORT,
   DEFAULT_GAME_MODE,
   DEFAULT_TURN_DURATION,
   ModelType,
 } from '@eop/shared';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import nock from 'nock';
+import React from 'react';
+import { describe, it, expect, beforeAll, vi, afterEach } from 'vitest';
 
 import Board from './board';
 
 import type { GameState } from '@eop/shared';
 import type { Ctx } from 'boardgame.io';
-
-const baseUrl = `${window.location.protocol}//${window.location.hostname}:${API_PORT}`;
-
-beforeAll(() => {
-  nock(baseUrl)
-    .get('/players')
-    .reply(200, { players: [{ id: 0, name: 'Player 0' }] });
-});
 
 const G: GameState = {
   dealt: [],
@@ -53,6 +45,16 @@ const ctx = {
 } as unknown as Ctx;
 
 describe('Board', () => {
+  beforeAll(() => {
+    nock(new URL('/api', window.location.href))
+      .get('/players')
+      .reply(200, { players: [{ id: 0, name: 'Player 0' }] });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('renders without crashing', () => {
     // when
     render(
@@ -74,7 +76,7 @@ describe('Board', () => {
 
   it('should render imprint link if env var is defined', () => {
     // given
-    process.env.REACT_APP_EOP_IMPRINT = 'https://example.tld/imprint/';
+    vi.stubEnv('VITE_EOP_IMPRINT', 'https://example.tld/imprint/');
 
     // when
     render(
@@ -96,9 +98,6 @@ describe('Board', () => {
   });
 
   it('should not render imprint link if env var is not defined', () => {
-    // given
-    process.env.REACT_APP_EOP_IMPRINT = '';
-
     // when
     render(
       <Board
@@ -120,7 +119,7 @@ describe('Board', () => {
 
   it('should render privacy link if env var is defined', () => {
     // given
-    process.env.REACT_APP_EOP_PRIVACY = 'https://example.tld/privacy/';
+    vi.stubEnv('VITE_EOP_PRIVACY', 'https://example.tld/privacy/');
 
     // when
     render(
@@ -142,9 +141,6 @@ describe('Board', () => {
   });
 
   it('should not render privacy link if env var is not defined', () => {
-    // given
-    process.env.REACT_APP_EOP_PRIVACY = '';
-
     // when
     render(
       <Board

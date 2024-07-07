@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import './imagemodel.css';
 import { MapInteractionCSS } from 'react-map-interaction';
-import { API_PORT, asyncSetTimeout } from '@eop/shared';
+import { asyncSetTimeout } from '@eop/shared';
 import type { PlayerID } from 'boardgame.io';
 
 type ImageModelProps = {
@@ -10,10 +10,7 @@ type ImageModelProps = {
   matchID: string;
 };
 
-const apiBase =
-  process.env.NODE_ENV === 'production'
-    ? '/api'
-    : `${window.location.protocol}//${window.location.hostname}:${API_PORT}`;
+const apiBase = '/api';
 
 const ImageModel: FC<ImageModelProps> = ({
   playerID,

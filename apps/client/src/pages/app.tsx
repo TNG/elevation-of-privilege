@@ -1,4 +1,4 @@
-import { ElevationOfPrivilege, SPECTATOR, SERVER_PORT } from '@eop/shared';
+import { ElevationOfPrivilege, SPECTATOR } from '@eop/shared';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { Client } from 'boardgame.io/react';
 import React from 'react';
@@ -27,10 +27,7 @@ const EOP = Client({
   board: Board,
   debug: false,
   multiplayer: SocketIO({
-    server:
-      process.env.NODE_ENV === 'production'
-        ? `${url}`
-        : `${window.location.hostname}:${SERVER_PORT}`,
+    server: `${url}`,
   }),
 });
 

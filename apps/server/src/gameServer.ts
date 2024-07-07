@@ -2,8 +2,7 @@ import { Server } from 'boardgame.io/server';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ElevationOfPrivilege } from '@eop/shared';
-import { INTERNAL_API_PORT, SERVER_PORT } from '@eop/shared';
-import { getDatabase } from './config';
+import { INTERNAL_API_PORT, SERVER_PORT, getDatabase } from './config';
 
 import type { ModelFlatFile } from './ModelFlatFile';
 
