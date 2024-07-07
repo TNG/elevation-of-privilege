@@ -1,3 +1,5 @@
+import { it, expect } from 'vitest';
+
 import { GameMode } from '../utils/GameMode';
 import { getThreatDescription } from './definitions';
 
