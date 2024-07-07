@@ -38,7 +38,6 @@ const CopyButton: FC<CopyButtonProps> = ({
 
   return (
     <Button color={color} onClick={handleClick} {...props}>
-      {/* @ts-expect-error @fortawesome/react-fontawesome uses an older version of @fortawesome/fontawesome-svg-core (1.3.0), which makes the types incompatible. It still works correctly at runtime. */}
       <FontAwesomeIcon icon={icon} fixedWidth /> {children}
     </Button>
   );

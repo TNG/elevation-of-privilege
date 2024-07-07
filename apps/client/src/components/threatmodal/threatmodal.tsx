@@ -136,7 +136,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
           />
         </FormGroup>
         <FormGroup hidden={!isOwner}>
-          <div className="checkbox-item">
+          <FormGroup check>
             <Input
               className="pointer"
               type="checkbox"
@@ -146,7 +146,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
             <Label for="showMitigation">
               Add a mitigation <em>(optional)</em>
             </Label>
-          </div>
+          </FormGroup>
         </FormGroup>
         <FormGroup hidden={isOwner && !showMitigation}>
           <Label for="mitigation">Mitigation</Label>
@@ -206,7 +206,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
           style={{ width: '100%' }}
         >
           {G.threat.new ? 'Add' : 'Update'} Threat &mdash;{' '}
-          <small className="text-muted">
+          <small className="text-secondary">
             being {G.threat.new ? 'added' : 'updated'} by{' '}
             {resolvePlayerName(G.threat.owner ?? '', names, playerID)}
           </small>

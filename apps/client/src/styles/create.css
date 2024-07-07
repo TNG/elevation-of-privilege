@@ -1,30 +1,11 @@
-.create h1 {
-  color: white;
-}
 table {
-  width: 100%;
-}
-
-.card {
-  min-width: 100%;
-  width: min-content;
-}
-
-.col-md-6 {
-  max-width: 100%;
-}
-
-.c-td-name {
-  width: 80%;
-  min-width: 76px;
-  max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  table-layout: auto;
+  word-wrap: break-word;
 }
 
 .spectator-row {
-  border-top: 5px double #eee;
+  border-top-width: 5px;
+  border-top-style: double;
 }
 
 .text-input-wide {

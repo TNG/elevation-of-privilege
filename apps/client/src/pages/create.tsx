@@ -101,7 +101,6 @@ class Create extends React.Component<CreateProps, CreateState> {
 
   async createGame(): Promise<void> {
     this.setState({
-      ...this.state,
       creating: true,
     });
     // FormData object (with file if required)
@@ -141,22 +140,9 @@ class Create extends React.Component<CreateProps, CreateState> {
 
     const gameId = r.game;
 
-    for (let i = 0; i < r.credentials.length; i++) {
-      this.setState({
-        ...this.state,
-        secret: {
-          ...this.state.secret,
-          [i]: r.credentials[i],
-        },
-      });
-    }
-
     this.setState({
+      secret: Object.fromEntries(r.credentials.map((s, i) => [i, s])),
       spectatorSecret: r.spectatorCredential,
-    });
-
-    this.setState({
-      ...this.state,
       matchID: gameId,
       created: true,
     });
@@ -171,7 +157,6 @@ class Create extends React.Component<CreateProps, CreateState> {
     // TODO: validation?
     const model = JSON.parse(this.fileReader.result) as CreateState['model'];
     this.setState({
-      ...this.state,
       model,
     });
   }
@@ -188,14 +173,12 @@ class Create extends React.Component<CreateProps, CreateState> {
 
   updateImage(e: ChangeEvent<HTMLInputElement>): void {
     this.setState({
-      ...this.state,
       image: e.target.files?.[0],
     });
   }
 
   onPlayersUpdated(e: ChangeEvent<HTMLInputElement>): void {
     this.setState({
-      ...this.state,
       players: parseInt(e.target.value),
     });
   }
@@ -207,7 +190,6 @@ class Create extends React.Component<CreateProps, CreateState> {
       throw new Error(`Invalid start suit '${startSuit}'`);
     }
     this.setState({
-      ...this.state,
       startSuit,
     });
   }
@@ -215,31 +197,27 @@ class Create extends React.Component<CreateProps, CreateState> {
   onGameModeUpdated(e: ChangeEvent<HTMLInputElement>): void {
     const gameMode = e.target.value as GameMode;
     this.setState({
-      ...this.state,
       gameMode,
     });
   }
 
   onNameUpdated(idx: number, e: ChangeEvent<HTMLInputElement>): void {
-    this.setState({
-      ...this.state,
+    this.setState((prevState) => ({
       names: {
-        ...this.state.names,
+        ...prevState.names,
         [idx]: e.target.value,
       },
-    });
+    }));
   }
 
   onTurnDurationUpdated(e: ChangeEvent<HTMLInputElement>): void {
     this.setState({
-      ...this.state,
       turnDuration: Number.parseInt(e.target.value),
     });
   }
 
   onModelRefUpdated(e: ChangeEvent<HTMLInputElement>): void {
     this.setState({
-      ...this.state,
       modelReference: e.target.value,
     });
   }
@@ -265,7 +243,6 @@ class Create extends React.Component<CreateProps, CreateState> {
       throw new Error(`Invalid model type ${modelType}`);
     }
     this.setState({
-      ...this.state,
       modelType,
     });
   }
@@ -291,136 +268,133 @@ class Create extends React.Component<CreateProps, CreateState> {
   }
 
   render(): JSX.Element {
-    let createForm = <div />;
-    let linkDisplay = <div />;
-    if (!this.state.created) {
-      createForm = (
-        <div>
-          <Banner />
-          <p>
-            Elevation of Privilege (EoP) is the easy way to get started and
-            learn threat modeling. It is a card game that developers, architects
-            or security experts can play.
-          </p>
-          <p>
-            To learn more about the game, navigate to the{' '}
-            <Link to="/about">about page</Link>.
-          </p>
-          <small className="text-muted">
-            To start playing, select the number of players and enter their
-            names.
-          </small>
-          <hr />
-          <Form>
-            <FormGroup row>
-              <Label for="players" sm={2}>
-                Players
-              </Label>
-              <Col sm={10}>
-                <Input
-                  type="select"
-                  name="players"
-                  id="players"
-                  onChange={(e) => this.onPlayersUpdated(e)}
-                  value={this.state.players}
-                >
-                  {_.range(MIN_NUMBER_PLAYERS, MAX_NUMBER_PLAYERS + 1).map(
-                    (n) => (
-                      <option key={`players-${n}`} value={n}>
-                        {n}
-                      </option>
-                    ),
-                  )}
-                </Input>
-              </Col>
-            </FormGroup>
-            <hr />
-            {Array(this.state.players)
-              .fill(0)
-              .map((v, i) => (
-                <FormGroup row key={i}>
-                  <Label for={`p${i}`} sm={2}>
-                    Name
-                  </Label>
-                  <Col sm={10}>
-                    <Input
-                      autoComplete={'off'}
-                      type="text"
-                      invalid={_.isEmpty(this.state.names[i])}
-                      name={`p${i}`}
-                      id={`p${i}`}
-                      onChange={(e) => this.onNameUpdated(i, e)}
-                      value={this.state.names[i]}
-                    />
-                    <FormFeedback>The name cannot be empty</FormFeedback>
-                  </Col>
-                </FormGroup>
-              ))}
-            <hr />
-            <FormGroup row>
-              <Label for="gameMode" sm={2}>
-                Game Mode
-              </Label>
-              <Col sm={10}>
-                <Input
-                  id="gameMode"
-                  type="select"
-                  onChange={(e) => this.onGameModeUpdated(e)}
-                  value={this.state.gameMode}
-                >
-                  {Object.values(GameMode).map((mode) => (
-                    <option key={`option-${mode}`}>{mode}</option>
-                  ))}
-                </Input>
-              </Col>
-            </FormGroup>
-            <FormGroup row>
-              <Label for="startSuit" sm={2}>
-                Start Suit
-              </Label>
-              <Col sm={10}>
-                <Input
-                  type="select"
-                  name="startSuit"
-                  id="startSuit"
-                  onChange={(e) => this.onStartSuitUpdated(e)}
-                  value={this.state.startSuit}
-                >
-                  {getSuits(this.state.gameMode).map((suit) => (
-                    <option value={suit} key={`start-suit-option-${suit}`}>
-                      {getSuitDisplayName(this.state.gameMode, suit)}
+    const cardBody = !this.state.created ? (
+      <div>
+        <Banner />
+        <p>
+          Elevation of Privilege (EoP) is the easy way to get started and learn
+          threat modeling. It is a card game that developers, architects or
+          security experts can play.
+        </p>
+        <p>
+          To learn more about the game, navigate to the{' '}
+          <Link to="/about">about page</Link>.
+        </p>
+        <small className="text-secondary">
+          To start playing, select the number of players and enter their names.
+        </small>
+        <hr />
+        <Form>
+          <FormGroup row>
+            <Label for="players" sm={2}>
+              Players
+            </Label>
+            <Col sm={10}>
+              <Input
+                type="select"
+                name="players"
+                id="players"
+                onChange={(e) => this.onPlayersUpdated(e)}
+                value={this.state.players}
+              >
+                {_.range(MIN_NUMBER_PLAYERS, MAX_NUMBER_PLAYERS + 1).map(
+                  (n) => (
+                    <option key={`players-${n}`} value={n}>
+                      {n}
                     </option>
-                  ))}
-                </Input>
-              </Col>
-            </FormGroup>
-            <hr />
-            <FormGroup row>
-              <Label for="turnDuration" sm={2}>
-                Turn Duration
-              </Label>
-              <Col sm={10}>
-                <Input
-                  type="select"
-                  name="turnDuration"
-                  id="turnDuration"
-                  onChange={(e) => this.onTurnDurationUpdated(e)}
-                  value={this.state.turnDuration}
-                >
-                  <option value={0}>No Timer</option>
-                  <option value={180}>3 mins</option>
-                  <option value={300}>5 mins</option>
-                  <option value={600}>10 mins</option>
-                </Input>
-              </Col>
-            </FormGroup>
-            <hr />
-            <FormGroup row>
-              <Label for="model" sm={2}>
-                Model
-              </Label>
-              <Col sm={10}>
-                <FormGroup>
+                  ),
+                )}
+              </Input>
+            </Col>
+          </FormGroup>
+          <hr />
+          {Array(this.state.players)
+            .fill(0)
+            .map((v, i) => (
+              <FormGroup row key={i}>
+                <Label for={`p${i}`} sm={2}>
+                  Name
+                </Label>
+                <Col sm={10}>
+                  <Input
+                    autoComplete={'off'}
+                    type="text"
+                    invalid={_.isEmpty(this.state.names[i])}
+                    name={`p${i}`}
+                    id={`p${i}`}
+                    onChange={(e) => this.onNameUpdated(i, e)}
+                    value={this.state.names[i]}
+                  />
+                  <FormFeedback>The name cannot be empty</FormFeedback>
+                </Col>
+              </FormGroup>
+            ))}
+          <hr />
+          <FormGroup row>
+            <Label for="gameMode" sm={2}>
+              Game Mode
+            </Label>
+            <Col sm={10}>
+              <Input
+                id="gameMode"
+                type="select"
+                onChange={(e) => this.onGameModeUpdated(e)}
+                value={this.state.gameMode}
+              >
+                {Object.values(GameMode).map((mode) => (
+                  <option key={`option-${mode}`}>{mode}</option>
+                ))}
+              </Input>
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Label for="startSuit" sm={2}>
+              Start Suit
+            </Label>
+            <Col sm={10}>
+              <Input
+                type="select"
+                name="startSuit"
+                id="startSuit"
+                onChange={(e) => this.onStartSuitUpdated(e)}
+                value={this.state.startSuit}
+              >
+                {getSuits(this.state.gameMode).map((suit) => (
+                  <option value={suit} key={`start-suit-option-${suit}`}>
+                    {getSuitDisplayName(this.state.gameMode, suit)}
+                  </option>
+                ))}
+              </Input>
+            </Col>
+          </FormGroup>
+          <hr />
+          <FormGroup row>
+            <Label for="turnDuration" sm={2}>
+              Turn Duration
+            </Label>
+            <Col sm={10}>
+              <Input
+                type="select"
+                name="turnDuration"
+                id="turnDuration"
+                onChange={(e) => this.onTurnDurationUpdated(e)}
+                value={this.state.turnDuration}
+              >
+                <option value={0}>No Timer</option>
+                <option value={180}>3 mins</option>
+                <option value={300}>5 mins</option>
+                <option value={600}>10 mins</option>
+              </Input>
+            </Col>
+          </FormGroup>
+          <hr />
+          <FormGroup row>
+            <Label for="model" sm={2}>
+              Model
+            </Label>
+            <Col sm={10}>
+              <FormGroup>
+                <FormGroup check>
                   <Label check>
                     <Input
                       type="radio"
@@ -442,7 +416,9 @@ class Create extends React.Component<CreateProps, CreateState> {
                   />
                   <FormText color="muted">(Max. 5 MB)</FormText>
                 </FormGroup>
-                <FormGroup>
+              </FormGroup>
+              <FormGroup>
+                <FormGroup check>
                   <Label check>
                     <Input
                       id="radio-button-default-model"
@@ -455,18 +431,20 @@ class Create extends React.Component<CreateProps, CreateState> {
                       }
                     />
                     Privacy enhanced mode.
-                    <Input
-                      disabled={
-                        this.state.modelType !== ModelType.PRIVACY_ENHANCED
-                      }
-                      type="text"
-                      placeholder="Optional: Provide link to model (e.g. in wiki)"
-                      className="text-input-wide"
-                      onChange={(e) => this.onModelRefUpdated(e)}
-                    />
                   </Label>
+                  <Input
+                    disabled={
+                      this.state.modelType !== ModelType.PRIVACY_ENHANCED
+                    }
+                    type="text"
+                    placeholder="Optional: Provide link to model (e.g. in wiki)"
+                    className="text-input-wide"
+                    onChange={(e) => this.onModelRefUpdated(e)}
+                  />
                 </FormGroup>
-                <FormGroup>
+              </FormGroup>
+              <FormGroup>
+                <FormGroup check>
                   <Label check>
                     <Input
                       type="radio"
@@ -493,10 +471,7 @@ class Create extends React.Component<CreateProps, CreateState> {
                     >
                       Threat Dragon
                     </a>
-                    .
-                  </FormText>
-                  <FormText color="muted">
-                    Or download a{' '}
+                    . Or download a{' '}
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
@@ -507,93 +482,91 @@ class Create extends React.Component<CreateProps, CreateState> {
                     to try it out.
                   </FormText>
                 </FormGroup>
-              </Col>
-            </FormGroup>
-            <hr />
-            <Button
-              block
-              size="lg"
-              color="warning"
-              disabled={this.state.creating || !this.isFormValid()}
-              onClick={this.createGame.bind(this)}
-            >
-              Proceed
-            </Button>
-          </Form>
+              </FormGroup>
+            </Col>
+          </FormGroup>
           <hr />
-          <small className="text-muted">
-            Players will be able to join the game with the links that are
-            generated after you proceed.
-          </small>
-        </div>
-      );
-    } else {
-      linkDisplay = (
-        <div>
-          <Banner />
-          <div className="text-center text-muted">
-            <p>
-              The following links should be distributed to the players
-              respectively.
-            </p>
-          </div>
-          <Table>
-            <tbody>
-              {Array(this.state.players)
-                .fill(0)
-                .map((v, i) => (
-                  <tr key={i}>
-                    <td className="c-td-name">{this.state.names[i]}</td>
-                    <td>
-                      <a
-                        href={`${this.url(`${i}`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {this.url(`${i}`)}
-                      </a>
-                    </td>
-                    <td>
-                      <CopyButton text={this.url(`${i}`)} />
-                    </td>
-                  </tr>
-                ))}
-              <tr key="spectator" className="spectator-row">
-                <td className="c-td-name">Spectator</td>
-                <td>
-                  <a
-                    href={`${this.url(SPECTATOR)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {this.url(SPECTATOR)}
-                  </a>
-                </td>
-                <td>
-                  <CopyButton text={this.url(SPECTATOR)} />
-                </td>
-              </tr>
-            </tbody>
-          </Table>
-          <hr />
-          <CopyButton
-            text={this.formatAllLinks()}
-            color="warning"
+          <Button
             block
             size="lg"
+            color="warning"
+            disabled={this.state.creating || !this.isFormValid()}
+            onClick={this.createGame.bind(this)}
           >
-            Copy All
-          </CopyButton>
-          <hr />
-          <div className="text-center">
-            <small className="text-muted">
-              These links are unique for each player and would allow them to
-              join the game.
-            </small>
-          </div>
+            Proceed
+          </Button>
+        </Form>
+        <hr />
+        <small className="text-secondary">
+          Players will be able to join the game with the links that are
+          generated after you proceed.
+        </small>
+      </div>
+    ) : (
+      <div>
+        <Banner />
+        <div className="text-center text-secondary">
+          <p>
+            The following links should be distributed to the players
+            respectively.
+          </p>
         </div>
-      );
-    }
+        <Table className="table-sm">
+          <tbody>
+            {Array(this.state.players)
+              .fill(0)
+              .map((v, i) => (
+                <tr key={i}>
+                  <td className="c-td-name">{this.state.names[i]}</td>
+                  <td>
+                    <a
+                      href={`${this.url(`${i}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {this.url(`${i}`)}
+                    </a>
+                  </td>
+                  <td>
+                    <CopyButton text={this.url(`${i}`)} />
+                  </td>
+                </tr>
+              ))}
+            <tr key="spectator" className="spectator-row">
+              <td className="c-td-name">Spectator</td>
+              <td>
+                <a
+                  href={`${this.url(SPECTATOR)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {this.url(SPECTATOR)}
+                </a>
+              </td>
+              <td>
+                <CopyButton text={this.url(SPECTATOR)} />
+              </td>
+            </tr>
+          </tbody>
+        </Table>
+        <hr />
+        <CopyButton
+          text={this.formatAllLinks()}
+          color="warning"
+          block
+          size="lg"
+        >
+          Copy All
+        </CopyButton>
+        <hr />
+        <div className="text-center">
+          <small className="text-secondary">
+            These links are unique for each player and would allow them to join
+            the game.
+          </small>
+        </div>
+      </div>
+    );
 
     return (
       <div>
@@ -606,14 +579,11 @@ class Create extends React.Component<CreateProps, CreateState> {
               <div className="text-center">
                 <Logo />
               </div>
-              <Card>
+              <Card className="create-card">
                 <CardHeader className="text-center">
                   Elevation of Privilege
                 </CardHeader>
-                <CardBody>
-                  {createForm}
-                  {linkDisplay}
-                </CardBody>
+                <CardBody>{cardBody}</CardBody>
               </Card>
             </Col>
           </Row>
