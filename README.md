@@ -180,6 +180,26 @@ When building the client via docker these env vars can be set by defining `build
 docker build --build-arg "REACT_APP_EOP_IMPRINT=https://example.tld/imprint/" --build-arg "REACT_APP_EOP_PRIVACY=https://example.tld/privacy/" -f apps/client/Dockerfile . -t "some-tag"
 ```
 
+### Versioning
+
+This repository uses [Changesets](https://github.com/changesets/changesets) for versioning.
+
+When you introduce a change that warrants a version bump (e.g., a new feature or bug fix), please run
+
+```bash
+npx changeset add
+```
+
+and follow the instructions to add a new changeset for the relevant packages.
+
+A release can then be performed by running
+
+```bash
+npx changeset version
+```
+
+and committing and pushing the changes.
+
 ## Credits
 The card game Elevation of Privilege was originally invented by [Adam Shostack](https://adam.shostack.org/) at Microsoft and is licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The [EoP Whitepaper](http://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf) written by Adam can be downloaded which describes the motivation, experience and lessons learned in creating the game.
 

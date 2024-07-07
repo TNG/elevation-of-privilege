@@ -1,6 +1,7 @@
 {
   "name": "@eop/shared",
   "type": "commonjs",
+  "version": "0.24.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {

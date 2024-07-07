@@ -1,6 +1,7 @@
 {
   "name": "@eop/eslint-config",
   "type": "module",
+  "version": "0.24.0",
   "exports": {
     "./base": {
       "default": "./base.js"

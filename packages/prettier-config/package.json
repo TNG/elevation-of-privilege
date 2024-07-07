@@ -1,6 +1,7 @@
 {
   "name": "@eop/prettier-config",
   "type": "module",
+  "version": "0.24.0",
   "main": "prettier.config.js",
   "scripts": {
     "checkformat": "prettier . --check",
