@@ -7,21 +7,26 @@ on:
     branches: [master]
 
 env:
-  node-version: '16.x'
+  DO_NOT_TRACK: '1'
 
 jobs:
   build:
+    strategy:
+      matrix:
+        node-version: ['18.x', '20.x', '22.x']
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ env.node-version }}
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.node-version }}
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm ci --prefer-offline
-      - run: npm run checkformat
-      - run: npm run lint
-      - run: npm run build
-      - run: npm test
+      - run: npx sherif
+      - run: npx turbo run checkformat
+      - run: npx turbo run lint
+      - run: npx turbo run build
+      - run: npx turbo run test

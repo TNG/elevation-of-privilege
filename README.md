@@ -81,7 +81,9 @@ For the case of Elevation of Privilege, we partly support the latest version (as
 
 This repository allows you to build docker containers ready to be deployed e.g. to Kubernetes.
 
-Frontend and backend are written in Javascript, although there are plans to migrate to Typescript. This game uses [boardgame.io](https://boardgame.io/) as a framework for turn based games. The backend furthermore exposes an API using [koa](https://koajs.com/). Frontend is written in [react](https://reactjs.org/).
+The frontend and backend are written in TypeScript and use [boardgame.io](https://boardgame.io/) as a framework for turn based games. The backend furthermore exposes an API using [koa](https://koajs.com/). The frontend is written in [react](https://reactjs.org/).
+
+This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces) to structure the different sub-packages and [Turborepo](https://turbo.build/repo) as a build system and task runner.
 
 ### Running the app
 There are two components that need to be started in order to run the game.
@@ -99,20 +101,28 @@ This will start the app on port `8080` and make it accessible at [http://localho
 The docker-compose setup starts two containers: 
 
 * `threats-client`: running `nginx` as a reverse proxy and serving the react application
-* `threats-server`: running the `nodejs` backends: public API and game server
+* `threats-server`: running the Node.js backend: public API and game server
 
 ![docker-compose setup](docs/docker-setup.svg)
 
 #### Local deployment
 
-The server can be started using:
+To start both the server and UI in dev mode, just run
 
 ```bash
-npm run server
+npx turbo run dev
 ```
 
-This will also automatically build the server first, compiling any TypeScript code, and then start the backend
-application listening on the following ports:
+For starting and building the individual applications separately, read on.
+
+The server can be started in dev mode using:
+
+```bash
+npx turbo run dev --filter=@eop/server
+```
+
+This will build any dependencies of the server if necessary and then start the backend application in dev mode,
+listening on the following ports:
 
 | Application | Description                                                       | Environment Variable | Default |
 |-------------|-------------------------------------------------------------------|----------------------|---------|
@@ -120,33 +130,38 @@ application listening on the following ports:
 | Lobby API   | Internal API for lobby operations, should not be exposed publicly | `INTERNAL_API_PORT`  | 8002    |
 | Public API  | Public API to create games and retrieve game info                 | `API_PORT`           | 8001    |
 
- If you want to build the server code manually, you can do so by running
+If you want to build the server code manually, you can do so by running
 
 ```bash
-npm run build:server
+npx turbo run build --filter=@eop/server
 ```
 
-The UI can be started using
+You can also start the server in production mode:
 
 ```bash
-npm start
+npx turbo run start --filter=@eop/server
 ```
 
-which starts a watch mode that automatically compiles and reloads the UI every time source files are changed. The UI is
-accessible at [http://localhost:3000/](http://localhost:3000/).
+The UI can be started in dev mode using
+
+```bash
+npx turbo run dev --filter=@eop/client
+```
+
+The UI is accessible at [http://localhost:3000/](http://localhost:3000/).
 
 You can also build the client manually by running
 
 ```bash
-npm run build:client
+npx turbo run build --filter=@eop/client
 ```
 
-The UI can also be built and served statically (see the [dockerfile](docker/client.dockerfile)), keep in mind that the values of the port numbers will be hard coded in the generated files.
+The UI can also be built and served statically (see the [Dockerfile](apps/client/Dockerfile)). Keep in mind that the values of the port numbers will be hard coded in the generated files.
 
 To build both the client and the server, just run
 
 ```bash
-npm run build
+npx turbo run build
 ```
 
 #### Imprint and privacy notices
@@ -162,22 +177,28 @@ are set when building the app.
 When building the client via docker these env vars can be set by defining `build-args`
 
 ```bash
-docker build --build-arg "REACT_APP_EOP_IMPRINT=https://example.tld/imprint/" --build-arg "REACT_APP_EOP_PRIVACY=https://example.tld/privacy/" -f docker/client.dockerfile . -t "some-tag"
+docker build --build-arg "REACT_APP_EOP_IMPRINT=https://example.tld/imprint/" --build-arg "REACT_APP_EOP_PRIVACY=https://example.tld/privacy/" -f apps/client/Dockerfile . -t "some-tag"
 ```
 
-### Using MongoDB
+### Versioning
 
-As of boardgame.io v0.39.0, MongoDB is no longer supported as a database connector. There is currently no external library providing this functionality, however there is an [implementation](https://github.com/boardgameio/boardgame.io/issues/6#issuecomment-656144940) posted on github. This class implements the abstract functions in [this base class](https://github.com/boardgameio/boardgame.io/blob/ce8ef4a16bcc420b05c5e0751b41f168352bce7d/src/server/db/base.ts#L49-L111).
+This repository uses [Changesets](https://github.com/changesets/changesets) for versioning.
 
-MongoDB has also been removed as a dependency so must be installed by running
+When you introduce a change that warrants a version bump (e.g., a new feature or bug fix), please run
 
 ```bash
-npm install mongodb
+npx changeset add
 ```
 
-An equivalent to `ModelFlatFile` should also be implemented. This extends the FlatFile database connector to allow the model to be saved to the database. The functions this implements are `setModel`, which allows the model to be set, and `fetch`, which is also overwritten to allow the model to be read in addition to the other properties. The implementations of these for the FlatFile object are available in `ModelFlatFile.ts`
+and follow the instructions to add a new changeset for the relevant packages.
 
-Once the database connector is fully implemented, it can be used instead of a FlatFile by changing the object used in `config.ts`. Just replace `ModelFlatFile` with the name of the mongoDB database connector.
+A release can then be performed by running
+
+```bash
+npx changeset version
+```
+
+and committing and pushing the changes.
 
 ## Credits
 The card game Elevation of Privilege was originally invented by [Adam Shostack](https://adam.shostack.org/) at Microsoft and is licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The [EoP Whitepaper](http://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf) written by Adam can be downloaded which describes the motivation, experience and lessons learned in creating the game.
