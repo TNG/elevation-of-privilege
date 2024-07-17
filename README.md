@@ -94,7 +94,7 @@ There are two components that need to be started in order to run the game.
 To start a dockerized version of the game use
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 This will start the app on port `8080` and make it accessible at [http://localhost:8080/](http://localhost:8080/).
@@ -201,6 +201,8 @@ npx changeset version
 and committing and pushing the changes.
 
 ## Credits
+The initial version of this online game was developed in 2018 by [dehydr8](https://github.com/dehydr8), working for Careem at that time. This repository is a fork of the [original one](https://github.com/dehydr8/elevation-of-privilege) including further maintenance and developments like the introduction of alternative card decks. We would like to thank dehydr8 for his great work in setting up this game.
+
 The card game Elevation of Privilege was originally invented by [Adam Shostack](https://adam.shostack.org/) at Microsoft and is licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The [EoP Whitepaper](http://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf) written by Adam can be downloaded which describes the motivation, experience and lessons learned in creating the game.
 
 The card game Cornucopia was originally developed by the [OWASP Foundation](https://owasp.org/). In this application a slightly modified version of the original card game is used. This can be found in the subfolder `cornucopiaCards/`. As the original, the modified version is licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
@@ -211,4 +213,4 @@ The motivation for creating this online version of the game at Careem was due to
 
 The game is built using [boardgame.io](https://boardgame.io/), a framework for developing turn based games. The graphics, icons and card images used in this version were extracted from the original card game built by Microsoft.
 
-Made with :green_heart: at Careem and [TNG Technology Consulting](https://www.tngtech.com/en/)
+Made with :green_heart: at [TNG Technology Consulting](https://www.tngtech.com/en/)
