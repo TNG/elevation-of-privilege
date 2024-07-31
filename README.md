@@ -1,5 +1,5 @@
 # Elevation of Privilege
-
+ 
 [![Tests](https://github.com/tng/elevation-of-privilege/actions/workflows/checks.yml/badge.svg)](https://github.com/tng/elevation-of-privilege/actions/workflows/checks.yml)
 
 **Improve both: your application's security and your developer's awareness!**
