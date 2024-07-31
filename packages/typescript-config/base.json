@@ -14,7 +14,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "importsNotUsedAsValues": "error",
+    "useDefineForClassFields": true,
 
     /* Interop Constraints */
     "isolatedModules": true,

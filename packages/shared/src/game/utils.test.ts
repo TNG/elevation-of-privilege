@@ -1,7 +1,9 @@
+import seedrandom from 'seedrandom';
+import { describe, it, expect } from 'vitest';
+
 import { CARD_LIMIT, DEFAULT_START_SUIT, ModelType } from '../utils/constants';
 import { GameMode } from '../utils/GameMode';
 import { endTurnIf, setupGame, shuffleCards } from './utils';
-import seedrandom from 'seedrandom';
 
 import type { SetupData } from './setupData';
 import {

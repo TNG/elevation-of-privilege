@@ -3,7 +3,7 @@
   "include": [],
   "exclude": ["**/*"],
   "references": [
-    { "path": "./tsconfig.lib.json" },
+    { "path": "./tsconfig.cjs.json" },
     { "path": "./tsconfig.test.json" }
   ]
 }

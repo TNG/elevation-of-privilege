@@ -1,4 +1,5 @@
-import type { GameState } from '../game/gameState';
+import { it, expect } from 'vitest';
+
 import { DEFAULT_GAME_MODE } from './GameMode';
 import { getStartingCard } from './cardDefinitions';
 import { DEFAULT_START_SUIT, ModelType } from './constants';
@@ -12,6 +13,8 @@ import {
   resolvePlayerName,
   resolvePlayerNames,
 } from './utils';
+
+import type { GameState } from '../game/gameState';
 
 const baseG: GameState = {
   dealt: [],

@@ -1,6 +1,7 @@
 import { DEFAULT_GAME_MODE } from '@eop/shared';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { it } from 'vitest';
 
 import DealtCard from './dealtcard';
 

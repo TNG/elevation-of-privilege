@@ -2,6 +2,7 @@ import { DEFAULT_GAME_MODE, ModelType } from '@eop/shared';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { describe, it, expect, vi } from 'vitest';
 
 import ThreatModal from './threatmodal';
 
@@ -83,7 +84,7 @@ describe('for the owner of the threat', () => {
     );
 
     // then
-    screen.getByText('×');
+    expect(screen.getByText('×')).toBeVisible();
   });
 
   it('renders save and cancel buttons', () => {
@@ -99,13 +100,13 @@ describe('for the owner of the threat', () => {
     );
 
     // then
-    screen.getByText('Save');
-    screen.getByText('Cancel');
+    expect(screen.getByText('Save')).toBeVisible();
+    expect(screen.getByText('Cancel')).toBeVisible();
   });
 
   it('calls the toggleModal move when the close button is clicked', async () => {
     // given
-    const toggleModal = jest.fn();
+    const toggleModal = vi.fn();
     render(
       <ThreatModal
         playerID={playerID}
@@ -127,7 +128,7 @@ describe('for the owner of the threat', () => {
 
   it('calls the toggleModal move when the cancel button is clicked', async () => {
     // given
-    const toggleModal = jest.fn();
+    const toggleModal = vi.fn();
     render(
       <ThreatModal
         playerID={playerID}
@@ -149,8 +150,8 @@ describe('for the owner of the threat', () => {
 
   it('calls the the updateThreat move when the title is changed and unfocused', async () => {
     // given
-    const addOrUpdateThreat = jest.fn();
-    const updateThreat = jest.fn();
+    const addOrUpdateThreat = vi.fn();
+    const updateThreat = vi.fn();
 
     render(
       <ThreatModal
@@ -178,8 +179,8 @@ describe('for the owner of the threat', () => {
 
   it('calls the addOrUpdateThreat move when the save button is clicked', async () => {
     // given
-    const addOrUpdateThreat = jest.fn();
-    const updateThreat = jest.fn();
+    const addOrUpdateThreat = vi.fn();
+    const updateThreat = vi.fn();
 
     render(
       <ThreatModal

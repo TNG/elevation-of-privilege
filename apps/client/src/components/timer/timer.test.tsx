@@ -1,6 +1,8 @@
 import React from 'react';
-import Timer from './timer';
 import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+
+import Timer from './timer';
 
 describe('Timer', () => {
   it('renders without crashing', async () => {

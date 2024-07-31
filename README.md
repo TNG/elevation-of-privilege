@@ -1,5 +1,5 @@
-Elevation of Privilege
-======================
+# Elevation of Privilege
+
 [![Tests](https://github.com/tng/elevation-of-privilege/actions/workflows/checks.yml/badge.svg)](https://github.com/tng/elevation-of-privilege/actions/workflows/checks.yml)
 
 **Improve both: your application's security and your developer's awareness!**
@@ -12,20 +12,19 @@ This application implements an online version of the card games [Elevation of Pr
 
 [<img style="height:50px;cursor:pointer;float:right" src="docs/img/playit.svg"/>](https://threats-demo.thenerdgroup.de/)
 
-*(Disclaimer: This demo instance is for testing purposes only. Do not add sensitive data!)*
+_(Disclaimer: This demo instance is for testing purposes only. Do not add sensitive data!)_
 
 [![Example](docs/eop.gif)](https://threats-demo.thenerdgroup.de/)
-
 
 ### Why Threat Modeling?
 
 Nowadays, security is a topic that concerns every IT project. What if a malicious actor (for financial, ideological or any other reasons) wants to corrupt the system you are building? What if some skilled person wants to break in and steal your intellectual property or the data you are holding?
 
-Threat Modeling is a systematic approach to the question "[What can go wrong?](https://www.threatmodelingmanifesto.org/)". It helps you and your team to take an attacker's perspective and understand your system aside from its features and business value. You will collect threats to your system and mitigate their risk before they get exploited and harm your business.  
+Threat Modeling is a systematic approach to the question "[What can go wrong?](https://www.threatmodelingmanifesto.org/)". It helps you and your team to take an attacker's perspective and understand your system aside from its features and business value. You will collect threats to your system and mitigate their risk before they get exploited and harm your business.
 
 ### And why Serious Games?
 
-The idea to perform threat modeling on a system using a serious card game as developed by the security department at Microsoft. At its core, threat modeling should be done continuously as part of the (agile) development process. Thus, it should also be done by the developers, as they are the real experts on the system.  
+The idea to perform threat modeling on a system using a serious card game as developed by the security department at Microsoft. At its core, threat modeling should be done continuously as part of the (agile) development process. Thus, it should also be done by the developers, as they are the real experts on the system.
 
 Microsoft's game allows developers, architects and security experts to find threats to the system even if they do not have a strong background in IT security. It is a threat catalog that guides the player's thoughts to new and unusual perspectives on the system, just as an attacker would do. Gamification makes this a fun thing to do and keeps the players motivated to find creative attacks.
 
@@ -65,9 +64,9 @@ Inspired by this, the game [Cornucopia](https://owasp.org/www-project-cornucopia
 
 When uploading an architectural model of your system you can choose between different formats:
 
-* an image (`.jpg`, `.png`, `.svg`, ...)
-* JSON model generated with [OWASP Threat Dragon](https://owasp.org/www-project-threat-dragon/)
-* no upload (this might be relevant you must comply to strict confidentiality regulation and want to supply the model via some different channel)
+- an image (`.jpg`, `.png`, `.svg`, ...)
+- JSON model generated with [OWASP Threat Dragon](https://owasp.org/www-project-threat-dragon/)
+- no upload (this might be relevant you must comply to strict confidentiality regulation and want to supply the model via some different channel)
 
 When starting the game you can configure the game mode and generate unique links for each of your players. With these links the players with their own hand of cards.
 
@@ -86,11 +85,14 @@ The frontend and backend are written in TypeScript and use [boardgame.io](https:
 This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces) to structure the different sub-packages and [Turborepo](https://turbo.build/repo) as a build system and task runner.
 
 ### Running the app
+
 There are two components that need to be started in order to run the game.
+
 1. Server
 2. UI/Client
 
 #### Docker
+
 To start a dockerized version of the game use
 
 ```bash
@@ -98,10 +100,10 @@ docker compose up --build
 ```
 
 This will start the app on port `8080` and make it accessible at [http://localhost:8080/](http://localhost:8080/).
-The docker-compose setup starts two containers: 
+The docker-compose setup starts two containers:
 
-* `threats-client`: running `nginx` as a reverse proxy and serving the react application
-* `threats-server`: running the Node.js backend: public API and game server
+- `threats-client`: running `nginx` as a reverse proxy and serving the react application
+- `threats-server`: running the Node.js backend: public API and game server
 
 ![docker-compose setup](docs/docker-setup.svg)
 
@@ -125,7 +127,7 @@ This will build any dependencies of the server if necessary and then start the b
 listening on the following ports:
 
 | Application | Description                                                       | Environment Variable | Default |
-|-------------|-------------------------------------------------------------------|----------------------|---------|
+| ----------- | ----------------------------------------------------------------- | -------------------- | ------- |
 | Server      | The game server for boardgame, exposes socket.io endpoints        | `SERVER_PORT`        | 8000    |
 | Lobby API   | Internal API for lobby operations, should not be exposed publicly | `INTERNAL_API_PORT`  | 8002    |
 | Public API  | Public API to create games and retrieve game info                 | `API_PORT`           | 8001    |
@@ -148,15 +150,21 @@ The UI can be started in dev mode using
 npx turbo run dev --filter=@eop/client
 ```
 
-The UI is accessible at [http://localhost:3000/](http://localhost:3000/).
+The UI is accessible at [http://localhost:5173/](http://localhost:5173/).
 
-You can also build the client manually by running
+The UI can also be built and served statically (see the [Dockerfile](apps/client/Dockerfile)). It assumes that it can access the public API at `/api` and the websocket connection at `/socket.io`, on the same origin that it was served at. Usually, this means you will need some kind of reverse proxy to pass those connections on to the server. See the [nginx configuration](apps/client/nginx/etc/nginx/) for more details.
+
+To build the client, run
 
 ```bash
 npx turbo run build --filter=@eop/client
 ```
 
-The UI can also be built and served statically (see the [Dockerfile](apps/client/Dockerfile)). Keep in mind that the values of the port numbers will be hard coded in the generated files.
+To start it in production mode, run
+
+```bash
+npx turbo run start --filter=@eop/client
+```
 
 To build both the client and the server, just run
 
@@ -164,20 +172,26 @@ To build both the client and the server, just run
 npx turbo run build
 ```
 
+Similarly, you can also start both the server and client in production mode:
+
+```bash
+npx turbo run start
+```
+
 #### Imprint and privacy notices
 
 Links to imprint and privacy notices can be included into the client, if the environment variables
 
 ```bash
-export REACT_APP_EOP_IMPRINT="https://example.tld/imprint/"
-export REACT_APP_EOP_PRIVACY="https://example.tld/privacy/"
+export VITE_EOP_IMPRINT="https://example.tld/imprint/"
+export VITE_EOP_PRIVACY="https://example.tld/privacy/"
 ```
 
 are set when building the app.
 When building the client via docker these env vars can be set by defining `build-args`
 
 ```bash
-docker build --build-arg "REACT_APP_EOP_IMPRINT=https://example.tld/imprint/" --build-arg "REACT_APP_EOP_PRIVACY=https://example.tld/privacy/" -f apps/client/Dockerfile . -t "some-tag"
+docker build --build-arg "VITE_EOP_IMPRINT=https://example.tld/imprint/" --build-arg "VITE_EOP_PRIVACY=https://example.tld/privacy/" -f apps/client/Dockerfile . -t "some-tag"
 ```
 
 ### Versioning
@@ -201,13 +215,14 @@ npx changeset version
 and committing and pushing the changes.
 
 ## Credits
+
 The initial version of this online game was developed in 2018 by [dehydr8](https://github.com/dehydr8), working for Careem at that time. This repository is a fork of the [original one](https://github.com/dehydr8/elevation-of-privilege) including further maintenance and developments like the introduction of alternative card decks. We would like to thank dehydr8 for his great work in setting up this game.
 
 The card game Elevation of Privilege was originally invented by [Adam Shostack](https://adam.shostack.org/) at Microsoft and is licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The [EoP Whitepaper](http://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf) written by Adam can be downloaded which describes the motivation, experience and lessons learned in creating the game.
 
 The card game Cornucopia was originally developed by the [OWASP Foundation](https://owasp.org/). In this application a slightly modified version of the original card game is used. This can be found in the subfolder `cornucopiaCards/`. As the original, the modified version is licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
 
-The card game Elevation of MLsec was developed at [Kantega AS](https://www.kantega.no/). This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International license (https://creativecommons.org/licenses/by-sa/4.0/). 
+The card game Elevation of MLsec was developed at [Kantega AS](https://www.kantega.no/). This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International license (https://creativecommons.org/licenses/by-sa/4.0/).
 
 The motivation for creating this online version of the game at Careem was due to a large number of teams working remotely across several geographies and we wanted to scale our method of teaching threat modeling to our engineering teams.
 

@@ -4,10 +4,11 @@
   "version": "0.24.0",
   "main": "src/client/index.tsx",
   "scripts": {
-    "build": "react-scripts build",
-    "dev": "react-scripts start",
-    "test": "react-scripts test --watchAll=false",
-    "test:watch": "react-scripts test",
+    "build": "tsc -b && vite build",
+    "dev": "vite",
+    "start": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint .",
     "fixlint": "eslint . --fix",
     "checkformat": "prettier . --check",
@@ -33,11 +34,10 @@
     "superagent": "^9.0.2"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@eop/eslint-config": "*",
     "@eop/prettier-config": "*",
     "@eop/typescript-config": "*",
-    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^12.1.5",
     "@testing-library/user-event": "^14.5.2",
     "@types/backbone": "^1.4.19",
@@ -46,27 +46,15 @@
     "@types/react-helmet": "^6.1.11",
     "@types/react-router-dom": "^5.3.3",
     "@types/superagent": "^8.1.7",
+    "@vitejs/plugin-react-swc": "^3.7.0",
     "eslint-plugin-react": "^7.34.3",
+    "jsdom": "^24.1.0",
     "nock": "^13.3.8",
     "prettier": "^3.3.2",
-    "react-scripts": "^5.0.1",
-    "typescript": "^4.8.4",
-    "typescript-eslint": "^8.0.0-alpha.37"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.0.0-alpha.37",
+    "vite": "^5.3.3",
+    "vitest": "^1.6.0"
   },
   "private": true
 }

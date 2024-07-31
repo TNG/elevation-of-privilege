@@ -1,4 +1,3 @@
-import { API_PORT } from '@eop/shared';
 import { faDownload, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { FC, ReactNode, useState } from 'react';
@@ -28,10 +27,7 @@ const DownloadButton: FC<DownloadButtonProps> = ({
   children,
   ...props
 }) => {
-  const apiBase =
-    process.env.NODE_ENV === 'production'
-      ? '/api'
-      : `${window.location.protocol}//${window.location.hostname}:${API_PORT}`;
+  const apiBase = '/api';
 
   const [color, setColor] = useState(initialColor);
   const [icon, setIcon] = useState(faDownload);

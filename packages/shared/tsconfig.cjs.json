@@ -3,7 +3,8 @@
   "extends": "@eop/typescript-config/base.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "./dist/cjs",
+    "declarationDir": "./dist/types",
     "composite": true
   },
   "include": ["src"],

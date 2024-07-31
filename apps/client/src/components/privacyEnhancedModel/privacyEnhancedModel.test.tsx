@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
+import { describe, it, expect } from 'vitest';
+
 import PrivacyEnhancedModel from './privacyEnhancedModel';
 
 describe('privacy enhanced model', () => {
@@ -8,13 +10,13 @@ describe('privacy enhanced model', () => {
 
     render(<PrivacyEnhancedModel modelReference={linkToModel} />);
 
-    screen.getByText(linkToModel);
-    screen.getByRole('link');
+    expect(screen.getByText(linkToModel)).toBeVisible();
+    expect(screen.getByRole('link')).toBeVisible();
   });
 
   it('should not provide link to model if there is no modelReference', () => {
     render(<PrivacyEnhancedModel modelReference={undefined} />);
 
-    expect(screen.queryByRole('link')).toBeNull();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });

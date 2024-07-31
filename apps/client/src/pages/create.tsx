@@ -1,5 +1,4 @@
 import {
-  API_PORT,
   DEFAULT_GAME_MODE,
   DEFAULT_START_SUIT,
   DEFAULT_TURN_DURATION,
@@ -97,10 +96,7 @@ class Create extends React.Component<CreateProps, CreateState> {
     this.fileReader = new FileReader();
     this.fileReader.onloadend = this.onFileRead.bind(this);
 
-    this.apiBase =
-      process.env.NODE_ENV === 'production'
-        ? '/api'
-        : `${window.location.protocol}//${window.location.hostname}:${API_PORT}`;
+    this.apiBase = '/api';
   }
 
   async createGame(): Promise<void> {

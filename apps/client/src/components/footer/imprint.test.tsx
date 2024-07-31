@@ -1,11 +1,17 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+
 import Imprint from './imprint';
 
 describe('Imprint', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('should render link if env var is defined', async () => {
     // given
-    process.env.REACT_APP_EOP_IMPRINT = 'https://example.tld/imprint/';
+    vi.stubEnv('VITE_EOP_IMPRINT', 'https://example.tld/imprint/');
     render(<Imprint />);
 
     // when
@@ -17,7 +23,6 @@ describe('Imprint', () => {
 
   it('should not render link if env var is not defined', () => {
     // given
-    process.env.REACT_APP_EOP_IMPRINT = '';
     render(<Imprint />);
 
     // when

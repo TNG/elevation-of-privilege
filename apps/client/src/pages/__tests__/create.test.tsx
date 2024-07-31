@@ -1,9 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+
 import Create from '../create';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 describe('Create', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('renders without crashing', () => {
     render(
       <Router>
@@ -18,7 +24,7 @@ describe('Create', () => {
 
   it('should render imprint link if env var is defined', () => {
     // given
-    process.env.REACT_APP_EOP_IMPRINT = 'https://example.tld/imprint/';
+    vi.stubEnv('VITE_EOP_IMPRINT', 'https://example.tld/imprint/');
 
     // when
     render(
@@ -37,9 +43,6 @@ describe('Create', () => {
   });
 
   it('should not render imprint link if env var is not defined', () => {
-    // given
-    process.env.REACT_APP_EOP_IMPRINT = '';
-
     // when
     render(
       <Router>
@@ -56,7 +59,7 @@ describe('Create', () => {
 
   it('should render privacy link if env var is defined', () => {
     // given
-    process.env.REACT_APP_EOP_PRIVACY = 'https://example.tld/privacy/';
+    vi.stubEnv('VITE_EOP_PRIVACY', 'https://example.tld/privacy/');
 
     // when
     render(
@@ -75,9 +78,6 @@ describe('Create', () => {
   });
 
   it('should not render privacy link if env var is not defined', () => {
-    // given
-    process.env.REACT_APP_EOP_PRIVACY = '';
-
     // when
     render(
       <Router>
@@ -87,7 +87,7 @@ describe('Create', () => {
 
     // then
     const links = screen.queryAllByRole('link', {
-      name: `Privacy`,
+      name: 'Privacy',
     });
     expect(links.length).toBe(0);
   });
