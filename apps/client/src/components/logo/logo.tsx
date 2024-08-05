@@ -1,15 +1,17 @@
 import type React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const Logo: React.FC<RouteComponentProps> = ({ history }) => {
+const Logo: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <img
       src="logo.png"
       alt="logo"
       height="120px"
-      onClick={() => history.push('/')}
+      onClick={() => navigate('/')}
     />
   );
 };
 
-export default withRouter(Logo);
+export default Logo;
