@@ -332,7 +332,8 @@ type CellType =
   | 'tm.Store'
   | 'tm.Actor'
   | 'tm.Flow'
-  | 'tm.Boundary';
+  | 'tm.Boundary'
+  |'tm.BoundaryBox';
 
 export interface ThreatDragonThreat {
   /**

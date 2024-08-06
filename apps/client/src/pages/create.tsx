@@ -255,7 +255,8 @@ class Create extends React.Component<CreateProps, CreateState> {
       }
     }
     if (
-      (this.state.modelType === ModelType.THREAT_DRAGON && !this.state.model) ||
+      (this.state.modelType === ModelType.THREAT_DRAGON && !this.state.model) || 
+      (this.state.modelType === ModelType.THREAT_DRAGON_V2 && !this.state.model) ||
       (this.state.modelType === ModelType.IMAGE && !this.state.image)
     ) {
       return false;
@@ -505,6 +506,47 @@ class Create extends React.Component<CreateProps, CreateState> {
                       target="_blank"
                       rel="noopener noreferrer"
                       href="https://raw.githubusercontent.com/mike-goodwin/owasp-threat-dragon-demo/master/ThreatDragonModels/Demo%20Threat%20Model/Demo%20Threat%20Model.json"
+                    >
+                      sample model
+                    </a>{' '}
+                    to try it out.
+                  </FormText>
+                </FormGroup>
+                <FormGroup>
+                  <Label check>
+                    <Input
+                      type="radio"
+                      name="model-type"
+                      value={ModelType.THREAT_DRAGON_V2}
+                      onChange={this.updateModelType.bind(this)}
+                    />
+                    Provide model via Threat Dragon V2
+                  </Label>
+                  <Input
+                    disabled={this.state.modelType !== ModelType.THREAT_DRAGON_V2}
+                    type="file"
+                    name="model-json"
+                    id="model"
+                    onChange={this.readJson.bind(this)}
+                    checked={this.state.modelType === ModelType.THREAT_DRAGON_V2}
+                  />
+                  <FormText color="muted">
+                    Select the JSON model produced by{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://docs.threatdragon.org/"
+                    >
+                      Threat Dragon V2
+                    </a>
+                    .
+                  </FormText>
+                  <FormText color="muted">
+                    Or download a{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href=""
                     >
                       sample model
                     </a>{' '}
