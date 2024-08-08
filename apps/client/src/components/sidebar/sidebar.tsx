@@ -60,6 +60,19 @@ const Sidebar: FC<SidebarProps> = ({
           Download Model
         </DownloadButton>
       )}
+      {G.modelType === ModelType.THREAT_DRAGON_V2 && (
+        <DownloadButton
+          matchID={matchID}
+          playerID={playerID}
+          secret={secret}
+          block
+          size="lg"
+          color="success"
+          apiEndpoint="download"
+        >
+          Download Model
+        </DownloadButton>
+      )}
       <DownloadButton
         matchID={matchID}
         playerID={playerID}
