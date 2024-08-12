@@ -4,7 +4,7 @@
   "version": "0.24.0",
   "main": "src/client/index.tsx",
   "scripts": {
-    "build": "tsc -b && vite build",
+    "build": "tsc -b tsconfig.app.json && vite build",
     "dev": "vite",
     "start": "vite preview",
     "test": "vitest run",
