@@ -1,5 +1,7 @@
 import { Client } from 'boardgame.io/client';
 import { Local } from 'boardgame.io/multiplayer';
+import { describe, it, expect } from 'vitest';
+
 import { getStartingCard } from '../utils/cardDefinitions';
 import { DEFAULT_START_SUIT } from '../utils/constants';
 import { DEFAULT_GAME_MODE } from '../utils/GameMode';

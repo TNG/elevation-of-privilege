@@ -1,13 +1,14 @@
 import React from 'react';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 
 import CopyButton from './copybutton';
 import * as utils from '../../utils/utils';
 
 describe('CopyButton', () => {
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('renders without crashing', async () => {
@@ -23,7 +24,7 @@ describe('CopyButton', () => {
 
   it('test button copied when clicked', async () => {
     // given
-    const copyToClipboardSpy = jest.spyOn(utils, 'copyToClipboard');
+    const copyToClipboardSpy = vi.spyOn(utils, 'copyToClipboard');
     copyToClipboardSpy.mockResolvedValueOnce();
     render(<CopyButton text={'Hello, world!'}>Button Text</CopyButton>);
     const button = await screen.findByRole('button', { name: 'Button Text' });

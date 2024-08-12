@@ -4,7 +4,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   { ignores: ['build/'] },
-  { languageOptions: { parserOptions: { project: './tsconfig.json' } } },
+  { languageOptions: { parserOptions: { project: './tsconfig.*.json' } } },
   { settings: { react: { version: 'detect' } } },
   react,
   ...config,

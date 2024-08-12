@@ -1,15 +1,17 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { vi, describe, it, afterEach, expect } from 'vitest';
+
 import Banner from './banner';
 
 describe('Banner', () => {
-  const envBackup = process.env;
-
-  afterEach(() => (process.env = envBackup));
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
 
   it('should render link if env var is defined', async () => {
     // given
-    process.env.REACT_APP_EOP_BANNER_TEXT = 'This is a banner text';
+    vi.stubEnv('VITE_EOP_BANNER_TEXT', 'This is a banner text');
     render(<Banner />);
 
     // when
@@ -21,7 +23,6 @@ describe('Banner', () => {
 
   it('should not render link if env var is not defined', () => {
     // given
-    process.env.REACT_APP_EOP_BANNER_TEXT = '';
     render(<Banner />);
 
     // when

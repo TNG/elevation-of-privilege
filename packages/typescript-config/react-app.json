@@ -6,9 +6,12 @@
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
+    "moduleDetection": "force",
 
     /* Modules */
     "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
 
     /* JavaScript Support */
     "allowJs": true,

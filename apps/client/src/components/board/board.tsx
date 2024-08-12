@@ -1,4 +1,4 @@
-import { API_PORT, getDealtCard, ModelType, SPECTATOR } from '@eop/shared';
+import { getDealtCard, ModelType, SPECTATOR } from '@eop/shared';
 import type { BoardProps as BoardgameIOBoardProps } from 'boardgame.io/react';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import request from 'superagent';
@@ -40,10 +40,7 @@ const Board: FC<BoardProps> = ({
   const [names, setNames] = useState(initialNames);
 
   const [model, setModel] = useState<ThreatDragonModel | undefined>(undefined);
-  const apiBase =
-    process.env.NODE_ENV === 'production'
-      ? '/api'
-      : `${window.location.protocol}//${window.location.hostname}:${API_PORT}`;
+  const apiBase = '/api';
 
   const updateName = useCallback((index: number, name: string) => {
     setNames((names) => {

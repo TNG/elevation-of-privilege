@@ -4,7 +4,8 @@ import auth from 'basic-auth';
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import Router from 'koa-router';
-import { API_PORT, SPECTATOR } from '@eop/shared';
+import { SPECTATOR } from '@eop/shared';
+import { API_PORT } from './config';
 import {
   createGame,
   downloadThreatDragonModel,
