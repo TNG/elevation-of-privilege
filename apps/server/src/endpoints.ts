@@ -9,8 +9,10 @@ import {
   getSuitDisplayName,
   isSuit,
   logEvent,
+  mapModel2toOldModel,
   ModelType,
   ThreatDragonModel,
+  ThreatDragonModel2,
   ThreatDragonThreat,
   gameName,
 } from '@eop/shared';
@@ -86,10 +88,20 @@ export const createGame =
       switch (body.modelType) {
         case ModelType.THREAT_DRAGON: {
           // TODO: validation
-          await gameServer.db.setModel(
-            matchID,
-            JSON.parse(body.model as string) as ThreatDragonModel,
-          );
+          logEvent('vishal printing body');
+          logEvent(`printing body: ${body.model}`);
+          var model = JSON.parse(body.model as string) as ThreatDragonModel;
+          await gameServer.db.setModel(matchID,model);
+          break;
+        }
+
+        case ModelType.THREAT_DRAGON_V2: {
+          // TODO: validation
+          logEvent('vishal printing body');
+          logEvent(`printing body: ${body.model}`);
+          var model2 = JSON.parse(body.model as string) as ThreatDragonModel2;
+          var model = mapModel2toOldModel(model2);
+          await gameServer.db.setModel(matchID,model);
           break;
         }
 
@@ -222,7 +234,8 @@ export const downloadThreatDragonModel =
 
     const isJsonModel =
       state.G.modelType == ModelType.PRIVACY_ENHANCED ||
-      state.G.modelType == ModelType.THREAT_DRAGON;
+      state.G.modelType == ModelType.THREAT_DRAGON || 
+      state.G.modelType == ModelType.THREAT_DRAGON_V2;
 
     const model = game.model;
     if (!model || 'extension' in model || !isJsonModel) {
@@ -295,7 +308,8 @@ export const downloadThreatsMarkdownFile =
 
     const isJsonModel =
       state.G.modelType == ModelType.PRIVACY_ENHANCED ||
-      state.G.modelType == ModelType.THREAT_DRAGON;
+      state.G.modelType == ModelType.THREAT_DRAGON || 
+      state.G.modelType == ModelType.THREAT_DRAGON_V2;
 
     const model = game.model;
     const threats = getThreats(

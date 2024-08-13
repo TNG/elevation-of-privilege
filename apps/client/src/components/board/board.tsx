@@ -147,6 +147,15 @@ const Board: FC<BoardProps> = ({
           onSelectComponent={moves.selectComponent}
         />
       )}
+       {G.modelType === ModelType.THREAT_DRAGON_V2 && model !== undefined && (
+        <Model
+          model={model}
+          selectedDiagram={G.selectedDiagram}
+          selectedComponent={G.selectedComponent}
+          onSelectDiagram={moves.selectDiagram}
+          onSelectComponent={moves.selectComponent}
+        />
+      )}
       {G.modelType === ModelType.PRIVACY_ENHANCED && (
         <PrivacyEnhancedModel modelReference={G.modelReference} />
       )}
