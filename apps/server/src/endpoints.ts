@@ -41,7 +41,7 @@ export const createGame =
       > & {
         turnDuration: `${number}`;
         players: `${number}`;
-        'names[]': string[];
+        names: string[];
         model?: string;
       };
 
@@ -75,7 +75,7 @@ export const createGame =
           matchID,
           {
             playerID: i.toString(),
-            playerName: body['names[]'][i],
+            playerName: body.names[i],
           },
         );
 
@@ -107,25 +107,28 @@ export const createGame =
             throw Error('A single image needs to be provided');
           }
 
-          if (!ctx.request.files.model.name) {
+          if (!ctx.request.files.model.originalFilename) {
             throw Error('No name specified for the provided image');
           }
 
-          if (!ctx.request.files.model.type) {
+          if (!ctx.request.files.model.mimetype) {
             throw Error('No mime type specified for the provided image');
           }
 
-          const extension = getImageExtension(ctx.request.files.model.name);
+          const extension = getImageExtension(
+            ctx.request.files.model.originalFilename,
+          );
           if (
             !(
-              /image\/[a-z+]+$/i.test(ctx.request.files.model.type) && extension
+              /image\/[a-z+]+$/i.test(ctx.request.files.model.mimetype) &&
+              extension
             )
           ) {
             throw Error('Filetype not supported');
           }
 
           await rename(
-            ctx.request.files.model.path,
+            ctx.request.files.model.filepath,
             `${getDbImagesFolder()}/${matchID}.${extension}`,
           );
           //use model object to store info about image

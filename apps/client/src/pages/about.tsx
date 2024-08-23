@@ -13,7 +13,6 @@ const About: FC = () => {
   return (
     <div>
       <Banner />
-      {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
       {/* @ts-expect-error This seems to be incorrectly typed in helmet*/}
       <Helmet bodyAttributes={{ style: 'background-color : #000' }} />
       <Container className="about" fluid>
