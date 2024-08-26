@@ -84,7 +84,7 @@ describe('for the owner of the threat', () => {
     );
 
     // then
-    expect(screen.getByText('×')).toBeVisible();
+    expect(screen.getByLabelText('Close')).toBeVisible();
   });
 
   it('renders save and cancel buttons', () => {
@@ -117,7 +117,7 @@ describe('for the owner of the threat', () => {
       />,
     );
 
-    const close = screen.getByText('×');
+    const close = screen.getByLabelText('Close');
 
     // when
     await userEvent.click(close);

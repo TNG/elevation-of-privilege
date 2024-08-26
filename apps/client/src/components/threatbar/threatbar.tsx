@@ -6,7 +6,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useState } from 'react';
 import nl2br from 'react-nl2br';
 import {
   Button,
@@ -19,8 +19,8 @@ import {
   Collapse,
   Row,
 } from 'reactstrap';
-import confirm from 'reactstrap-confirm';
 
+import ConfirmModal from '../confirmmodal/confirmmodal';
 import ThreatModal from '../threatmodal/threatmodal';
 
 import './threatbar.css';
@@ -32,6 +32,7 @@ import type {
 } from '@eop/shared';
 import type { BoardProps } from 'boardgame.io/react';
 import type { FC } from 'react';
+import { Threat } from '../../../../../packages/shared/dist/types/game/threat';
 
 type ThreatbarProps = {
   model?: ThreatDragonModel;
@@ -81,12 +82,19 @@ const Threatbar: FC<ThreatbarProps> = ({
   const component = getSelectedComponent();
   const componentName = getComponentName(component);
 
+  const [threatToBeDeleted, setThreatToBeDeleted] = useState<
+    Threat | undefined
+  >(undefined);
+
+  const deleteThreat = () => {
+    moves.deleteThreat(threatToBeDeleted);
+  };
+
   return (
     <div className="threat-bar" hidden={G.selectedComponent === ''}>
       <Card>
         <CardHeader>
           Threats for {componentName}{' '}
-          {/* @ts-expect-error @fortawesome/react-fontawesome uses an older version of @fortawesome/fontawesome-svg-core (1.3.0), which makes the types incompatible. It still works correctly at runtime. */}
           <FontAwesomeIcon style={{ float: 'right' }} icon={faBolt} />
         </CardHeader>
         <CardBody className="threat-container">
@@ -103,7 +111,6 @@ const Threatbar: FC<ThreatbarProps> = ({
               }
               onClick={() => moves.toggleModal()}
             >
-              {/* @ts-expect-error @fortawesome/react-fontawesome uses an older version of @fortawesome/fontawesome-svg-core (1.3.0), which makes the types incompatible. It still works correctly at runtime. */}
               <FontAwesomeIcon icon={faPlus} /> Add Threat
             </Button>
           )}
@@ -149,7 +156,6 @@ const Threatbar: FC<ThreatbarProps> = ({
                         block
                         onClick={() => moves.toggleModalUpdate(val)}
                       >
-                        {/* @ts-expect-error @fortawesome/react-fontawesome uses an older version of @fortawesome/fontawesome-svg-core (1.3.0), which makes the types incompatible. It still works correctly at runtime. */}
                         <FontAwesomeIcon icon={faEdit} /> Update
                       </Button>
                     </Col>
@@ -157,15 +163,8 @@ const Threatbar: FC<ThreatbarProps> = ({
                       <Button
                         block
                         color="danger"
-                        onClick={() =>
-                          void confirm().then((result) => {
-                            if (result) {
-                              moves.deleteThreat(val);
-                            }
-                          })
-                        }
+                        onClick={() => setThreatToBeDeleted(val)}
                       >
-                        {/* @ts-expect-error @fortawesome/react-fontawesome uses an older version of @fortawesome/fontawesome-svg-core (1.3.0), which makes the types incompatible. It still works correctly at runtime. */}
                         <FontAwesomeIcon icon={faTrash} /> Remove
                       </Button>
                     </Col>
@@ -175,7 +174,7 @@ const Threatbar: FC<ThreatbarProps> = ({
             </Card>
           ))}
           {identifiedThreats.length <= 0 && (
-            <em className="text-muted">
+            <em className="text-secondary">
               No threats identified for this component yet.
             </em>
           )}
@@ -212,7 +211,7 @@ const Threatbar: FC<ThreatbarProps> = ({
             </Card>
           ))}
           {threats.length <= 0 && (
-            <em className="text-muted">
+            <em className="text-secondary">
               No existing threats for this component.
             </em>
           )}
@@ -225,6 +224,15 @@ const Threatbar: FC<ThreatbarProps> = ({
         moves={moves}
         names={names}
       />
+      <ConfirmModal
+        isOpen={threatToBeDeleted !== undefined}
+        onClose={(result) => {
+          if (result) {
+            deleteThreat();
+          }
+          setThreatToBeDeleted(undefined);
+        }}
+      ></ConfirmModal>
     </div>
   );
 };
