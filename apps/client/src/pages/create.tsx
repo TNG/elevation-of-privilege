@@ -112,7 +112,7 @@ class Create extends React.Component<CreateProps, CreateState> {
       formData.append(
         'model',
         this.state.modelType === ModelType.IMAGE
-          ? this.state.image ?? ''
+          ? (this.state.image ?? '')
           : JSON.stringify(this.state.model),
       );
     }
@@ -570,7 +570,6 @@ class Create extends React.Component<CreateProps, CreateState> {
 
     return (
       <div>
-        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
         {/* @ts-expect-error This seems to be incorrectly typed in helmet*/}
         <Helmet bodyAttributes={{ style: 'background-color : #000' }} />
         <Container className="create">
