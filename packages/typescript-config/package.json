@@ -1,7 +1,7 @@
 {
   "name": "@eop/typescript-config",
   "type": "module",
-  "version": "0.24.0",
+  "version": "1.0.0",
   "scripts": {
     "checkformat": "prettier . --check",
     "format": "prettier . --write"
