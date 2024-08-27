@@ -1,7 +1,7 @@
 {
   "name": "@eop/client",
   "type": "module",
-  "version": "0.24.0",
+  "version": "1.0.0",
   "main": "src/client/index.tsx",
   "scripts": {
     "build": "tsc -b tsconfig.app.json && vite build",

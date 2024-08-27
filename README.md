@@ -209,7 +209,7 @@ and follow the instructions to add a new changeset for the relevant packages.
 A release can then be performed by running
 
 ```bash
-npx changeset version
+npx changeset version && npm install
 ```
 
 and committing and pushing the changes.
