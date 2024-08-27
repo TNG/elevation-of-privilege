@@ -1,7 +1,7 @@
 {
   "name": "@eop/shared",
   "type": "commonjs",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "main": "./dist/cjs/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
