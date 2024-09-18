@@ -38,7 +38,7 @@
     "@eop/prettier-config": "*",
     "@eop/typescript-config": "*",
     "@testing-library/jest-dom": "^6.4.8",
-    "@testing-library/react": "^16.0.0",
+    "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/backbone": "^1.4.19",
     "@types/react": "^18.3.4",
