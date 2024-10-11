@@ -467,7 +467,7 @@ class Create extends React.Component<CreateProps, CreateState> {
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
-                      href="https://docs.threatdragon.org/"
+                      href="https://owasp.org/www-project-threat-dragon/"
                     >
                       Threat Dragon
                     </a>
