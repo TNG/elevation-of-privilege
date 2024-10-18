@@ -1,7 +1,7 @@
 {
   "name": "@eop/server",
   "type": "commonjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "build": "rimraf dist *.tsbuildinfo && tsc --build tsconfig.app.json",
     "dev": "cross-env TS_NODE_PROJECT=./tsconfig.app.json node --inspect --watch --unhandled-rejections=warn -r ts-node/register src/main.ts",

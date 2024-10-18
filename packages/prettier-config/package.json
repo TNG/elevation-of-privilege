@@ -1,7 +1,7 @@
 {
   "name": "@eop/prettier-config",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "prettier.config.mjs",
   "scripts": {
     "checkformat": "prettier . --check",

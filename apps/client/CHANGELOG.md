@@ -1,5 +1,13 @@
 # @eop/client
 
+## 1.0.1
+
+### Patch Changes
+
+- 7586ca9: Fix dead link to Threat Dragon
+  - @eop/cornucopia-cards@1.0.1
+  - @eop/shared@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

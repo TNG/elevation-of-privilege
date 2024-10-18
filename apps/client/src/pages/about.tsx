@@ -88,7 +88,7 @@ const About: FC = () => {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="https://docs.threatdragon.org/"
+                    href="https://owasp.org/www-project-threat-dragon/"
                   >
                     Threat Dragon
                   </a>
