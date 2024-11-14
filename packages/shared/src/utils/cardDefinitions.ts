@@ -15,7 +15,7 @@ type CardDeckDefinitions = {
   [key in GameMode]: { [suit in Suit]: SuitDetails };
 };
 
-const CARD_DECKS: CardDeckDefinitions = {
+export const CARD_DECKS: CardDeckDefinitions = {
   [GameMode.EOP]: {
     A: {
       name: 'Denial of Service',

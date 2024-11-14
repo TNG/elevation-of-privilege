@@ -15,3 +15,7 @@ table {
 .text-input-wide {
   width: 100%;
 }
+
+.space-top {
+  margin-top: 2rem;
+}

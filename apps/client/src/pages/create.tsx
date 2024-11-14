@@ -16,7 +16,6 @@ import {
 import type { PlayerID } from 'boardgame.io';
 import _ from 'lodash';
 import React, { ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Button,
   Card,
@@ -256,7 +255,7 @@ class Create extends React.Component<CreateProps, CreateState> {
 
   formatAllLinks(): string {
     return (
-      'You have been invited to a game of Elevation of Privilege:\n\n' +
+      'You have been invited to a threat modeling game:\n\n' +
       Array(this.state.players)
         .fill(0)
         .map((_, i) => {
@@ -270,19 +269,20 @@ class Create extends React.Component<CreateProps, CreateState> {
     const cardBody = !this.state.created ? (
       <div>
         <Banner />
-        <p>
-          Elevation of Privilege (EoP) is the easy way to get started and learn
-          threat modeling. It is a card game that developers, architects or
-          security experts can play.
-        </p>
-        <p>
-          To learn more about the game, navigate to the{' '}
-          <Link to="/about">about page</Link>.
-        </p>
-        <small className="text-secondary">
-          To start playing, select the number of players and enter their names.
-        </small>
+        <Button
+          block
+          size="lg"
+          color="primary"
+          onClick={() => (window.location.href = `/random-card`)}
+        >
+          Draw a random card
+        </Button>
         <hr />
+        <p className="space-top">
+          <center>
+            <strong>Or create a new game:</strong>
+          </center>
+        </p>
         <Form>
           <FormGroup row>
             <Label for="players" sm={2}>
@@ -488,7 +488,7 @@ class Create extends React.Component<CreateProps, CreateState> {
           <Button
             block
             size="lg"
-            color="warning"
+            color="danger"
             disabled={this.state.creating || !this.isFormValid()}
             onClick={this.createGame.bind(this)}
           >
@@ -549,12 +549,7 @@ class Create extends React.Component<CreateProps, CreateState> {
           </tbody>
         </Table>
         <hr />
-        <CopyButton
-          text={this.formatAllLinks()}
-          color="warning"
-          block
-          size="lg"
-        >
+        <CopyButton text={this.formatAllLinks()} color="light" block size="lg">
           Copy All
         </CopyButton>
         <hr />
@@ -576,9 +571,7 @@ class Create extends React.Component<CreateProps, CreateState> {
                 <Logo />
               </div>
               <Card className="create-card">
-                <CardHeader className="text-center">
-                  Elevation of Privilege
-                </CardHeader>
+                <CardHeader className="text-center">Threat Modeling</CardHeader>
                 <CardBody>{cardBody}</CardBody>
               </Card>
             </Col>
