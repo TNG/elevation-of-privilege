@@ -16,7 +16,6 @@ import {
 import type { PlayerID } from 'boardgame.io';
 import _ from 'lodash';
 import React, { ChangeEvent } from 'react';
-import Helmet from 'react-helmet';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -570,8 +569,6 @@ class Create extends React.Component<CreateProps, CreateState> {
 
     return (
       <div>
-        {/* @ts-expect-error This seems to be incorrectly typed in helmet*/}
-        <Helmet bodyAttributes={{ style: 'background-color : #000' }} />
         <Container className="create">
           <Row style={{ paddingTop: '20px' }}>
             <Col sm="12" md={{ size: 6, offset: 3 }}>

@@ -1,3 +1,7 @@
+html body {
+  background-color: #000;
+}
+
 table {
   table-layout: auto;
   word-wrap: break-word;

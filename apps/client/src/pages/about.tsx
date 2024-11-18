@@ -2,7 +2,6 @@ import '../styles/about.css';
 
 import type React from 'react';
 import type { FC } from 'react';
-import Helmet from 'react-helmet';
 import { Card, CardBody, CardHeader, Col, Container, Row } from 'reactstrap';
 
 import Footer from '../components/footer/footer';
@@ -13,8 +12,6 @@ const About: FC = () => {
   return (
     <div>
       <Banner />
-      {/* @ts-expect-error This seems to be incorrectly typed in helmet*/}
-      <Helmet bodyAttributes={{ style: 'background-color : #000' }} />
       <Container className="about" fluid>
         <Row style={{ paddingTop: '20px' }}>
           <Col sm="12" md={{ size: 6, offset: 3 }}>
