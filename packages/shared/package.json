@@ -29,7 +29,7 @@
     "@eop/eslint-config": "*",
     "@eop/prettier-config": "*",
     "@eop/typescript-config": "*",
-    "@types/lodash": "^4.17.7",
+    "@types/lodash": "^4.17.13",
     "@types/seedrandom": "^3.0.8",
     "@types/uuid": "^10.0.0",
     "eslint": "^9.9.0",
