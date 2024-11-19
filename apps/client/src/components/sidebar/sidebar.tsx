@@ -1,4 +1,4 @@
-import { GameMode, getDealtCard, ModelType, SPECTATOR } from '@eop/shared';
+import { getDealtCard, ModelType, SPECTATOR } from '@eop/shared';
 import React from 'react';
 import { Button } from 'reactstrap';
 
