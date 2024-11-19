@@ -100,7 +100,7 @@ const Sidebar: FC<SidebarProps> = ({
         <DealtCard
           card={dealtCard}
           gameMode={G.gameMode}
-          isShiftedLeft={G.gameMode === GameMode.EOMLSEC}
+          isAlignedRight={true}
         />
       </div>
     </div>

@@ -5,10 +5,12 @@
 }
 .card-deck-selection {
   width: 15rem;
+  cursor: pointer;
 }
 
 .card-container {
   display: flex;
+  position: inherit;
   justify-content: center;
   height: 600px;
 }
