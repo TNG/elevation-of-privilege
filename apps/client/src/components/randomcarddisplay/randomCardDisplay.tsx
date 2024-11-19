@@ -77,7 +77,7 @@ const RandomCardDisplay: FC = () => {
           />
         </div>
       )}
-      <Button block size="lg" color="primary" onClick={() => selectCard()}>
+      <Button block size="lg" color="primary" onClick={selectCard}>
         New Card
       </Button>
     </>
