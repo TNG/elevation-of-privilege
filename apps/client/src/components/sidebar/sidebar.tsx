@@ -54,7 +54,7 @@ const Sidebar: FC<SidebarProps> = ({
           secret={secret}
           block
           size="lg"
-          color="success"
+          color="secondary"
           apiEndpoint="download"
         >
           Download Model
@@ -66,7 +66,7 @@ const Sidebar: FC<SidebarProps> = ({
         secret={secret}
         block
         size="lg"
-        color="warning"
+        color="secondary"
         apiEndpoint="download/text"
       >
         Download Threats
@@ -96,8 +96,13 @@ const Sidebar: FC<SidebarProps> = ({
           Pass
         </Button>
       )}
-
-      <DealtCard card={dealtCard} gameMode={G.gameMode} />
+      <div className="dealt-card-container">
+        <DealtCard
+          card={dealtCard}
+          gameMode={G.gameMode}
+          isAlignedRight={true}
+        />
+      </div>
     </div>
   );
 };

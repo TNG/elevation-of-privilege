@@ -1,5 +1,17 @@
 # @eop/client
 
+## 1.1.0
+
+### Minor Changes
+
+- Draw a random card.
+
+### Patch Changes
+
+- Updated dependencies
+  - @eop/shared@1.1.0
+  - @eop/cornucopia-cards@1.1.0
+
 ## 1.0.1
 
 ### Patch Changes

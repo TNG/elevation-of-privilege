@@ -16,7 +16,6 @@ import {
 import type { PlayerID } from 'boardgame.io';
 import _ from 'lodash';
 import React, { ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Button,
   Card,
@@ -256,7 +255,7 @@ class Create extends React.Component<CreateProps, CreateState> {
 
   formatAllLinks(): string {
     return (
-      'You have been invited to a game of Elevation of Privilege:\n\n' +
+      'You have been invited to a threat modeling game:\n\n' +
       Array(this.state.players)
         .fill(0)
         .map((_, i) => {
@@ -270,19 +269,6 @@ class Create extends React.Component<CreateProps, CreateState> {
     const cardBody = !this.state.created ? (
       <div>
         <Banner />
-        <p>
-          Elevation of Privilege (EoP) is the easy way to get started and learn
-          threat modeling. It is a card game that developers, architects or
-          security experts can play.
-        </p>
-        <p>
-          To learn more about the game, navigate to the{' '}
-          <Link to="/about">about page</Link>.
-        </p>
-        <small className="text-secondary">
-          To start playing, select the number of players and enter their names.
-        </small>
-        <hr />
         <Form>
           <FormGroup row>
             <Label for="players" sm={2}>
@@ -488,7 +474,7 @@ class Create extends React.Component<CreateProps, CreateState> {
           <Button
             block
             size="lg"
-            color="warning"
+            color="primary"
             disabled={this.state.creating || !this.isFormValid()}
             onClick={this.createGame.bind(this)}
           >
@@ -496,10 +482,18 @@ class Create extends React.Component<CreateProps, CreateState> {
           </Button>
         </Form>
         <hr />
-        <small className="text-secondary">
-          Players will be able to join the game with the links that are
-          generated after you proceed.
-        </small>
+        <p className="centered">
+          Alternatively, if you do not want to play a full game you can just
+          select a few random cards.
+        </p>
+        <Button
+          block
+          size="lg"
+          color="secondary"
+          onClick={() => (window.location.href = `/random-card`)}
+        >
+          Draw a random card
+        </Button>
       </div>
     ) : (
       <div>
@@ -551,7 +545,7 @@ class Create extends React.Component<CreateProps, CreateState> {
         <hr />
         <CopyButton
           text={this.formatAllLinks()}
-          color="warning"
+          color="secondary"
           block
           size="lg"
         >
@@ -576,9 +570,7 @@ class Create extends React.Component<CreateProps, CreateState> {
                 <Logo />
               </div>
               <Card className="create-card">
-                <CardHeader className="text-center">
-                  Elevation of Privilege
-                </CardHeader>
+                <CardHeader className="text-center">Threat Modeling</CardHeader>
                 <CardBody>{cardBody}</CardBody>
               </Card>
             </Col>

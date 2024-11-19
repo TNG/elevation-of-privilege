@@ -1,5 +1,5 @@
 html body {
-  background-color: #000;
+  background-color: #fff;
 }
 
 table {
@@ -14,4 +14,12 @@ table {
 
 .text-input-wide {
   width: 100%;
+}
+
+.space-top {
+  margin-top: 2rem;
+}
+
+.centered {
+  text-align: center;
 }

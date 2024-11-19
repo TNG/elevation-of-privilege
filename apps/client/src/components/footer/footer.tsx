@@ -12,7 +12,7 @@ type FooterProps = {
 };
 
 const Footer: FC<FooterProps> = ({ short = false }) => (
-  <small className="text-white-50">
+  <small className="text-black-50">
     v{packageJson.version}
     {!short && (
       <>
@@ -20,10 +20,12 @@ const Footer: FC<FooterProps> = ({ short = false }) => (
           {' '}
           - made with{' '}
           <FontAwesomeIcon icon={faHeart} style={{ color: '#00cc00' }} /> at
-          Careem and{' '}
-          <a href="https://www.tngtech.com/en/">TNG Technology Consulting</a> -
-          Elevation of Privilege was originally invented at Microsoft,
-          Cornucopia was developed at OWASP, Cumulus was started at{' '}
+          &nbsp;
+          <a href="https://www.tngtech.com/en/">
+            TNG Technology Consulting
+          </a>{' '}
+          and Careem - Elevation of Privilege was originally invented at
+          Microsoft, Cornucopia was developed at OWASP, Cumulus was started at{' '}
           <a href="https://www.tngtech.com/en/">TNG Technology Consulting</a>,
           Elevation of MLsec was developed at{' '}
           <a href="https://www.kantega.no/">Kantega AS</a>.
