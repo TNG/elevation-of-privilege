@@ -1,62 +1,39 @@
 import React from 'react';
-import { Card, CARD_DECKS, GameMode, Suit } from '@eop/shared';
-import { FC, useEffect, useState } from 'react';
+import { CARD_DECKS, GameMode, SUITS } from '@eop/shared';
+import { FC, useState } from 'react';
 import DealtCard from '../dealtcard/dealtcard';
-import './randomCardDisplay.css';
+import classes from './randomCardDisplay.module.css';
 import { Button, FormGroup, Input, Label } from 'reactstrap';
 
-type SelectableCard = {
-  card: Card;
-  gameMode: GameMode;
-};
-
-const suites: Suit[] = ['A', 'B', 'C', 'D', 'E', 'T'];
-
+const allDecks = Object.keys(CARD_DECKS) as GameMode[];
 const RandomCardDisplay: FC = () => {
-  const allDecks = Object.keys(CARD_DECKS) as GameMode[];
   const [selectedDecks, setSelectedDecks] = useState<GameMode[]>(allDecks);
-  const [selectedCard, setSelectedCard] = useState<SelectableCard | undefined>(
-    undefined,
+  const selectableCards = selectedDecks.flatMap((deck) =>
+    SUITS.flatMap((suit) =>
+      CARD_DECKS[deck][suit].cards.map((card) => ({
+        card,
+        gameMode: deck,
+      })),
+    ),
   );
-  const selectableCards: SelectableCard[] = [];
-
-  selectedDecks.forEach((deck) =>
-    suites.forEach((suit) => {
-      selectableCards.push(
-        ...CARD_DECKS[deck][suit].cards.map((card) => ({
-          card,
-          gameMode: deck,
-        })),
-      );
-    }),
-  );
-
-  const selectCard = () =>
-    setSelectedCard(
-      selectableCards[Math.floor(Math.random() * selectableCards.length)],
+  const getRandomSelectableCard = () =>
+    selectableCards[Math.floor(Math.random() * selectableCards.length)];
+  const [selectedCard, setSelectedCard] = useState(getRandomSelectableCard());
+  const selectCard = () => setSelectedCard(getRandomSelectableCard());
+  const toggleCardDeck = (deck: GameMode) =>
+    setSelectedDecks((selectedDecks) =>
+      selectedDecks.includes(deck)
+        ? selectedDecks.filter((selectedDeck) => selectedDeck !== deck)
+        : [...selectedDecks, deck],
     );
-
-  useEffect(() => {
-    selectCard();
-  }, []);
-
-  const toggleCardDeck = (deck: GameMode) => {
-    if (selectedDecks.includes(deck)) {
-      setSelectedDecks(
-        selectedDecks.filter((selectedDeck) => selectedDeck !== deck),
-      );
-    } else {
-      setSelectedDecks(selectedDecks.concat(deck));
-    }
-  };
 
   return (
     <>
-      <FormGroup check className="card-deck-selector-container">
+      <FormGroup check className={classes['card-deck-selector-container']}>
         {allDecks.map((deck) => (
           <Label
             check
-            className="card-deck-selection"
+            className={classes['card-deck-selection']}
             key={`card-deck-selector-${deck}`}
           >
             <Input
@@ -70,7 +47,7 @@ const RandomCardDisplay: FC = () => {
         ))}
       </FormGroup>
       {selectedCard && (
-        <div className="card-container">
+        <div className={classes['card-container']}>
           <DealtCard
             gameMode={selectedCard.gameMode}
             card={selectedCard.card}

@@ -12,7 +12,7 @@ type FooterProps = {
 };
 
 const Footer: FC<FooterProps> = ({ short = false }) => (
-  <small className="text-white-50">
+  <small className="text-black-50">
     v{packageJson.version}
     {!short && (
       <>

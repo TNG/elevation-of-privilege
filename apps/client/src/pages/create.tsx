@@ -269,20 +269,6 @@ class Create extends React.Component<CreateProps, CreateState> {
     const cardBody = !this.state.created ? (
       <div>
         <Banner />
-        <Button
-          block
-          size="lg"
-          color="primary"
-          onClick={() => (window.location.href = `/random-card`)}
-        >
-          Draw a random card
-        </Button>
-        <hr />
-        <p className="space-top">
-          <center>
-            <strong>Or create a new game:</strong>
-          </center>
-        </p>
         <Form>
           <FormGroup row>
             <Label for="players" sm={2}>
@@ -488,7 +474,7 @@ class Create extends React.Component<CreateProps, CreateState> {
           <Button
             block
             size="lg"
-            color="danger"
+            color="primary"
             disabled={this.state.creating || !this.isFormValid()}
             onClick={this.createGame.bind(this)}
           >
@@ -496,10 +482,18 @@ class Create extends React.Component<CreateProps, CreateState> {
           </Button>
         </Form>
         <hr />
-        <small className="text-secondary">
-          Players will be able to join the game with the links that are
-          generated after you proceed.
-        </small>
+        <p className="centered">
+          Alternatively, if you do not want to play a full game you can just
+          select a few random cards.
+        </p>
+        <Button
+          block
+          size="lg"
+          color="secondary"
+          onClick={() => (window.location.href = `/random-card`)}
+        >
+          Draw a random card
+        </Button>
       </div>
     ) : (
       <div>
@@ -549,7 +543,12 @@ class Create extends React.Component<CreateProps, CreateState> {
           </tbody>
         </Table>
         <hr />
-        <CopyButton text={this.formatAllLinks()} color="light" block size="lg">
+        <CopyButton
+          text={this.formatAllLinks()}
+          color="secondary"
+          block
+          size="lg"
+        >
           Copy All
         </CopyButton>
         <hr />

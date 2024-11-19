@@ -11,14 +11,12 @@ interface DealtCardProps {
 const DealtCard: React.FC<DealtCardProps> = ({ gameMode, card }) => {
   const roundedClass =
     gameMode === GameMode.CUMULUS ? `card-rounded-cumulus` : `card-rounded`;
-  const translationClass =
-    gameMode === GameMode.EOMLSEC ? `card-translate-left` : ``;
   return (
     <div
       className={`playing-card ${getCardCssClass(
         gameMode,
         card,
-      )} active ${roundedClass} scaled-big ${translationClass}`}
+      )} active ${roundedClass} scaled-big aligned-right`}
     />
   );
 };

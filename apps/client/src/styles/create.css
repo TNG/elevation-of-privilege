@@ -1,5 +1,5 @@
 html body {
-  background-color: #000;
+  background-color: #fff;
 }
 
 table {
@@ -18,4 +18,8 @@ table {
 
 .space-top {
   margin-top: 2rem;
+}
+
+.centered {
+  text-align: center;
 }
