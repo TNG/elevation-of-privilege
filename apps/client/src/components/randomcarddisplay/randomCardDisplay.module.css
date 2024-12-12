@@ -1,0 +1,16 @@
+.card-deck-selector-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+}
+.card-deck-selection {
+  width: 15rem;
+  cursor: pointer;
+}
+
+.card-container {
+  display: flex;
+  position: inherit;
+  justify-content: center;
+  height: 600px;
+}

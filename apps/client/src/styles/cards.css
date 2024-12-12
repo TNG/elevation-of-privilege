@@ -24,10 +24,6 @@
   border-radius: 25px;
 }
 
-.card-translate-left {
-  margin-left: -5rem;
-}
-
 .playingCardsContainer {
   position: fixed;
   bottom: 0;

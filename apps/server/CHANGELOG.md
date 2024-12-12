@@ -1,5 +1,12 @@
 # @eop/server
 
+## 1.1.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @eop/shared@1.1.0
+
 ## 1.0.1
 
 ### Patch Changes

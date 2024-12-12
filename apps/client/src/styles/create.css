@@ -1,7 +1,3 @@
-html body {
-  background-color: #000;
-}
-
 table {
   table-layout: auto;
   word-wrap: break-word;
@@ -14,4 +10,12 @@ table {
 
 .text-input-wide {
   width: 100%;
+}
+
+.space-top {
+  margin-top: 2rem;
+}
+
+.centered {
+  text-align: center;
 }

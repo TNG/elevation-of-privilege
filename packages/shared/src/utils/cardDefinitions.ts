@@ -1,7 +1,8 @@
 import { GameMode } from './GameMode';
 
 export type Card = string;
-export type Suit = 'A' | 'B' | 'C' | 'D' | 'E' | 'T';
+export const SUITS = ['A', 'B', 'C', 'D', 'E', 'T'] as const;
+export type Suit = (typeof SUITS)[number];
 
 interface SuitDetails {
   name?: string;
@@ -15,7 +16,7 @@ type CardDeckDefinitions = {
   [key in GameMode]: { [suit in Suit]: SuitDetails };
 };
 
-const CARD_DECKS: CardDeckDefinitions = {
+export const CARD_DECKS: CardDeckDefinitions = {
   [GameMode.EOP]: {
     A: {
       name: 'Denial of Service',
