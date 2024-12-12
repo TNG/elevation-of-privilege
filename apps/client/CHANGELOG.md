@@ -1,5 +1,13 @@
 # @eop/client
 
+## 1.1.1
+
+### Patch Changes
+
+- 320af5a: Fix positioning of threat bar relativ to played card
+  - @eop/cornucopia-cards@1.1.1
+  - @eop/shared@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes
