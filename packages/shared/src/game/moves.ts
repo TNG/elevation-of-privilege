@@ -181,7 +181,7 @@ export const addOrUpdateThreat: MoveFn<GameState> = ({ G, playerID }) => {
     playerID === undefined ||
     G.threat.owner !== playerID ||
     _.isEmpty(threatTitle) ||
-    _.isEmpty(threatDescription) ||
+    threatDescription === undefined ||
     G.threat.id === undefined
   ) {
     return INVALID_MOVE;
