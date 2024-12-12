@@ -1,5 +1,11 @@
 # @eop/server
 
+## 1.1.1
+
+### Patch Changes
+
+- @eop/shared@1.1.1
+
 ## 1.1.0
 
 ### Patch Changes
