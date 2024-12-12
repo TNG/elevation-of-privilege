@@ -1,5 +1,3 @@
-import '../styles/about.css';
-
 import type React from 'react';
 import type { FC } from 'react';
 import { Card, CardBody, CardHeader, Col, Container, Row } from 'reactstrap';

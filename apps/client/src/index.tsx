@@ -6,6 +6,7 @@ import App from './pages/app';
 import Create from './pages/create';
 import RandomCard from './pages/random-card';
 
+import './styles/index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const container = document.getElementById('root');
