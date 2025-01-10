@@ -23,7 +23,7 @@
   "dependencies": {
     "boardgame.io": "^0.50.2",
     "lodash": "^4.17.21",
-    "uuid": "^10.0.0"
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@eop/eslint-config": "*",
