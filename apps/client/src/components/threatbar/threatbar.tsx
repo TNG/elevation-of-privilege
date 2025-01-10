@@ -6,8 +6,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
-import nl2br from 'react-nl2br';
+import { useState } from 'react';
 import {
   Button,
   Card,
@@ -33,6 +32,7 @@ import type {
 import type { BoardProps } from 'boardgame.io/react';
 import type { FC } from 'react';
 import { Threat } from '../../../../../packages/shared/dist/types/game/threat';
+import { nl2br } from '../../utils/nl2br';
 
 type ThreatbarProps = {
   model?: ThreatDragonModel;

@@ -1,6 +1,6 @@
 import { faDownload, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { FC, ReactNode, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import { Button } from 'reactstrap';
 import type { PlayerID } from 'boardgame.io';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import type { FC } from 'react';
 import packageJson from '../../../package.json';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';

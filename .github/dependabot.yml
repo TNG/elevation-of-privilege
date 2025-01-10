@@ -7,7 +7,12 @@ updates:
     versioning-strategy: "increase"
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/apps/client"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "docker"
+    directory: "/apps/server"
     schedule:
       interval: "daily"
 

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import './imagemodel.css';
 import { MapInteractionCSS } from 'react-map-interaction';
 import { asyncSetTimeout } from '@eop/shared';

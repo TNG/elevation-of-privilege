@@ -1,6 +1,5 @@
 import { DEFAULT_GAME_MODE, GameState, ModelType } from '@eop/shared';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { describe, it, expect } from 'vitest';
 
 import Sidebar from './sidebar';
