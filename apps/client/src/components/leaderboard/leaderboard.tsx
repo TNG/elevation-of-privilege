@@ -1,6 +1,5 @@
 import { getCardDisplayName, Card as EOPCard } from '@eop/shared';
 import type { PlayerID } from 'boardgame.io';
-import React from 'react';
 import type { FC } from 'react';
 import { Badge, Card, CardHeader, Table } from 'reactstrap';
 

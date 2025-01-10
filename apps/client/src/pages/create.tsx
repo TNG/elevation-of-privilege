@@ -15,7 +15,7 @@ import {
 } from '@eop/shared';
 import type { PlayerID } from 'boardgame.io';
 import _ from 'lodash';
-import React, { ChangeEvent } from 'react';
+import { ChangeEvent, Component, JSX } from 'react';
 import {
   Button,
   Card,
@@ -60,7 +60,7 @@ interface CreateState {
   modelReference?: string;
 }
 
-class Create extends React.Component<CreateProps, CreateState> {
+class Create extends Component<CreateProps, CreateState> {
   fileReader: FileReader;
   apiBase: string;
 

@@ -1,6 +1,6 @@
 import { getDealtCard, ModelType, SPECTATOR } from '@eop/shared';
 import type { BoardProps as BoardgameIOBoardProps } from 'boardgame.io/react';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import request from 'superagent';
 
 import Banner from '../banner/banner';

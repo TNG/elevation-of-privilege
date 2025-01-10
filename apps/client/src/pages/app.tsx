@@ -1,7 +1,6 @@
 import { ElevationOfPrivilege, SPECTATOR } from '@eop/shared';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { Client } from 'boardgame.io/react';
-import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import '@eop/cornucopia-cards/style.css';

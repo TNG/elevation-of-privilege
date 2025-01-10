@@ -5,7 +5,6 @@ import {
   resolvePlayerName,
   resolvePlayerNames,
 } from '@eop/shared';
-import React from 'react';
 
 import './status.css';
 

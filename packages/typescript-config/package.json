@@ -1,14 +1,14 @@
 {
   "name": "@eop/typescript-config",
   "type": "module",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "scripts": {
     "checkformat": "prettier . --check",
     "format": "prettier . --write"
   },
   "devDependencies": {
     "@eop/prettier-config": "*",
-    "prettier": "^3.3.3"
+    "prettier": "^3.4.2"
   },
   "private": true
 }

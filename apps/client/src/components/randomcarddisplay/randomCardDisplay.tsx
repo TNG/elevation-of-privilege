@@ -1,4 +1,3 @@
-import React from 'react';
 import { CARD_DECKS, GameMode, SUITS } from '@eop/shared';
 import { FC, useState } from 'react';
 import DealtCard from '../dealtcard/dealtcard';

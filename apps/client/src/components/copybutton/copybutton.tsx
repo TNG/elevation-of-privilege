@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren, useState } from 'react';
+import { FC, PropsWithChildren, useState } from 'react';
 import { Button, ButtonProps } from 'reactstrap';
 import { copyToClipboard } from '../../utils/utils';
 import { faCopy, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';

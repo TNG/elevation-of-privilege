@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import * as joint from 'jointjs';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { Nav, NavItem, NavLink } from 'reactstrap';
 import Helmet from 'react-helmet';
 

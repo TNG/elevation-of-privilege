@@ -1,6 +1,6 @@
 import type { BoardProps } from 'boardgame.io/react';
 import _ from 'lodash';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import {
   Button,
   Form,

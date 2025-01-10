@@ -5,7 +5,6 @@ import {
 } from '@eop/shared';
 import { render, screen } from '@testing-library/react';
 import nock from 'nock';
-import React from 'react';
 import { describe, it, expect, beforeAll, vi, afterEach } from 'vitest';
 
 import Board from './board';
