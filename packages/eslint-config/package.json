@@ -20,12 +20,12 @@
     "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",
-    "typescript-eslint": "^8.2.0"
+    "typescript-eslint": "^8.19.1"
   },
   "peerDependencies": {
     "@eslint/js": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
-    "typescript-eslint": "^8.2.0"
+    "typescript-eslint": "^8.19.1"
   },
   "private": true
 }
