@@ -29,7 +29,7 @@
     "react-helmet": "^6.1.0",
     "react-map-interaction": "^2.1.0",
     "react-nl2br": "^1.0.4",
-    "react-router-dom": "^6.26.1",
+    "react-router-dom": "^7.1.1",
     "reactstrap": "^9.2.2",
     "superagent": "^10.0.2"
   },
