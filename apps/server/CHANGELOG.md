@@ -1,5 +1,13 @@
 # @eop/server
 
+## 1.1.2
+
+### Patch Changes
+
+- 17eecda: Update dependencies
+- Updated dependencies [17eecda]
+  - @eop/shared@1.1.2
+
 ## 1.1.1
 
 ### Patch Changes
