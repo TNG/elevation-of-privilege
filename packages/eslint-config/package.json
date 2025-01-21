@@ -18,13 +18,13 @@
     "@eop/prettier-config": "*",
     "@eslint/js": "^9.17.0",
     "eslint": "^9.18.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-prettier": "^10.0.1",
     "prettier": "^3.4.2",
     "typescript-eslint": "^8.19.1"
   },
   "peerDependencies": {
     "@eslint/js": "^9.9.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-prettier": "^10.0.1",
     "typescript-eslint": "^8.2.0"
   },
   "private": true
