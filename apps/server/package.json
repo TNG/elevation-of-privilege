@@ -46,7 +46,7 @@
     "ts-toolbelt": "^9.6.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.19.1",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.9"
   },
   "private": true
 }
