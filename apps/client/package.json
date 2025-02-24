@@ -45,7 +45,7 @@
     "@types/react-helmet": "^6.1.11",
     "@types/superagent": "^8.1.9",
     "@vitejs/plugin-react-swc": "^3.7.2",
-    "eslint": "^9.18.0",
+    "eslint": "^9.21.0",
     "eslint-plugin-react": "^7.37.3",
     "jsdom": "^26.0.0",
     "nock": "^13.5.6",
