@@ -215,23 +215,22 @@ export function isSuitInDeck(suit: Suit, gameMode: GameMode): boolean {
 
 export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
   const suitDetails = CARD_DECKS[gameMode]?.[suit];
-  if (suitDetails?.cards?.length) {
+  if (suitDetails && suitDetails.cards && suitDetails.cards.length > 0) {
     return suitDetails.cards[0];
   }
 
   const defaultSuit = getDefaultStartingSuit(gameMode);
   const defaultSuitDetails = CARD_DECKS[gameMode]?.[defaultSuit];
-
-  if (defaultSuitDetails?.cards?.length) {
+  if (defaultSuitDetails && defaultSuitDetails.cards && defaultSuitDetails.cards.length > 0) {
     return defaultSuitDetails.cards[0];
   }
 
-  return 'A2'; // Ultimate fallback
+  return 'A2'; // Ultimate fallback if all else fails
 }
 
 function getDefaultStartingSuit(gameMode: GameMode): Suit {
   return (Object.entries(CARD_DECKS[gameMode] ?? {}) as [Suit, SuitDetails][])
-    .find(([, details]) => details?.isDefault)?.[0] ?? 'A';
+    .find(([, details]) => details && details.isDefault)?.[0] ?? 'A';
 }
 
 export function getSuits(gameMode: GameMode): Suit[] {
