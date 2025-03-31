@@ -2,7 +2,9 @@ import { GameMode } from './GameMode';
 
 export type Card = string;
 export const SUITS = ['A', 'B', 'C', 'D', 'E', 'T'] as const;
-export type Suit = (typeof SUITS)[number];
+export type Suit =
+  | 'A' | 'B' | 'C' | 'D' | 'E' | 'T'  // core suits
+  | 'F' | 'G' | 'H' | 'I' | 'J';       // extended Privacy suits
 
 interface SuitDetails {
   name?: string;
@@ -544,8 +546,8 @@ export const CARD_DECKS: CardDeckDefinitions = {
   },
 };
 
-export function isSuit(str: string): str is Suit {
-  return ['A', 'B', 'C', 'D', 'E', 'T'].includes(str);
+export function isSuitInDeck(suit: string, gameMode: GameMode): boolean {
+  return Object.keys(CARD_DECKS[gameMode]).includes(suit);
 }
 
 export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
