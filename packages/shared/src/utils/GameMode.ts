@@ -22,7 +22,7 @@ export function getCardCssClass(gameMode: GameMode, c: Card): string {
   if (isGameModeElevationOfMlSec(gameMode)) {
     return `eomlsec-card eomlsec-card-img-${c.toLowerCase()}`;
   }
-  if (gameMode === GameMode.PRIVACY) {
+  if (gameMode === GameMode.PRIVACY || gameMode === 'Elevation of Privacy') {
     return `eoprivacy-card eoprivacy-card-img-${c.toLowerCase()}`;
   }
 
