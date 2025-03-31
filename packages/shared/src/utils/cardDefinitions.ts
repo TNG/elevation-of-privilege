@@ -1,7 +1,7 @@
 import { GameMode } from './GameMode';
 
 export type Card = string;
-export const SUITS = ['A', 'B', 'C', 'D', 'E', 'T'] as const;
+export const SUITS = ['A', 'B', 'C', 'D', 'E', 'T', 'F', 'G', 'H', 'I', 'J'] as const;
 export type Suit =
   | 'A' | 'B' | 'C' | 'D' | 'E' | 'T'  // core suits
   | 'F' | 'G' | 'H' | 'I' | 'J';       // extended Privacy suits
@@ -546,8 +546,8 @@ export const CARD_DECKS: CardDeckDefinitions = {
   },
 };
 
-export function isSuitInDeck(suit: string, gameMode: GameMode): boolean {
-  return Object.keys(CARD_DECKS[gameMode]).includes(suit);
+export function isSuitInDeck(suit: Suit, gameMode: GameMode): boolean {
+  return suit in CARD_DECKS[gameMode];
 }
 
 export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
@@ -560,11 +560,9 @@ export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
 }
 
 function getDefaultStartingSuit(gameMode: GameMode): Suit {
-  return (
-    (Object.keys(CARD_DECKS[gameMode]) as Suit[]).find(
-      (suit) => CARD_DECKS[gameMode][suit].isDefault,
-    ) ?? 'A'
-  );
+  return (Object.entries(CARD_DECKS[gameMode]) as [Suit, SuitDetails][]).find(
+      ([, details]) => details?.isDefault,
+    )?.[0] ?? 'A';
 }
 
 export function getSuits(gameMode: GameMode): Suit[] {
