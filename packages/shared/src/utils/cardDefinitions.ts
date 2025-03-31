@@ -219,7 +219,11 @@ export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
       ? suit
       : getDefaultStartingSuit(gameMode);
 
-  return CARD_DECKS[gameMode]?.[usedSuit]?.cards?.[0] ?? 'A2';
+  if (!usedSuit || !CARD_DECKS[gameMode]?.[usedSuit]?.cards?.length) {
+    return 'A2';
+  }
+
+  return CARD_DECKS[gameMode]![usedSuit]!.cards[0];
 }
 
 function getDefaultStartingSuit(gameMode: GameMode): Suit {
