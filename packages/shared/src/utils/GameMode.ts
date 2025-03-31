@@ -22,7 +22,8 @@ export function getCardCssClass(gameMode: GameMode, c: Card): string {
   if (isGameModeElevationOfMlSec(gameMode)) {
     return `eomlsec-card eomlsec-card-img-${c.toLowerCase()}`;
   }
-  if (gameMode === GameMode.PRIVACY || gameMode === 'Elevation of Privacy') {
+
+  if (isGameModePrivacy(gameMode)) {
     return `eoprivacy-card eoprivacy-card-img-${c.toLowerCase()}`;
   }
 
@@ -44,3 +45,6 @@ function isGameModeCumulus(gameMode: GameMode): boolean {
 function isGameModeElevationOfMlSec(gameMode: GameMode): boolean {
   return isGameMode(gameMode) && gameMode === GameMode.EOMLSEC;
 }
+
+function isGameModePrivacy(gameMode: GameMode): boolean {
+  return isGameMode(gameMode) && gameMode === GameMode.PRIVACY;
