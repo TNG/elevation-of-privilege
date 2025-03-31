@@ -214,14 +214,16 @@ export function isSuitInDeck(suit: Suit, gameMode: GameMode): boolean {
 }
 
 export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
-  const suitDetails = CARD_DECKS[gameMode]?.[suit] ?? {};
-  if (suitDetails.cards && suitDetails.cards.length > 0) {
+  const suitDetails: SuitDetails | undefined = CARD_DECKS[gameMode]?.[suit];
+
+  if (suitDetails?.cards?.length) {
     return suitDetails.cards[0];
   }
 
   const defaultSuit = getDefaultStartingSuit(gameMode);
-  const defaultSuitDetails = CARD_DECKS[gameMode]?.[defaultSuit] ?? {};
-  return defaultSuitDetails.cards?.[0] ?? 'A2';
+  const defaultDetails: SuitDetails | undefined = CARD_DECKS[gameMode]?.[defaultSuit];
+
+  return defaultDetails?.cards?.[0] ?? 'A2';
 }
 
 function getDefaultStartingSuit(gameMode: GameMode): Suit {
