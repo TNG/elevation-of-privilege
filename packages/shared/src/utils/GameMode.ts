@@ -2,6 +2,7 @@ import type { Card } from './cardDefinitions';
 
 export enum GameMode {
   EOP = 'Elevation of Privilege',
+  PRIVACY = 'Elevation of Privacy',
   CORNUCOPIA = 'OWASP Cornucopia',
   CUMULUS = 'OWASP Cumulus',
   EOMLSEC = 'Elevation of MLsec',
@@ -20,6 +21,9 @@ export function getCardCssClass(gameMode: GameMode, c: Card): string {
 
   if (isGameModeElevationOfMlSec(gameMode)) {
     return `eomlsec-card eomlsec-card-img-${c.toLowerCase()}`;
+  }
+  if (gameMode === GameMode.PRIVACY) {
+    return `eoprivacy-card eoprivacy-card-img-${c.toLowerCase()}`;
   }
 
   return `eop-card eop-card-img-${c.toLowerCase()}`;
