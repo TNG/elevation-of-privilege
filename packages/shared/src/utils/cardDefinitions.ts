@@ -556,7 +556,7 @@ export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
       ? suit
       : getDefaultStartingSuit(gameMode);
 
-  return CARD_DECKS[gameMode][usedSuit].cards[0];
+  return CARD_DECKS[gameMode][usedSuit]?.cards?.[0] ?? 'A2';
 }
 
 function getDefaultStartingSuit(gameMode: GameMode): Suit {
@@ -580,7 +580,7 @@ export function getSuitDisplayName(gameMode: GameMode, suit?: Suit): string {
 
 function getCardAbbreviation(gameMode: GameMode, card: Card): string {
   const suitHoldingCard = Object.values(CARD_DECKS[gameMode] ?? []).find(
-    (suit) => suit.cards.length > 0 && suit.cards.includes(card),
+    (suit) => suit?.cards?.length > 0 && suit?.cards?.includes(card),
   );
 
   return suitHoldingCard?.abbreviation ?? '';
@@ -629,6 +629,6 @@ function isCardOfSuit(card: Card, suit: Suit): boolean {
 
 function getCardSuit(card: Card, gameMode: GameMode): SuitDetails | undefined {
   return Object.values(CARD_DECKS[gameMode]).find((suit) =>
-    suit.cards.includes(card),
+    suit?.cards?.includes(card),
   );
 }
