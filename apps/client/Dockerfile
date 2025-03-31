@@ -4,7 +4,7 @@ FROM base AS pruner
 WORKDIR /app
 ENV DO_NOT_TRACK=1
 COPY . .
-RUN npm ci --workspaces=false
+RUN npm install --workspaces=false
 RUN npx turbo prune @eop/client --docker
 
 FROM base AS builder

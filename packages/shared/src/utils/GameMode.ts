@@ -42,9 +42,10 @@ function isGameModeCumulus(gameMode: GameMode): boolean {
   return isGameMode(gameMode) && gameMode === GameMode.CUMULUS;
 }
 
+function isGameModePrivacy(gameMode: GameMode): boolean {
+  return isGameMode(gameMode) && gameMode === GameMode.PRIVACY;
+}
+
 function isGameModeElevationOfMlSec(gameMode: GameMode): boolean {
   return isGameMode(gameMode) && gameMode === GameMode.EOMLSEC;
 }
-
-function isGameModePrivacy(gameMode: GameMode): boolean {
-  return isGameMode(gameMode) && gameMode === GameMode.PRIVACY;
