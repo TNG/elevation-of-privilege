@@ -15,7 +15,7 @@ interface SuitDetails {
 }
 
 type CardDeckDefinitions = {
-  [key in GameMode]: { [suit in Suit]: SuitDetails };
+  [key in GameMode]: Partial<Record<Suit, SuitDetails>>;
 };
 
 export const CARD_DECKS: CardDeckDefinitions = {
@@ -633,8 +633,4 @@ function getCardSuit(card: Card, gameMode: GameMode): SuitDetails | undefined {
   return Object.values(CARD_DECKS[gameMode]).find((suit) =>
     suit.cards.includes(card),
   );
-}
-
-export function isSuitInDeck(suit: Suit, gameMode: GameMode): boolean {
-  return Object.keys(CARD_DECKS[gameMode]).includes(suit);
 }
