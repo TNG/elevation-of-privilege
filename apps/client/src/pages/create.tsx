@@ -87,7 +87,7 @@ class Create extends Component<CreateProps, CreateState> {
       startSuit: DEFAULT_START_SUIT,
       turnDuration: DEFAULT_TURN_DURATION,
       provideModelThruAlternativeChannel: false,
-      gameMode: DEFAULT_GAME_MODE,
+      gameMode: GameMode.PRIVACY,
       modelReference: undefined,
     };
 
