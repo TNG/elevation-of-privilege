@@ -1,5 +1,5 @@
 {
-    "name": "eoprivacy-cards",
+    "name": "@eop/eoprivacy-cards",
     "version": "1.0.0",
     "main": "style.css"
   }
