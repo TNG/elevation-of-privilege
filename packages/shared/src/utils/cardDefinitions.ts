@@ -215,17 +215,16 @@ export function isSuitInDeck(suit: Suit, gameMode: GameMode): boolean {
 
 export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
   const usedSuit =
-    CARD_DECKS[gameMode][suit]?.cards?.length > 0
+    CARD_DECKS[gameMode]?.[suit]?.cards?.length > 0
       ? suit
       : getDefaultStartingSuit(gameMode);
 
-  return CARD_DECKS[gameMode][usedSuit]?.cards?.[0] ?? 'A2';
+  return CARD_DECKS[gameMode]?.[usedSuit]?.cards?.[0] ?? 'A2';
 }
 
 function getDefaultStartingSuit(gameMode: GameMode): Suit {
-  return (Object.entries(CARD_DECKS[gameMode]) as [Suit, SuitDetails][]).find(
-    ([, details]) => details?.isDefault,
-  )?.[0] ?? 'A';
+  return (Object.entries(CARD_DECKS[gameMode] ?? {}) as [Suit, SuitDetails][])
+    .find(([, details]) => details?.isDefault)?.[0] ?? 'A';
 }
 
 export function getSuits(gameMode: GameMode): Suit[] {
@@ -269,7 +268,7 @@ export function getCardScore(card: Card, currentSuit: Suit, gameMode: GameMode):
 
 function getCardNumericalScore(card: Card, gameMode: GameMode): number {
   const cardSuit = getCardSuit(card, gameMode);
-  return cardSuit?.cards.indexOf(card) ?? 0;
+  return cardSuit?.cards?.indexOf(card) ?? 0;
 }
 
 function isCardOfSuit(card: Card, suit: Suit): boolean {
