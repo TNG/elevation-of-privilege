@@ -547,12 +547,12 @@ export const CARD_DECKS: CardDeckDefinitions = {
 };
 
 export function isSuitInDeck(suit: Suit, gameMode: GameMode): boolean {
-  return suit in CARD_DECKS[gameMode];
+  return !!CARD_DECKS[gameMode]?.[suit];
 }
 
 export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
   const usedSuit =
-    CARD_DECKS[gameMode][suit].cards.length > 0
+    CARD_DECKS[gameMode][suit]?.cards?.length > 0
       ? suit
       : getDefaultStartingSuit(gameMode);
 
@@ -601,8 +601,8 @@ export function getCardDisplayName(
 
 export function getAllCards(gameMode: GameMode): Card[] {
   return Object.values(CARD_DECKS[gameMode])
-    .map((suit) => suit.cards)
-    .reduce((accumulator, value) => accumulator.concat(value), []);
+    .filter((suit): suit is SuitDetails => suit?.cards !== undefined)
+    .flatMap((suit) => suit.cards);
 }
 
 export function getCardScore(

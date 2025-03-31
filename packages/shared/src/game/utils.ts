@@ -57,7 +57,6 @@ export function setupGame(
     turnDuration: turnDuration,
     modelType,
     modelReference,
-    gameMode, 
   };
 }
 
