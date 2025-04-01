@@ -1,5 +1,21 @@
 {
-    "name": "@eop/eoprivacy-cards",
-    "version": "1.0.0",
-    "main": "style.css"
-  }
+  "name": "@eop/eoprivacy-cards",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "a version of Elevation of Privacy adapted for this game",
+  "author": "Gareth + WithSecure",
+  "license": "CC-BY-SA-3.0",
+  "scripts": {
+    "lint": "eslint .",
+    "fixlint": "eslint . --fix",
+    "checkformat": "prettier . --check",
+    "format": "prettier . --write"
+  },
+  "devDependencies": {
+    "@eop/eslint-config": "*",
+    "@eop/prettier-config": "*",
+    "eslint": "^9.21.0",
+    "prettier": "^3.4.2"
+  },
+  "private": true
+}
