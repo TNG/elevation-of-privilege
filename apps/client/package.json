@@ -46,7 +46,7 @@
     "@types/superagent": "^8.1.9",
     "@vitejs/plugin-react-swc": "^3.7.2",
     "eslint": "^9.21.0",
-    "eslint-plugin-react": "^7.37.3",
+    "eslint-plugin-react": "^7.37.4",
     "jsdom": "^26.0.0",
     "nock": "^14.0.2",
     "prettier": "^3.4.2",
