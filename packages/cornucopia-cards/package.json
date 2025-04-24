@@ -15,7 +15,7 @@
     "@eop/eslint-config": "*",
     "@eop/prettier-config": "*",
     "eslint": "^9.21.0",
-    "prettier": "^3.4.2"
+    "prettier": "^3.5.3"
   },
   "private": true
 }
