@@ -29,7 +29,8 @@
   bottom: 0;
   border-top: 4px double #ccc;
 
-  background-image: radial-gradient(#ccc 20%, transparent 20%),
+  background-image:
+    radial-gradient(#ccc 20%, transparent 20%),
     radial-gradient(#fafafa 20%, transparent 20%);
   background-color: #eaeaea;
   background-position:
