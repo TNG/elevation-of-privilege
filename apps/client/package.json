@@ -30,7 +30,7 @@
     "react-map-interaction": "^2.1.0",
     "react-router-dom": "^7.1.1",
     "reactstrap": "^9.2.3",
-    "superagent": "^10.1.1"
+    "superagent": "^10.2.0"
   },
   "devDependencies": {
     "@eop/eslint-config": "*",
