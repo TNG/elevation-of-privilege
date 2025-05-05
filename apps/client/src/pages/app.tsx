@@ -4,12 +4,14 @@ import { Client } from 'boardgame.io/react';
 import { useParams } from 'react-router-dom';
 
 import '@eop/cornucopia-cards/style.css';
+import '@eop/eoprivacy-cards/style.css';
 
 import Board from '../components/board/board';
 
 import '../styles/cards.css';
 import '../styles/eop_cards.css';
 import '../styles/cornucopia_cards.css';
+import '../styles/eoprivacy_cards.css';
 import '../styles/cumulus_cards.css';
 import '../styles/eomlsec_cards.css';
 
