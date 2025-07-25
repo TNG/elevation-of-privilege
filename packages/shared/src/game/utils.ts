@@ -167,7 +167,9 @@ export function onTurnEnd({ G, ctx }: FnContext<GameState>): GameState {
   if (numCardsPlayed >= ctx.numPlayers) {
     lastWinner = getWinner(dealt, suit, G.gameMode);
 
-    scores[lastWinner]++;
+    if (scores[lastWinner] !== undefined) {
+      scores[lastWinner]!++;
+    }
 
     dealt = [];
     suit = undefined;

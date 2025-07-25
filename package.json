@@ -1,9 +1,9 @@
 {
   "name": "@eop/root",
   "devDependencies": {
-    "@changesets/cli": "^2.29.2",
-    "sherif": "^1.1.1",
-    "turbo": "^2.4.0"
+    "@changesets/cli": "^2.29.5",
+    "sherif": "^1.6.1",
+    "turbo": "^2.5.5"
   },
   "workspaces": [
     "./apps/*",

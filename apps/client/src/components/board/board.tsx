@@ -1,7 +1,6 @@
 import { getDealtCard, ModelType, SPECTATOR } from '@eop/shared';
 import type { BoardProps as BoardgameIOBoardProps } from 'boardgame.io/react';
 import { FC, useCallback, useEffect, useState } from 'react';
-import request from 'superagent';
 
 import Banner from '../banner/banner';
 import Deck from '../deck/deck';
@@ -51,13 +50,14 @@ const Board: FC<BoardProps> = ({
   }, []);
 
   const apiGetRequest = useCallback(
-    async (endpoint: string) => {
-      // TODO: Use fetch instead of superagent
+    async (endpoint: string): Promise<unknown> => {
       if (credentials !== undefined) {
         try {
-          return await request
-            .get(`${apiBase}/game/${matchID}/${endpoint}`)
-            .auth(playerID ?? SPECTATOR, credentials);
+          return await fetch(`${apiBase}/game/${matchID}/${endpoint}`, {
+            headers: {
+              Authorization: `Basic ${btoa((playerID ?? SPECTATOR) + ':' + credentials)}`,
+            },
+          }).then((response) => response.json());
         } catch (err) {
           console.error(err);
         }
@@ -69,12 +69,10 @@ const Board: FC<BoardProps> = ({
   );
 
   const updateNames = useCallback(async () => {
-    // TODO: Type with zod and consider using react-query.
-    const playersResponse = await apiGetRequest('players');
+    // TODO: Type with valibot and consider using react-query.
+    const body = await apiGetRequest('players');
     for (const player of (
-      playersResponse?.body as
-        | { players: { id: number; name: string }[] }
-        | undefined
+      body as { players: { id: number; name: string }[] } | undefined
     )?.players ?? []) {
       if (typeof player.name !== 'undefined') {
         updateName(player.id, player.name);
@@ -83,10 +81,10 @@ const Board: FC<BoardProps> = ({
   }, [apiGetRequest, updateName]);
 
   const updateModel = useCallback(async () => {
-    // TODO: Type with zod and consider using react-query.
-    const modelResponse = await apiGetRequest('model');
+    // TODO: Type with valibot and consider using react-query.
+    const body = await apiGetRequest('model');
 
-    const model = modelResponse?.body as ThreatDragonModel | undefined;
+    const model = body as ThreatDragonModel | undefined;
 
     setModel(model);
   }, [apiGetRequest]);
@@ -164,14 +162,14 @@ const Board: FC<BoardProps> = ({
           </div>
           {playerID && (
             <Deck
-              cards={G.players[Number.parseInt(playerID)]}
+              cards={G.players[Number.parseInt(playerID)] ?? []}
               suit={G.suit}
               /* phase replaced with isInThreatStage. active players is null when not */
               isInThreatStage={isInThreatStage}
               round={G.round}
               current={current}
               active={active}
-              onCardSelect={(e) => moves.draw(e)}
+              onCardSelect={(e) => moves.draw?.(e)}
               startingCard={G.startingCard} // <===  This is still missing   i.e. undeifned
               gameMode={G.gameMode}
             />

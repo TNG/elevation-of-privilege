@@ -55,8 +55,8 @@ const Threatbar: FC<ThreatbarProps> = ({
       return undefined;
     }
 
-    const diagram = model.detail.diagrams[G.selectedDiagram].diagramJson;
-    return diagram.cells?.find((cell) => cell.id === G.selectedComponent);
+    const diagram = model.detail.diagrams[G.selectedDiagram]?.diagramJson;
+    return diagram?.cells?.find((cell) => cell.id === G.selectedComponent);
   };
 
   const getThreatsForSelectedComponent = (): ThreatDragonThreat[] => {
@@ -87,7 +87,7 @@ const Threatbar: FC<ThreatbarProps> = ({
   >(undefined);
 
   const deleteThreat = () => {
-    moves.deleteThreat(threatToBeDeleted);
+    moves.deleteThreat?.(threatToBeDeleted);
   };
 
   return (
@@ -109,7 +109,7 @@ const Threatbar: FC<ThreatbarProps> = ({
                 G.passed.includes(playerID) ||
                 !active
               }
-              onClick={() => moves.toggleModal()}
+              onClick={() => moves.toggleModal?.()}
             >
               <FontAwesomeIcon icon={faPlus} /> Add Threat
             </Button>
@@ -119,7 +119,7 @@ const Threatbar: FC<ThreatbarProps> = ({
             <Card key={idx}>
               <CardHeader
                 className="hoverable"
-                onClick={() => moves.selectThreat(val.id)}
+                onClick={() => moves.selectThreat?.(val.id)}
               >
                 <strong>{val.title}</strong>
                 <Row>
@@ -154,7 +154,7 @@ const Threatbar: FC<ThreatbarProps> = ({
                     <Col xs="6">
                       <Button
                         block
-                        onClick={() => moves.toggleModalUpdate(val)}
+                        onClick={() => moves.toggleModalUpdate?.(val)}
                       >
                         <FontAwesomeIcon icon={faEdit} /> Update
                       </Button>
@@ -183,7 +183,7 @@ const Threatbar: FC<ThreatbarProps> = ({
             <Card key={idx}>
               <CardHeader
                 className="hoverable"
-                onClick={() => moves.selectThreat(val.id)}
+                onClick={() => moves.selectThreat?.(val.id)}
               >
                 <strong>{val.title}</strong>
                 <Row>

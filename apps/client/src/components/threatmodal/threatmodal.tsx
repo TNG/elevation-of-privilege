@@ -1,5 +1,4 @@
 import type { BoardProps } from 'boardgame.io/react';
-import _ from 'lodash';
 import { FC, useCallback, useEffect, useState } from 'react';
 import {
   Button,
@@ -46,31 +45,31 @@ const ThreatModal: FC<ThreatModalProps> = ({
 
   const isPrivacyEnhancedMode = G.modelType === ModelType.PRIVACY_ENHANCED;
   const isOwner = G.threat.owner === playerID;
-  const isInvalid = _.isEmpty(title);
+  const isInvalid = title === undefined || title === '';
 
   const saveThreat = () => {
     if (G.threat.title !== title) {
-      moves.updateThreat('title', title);
+      moves.updateThreat?.('title', title);
     }
 
     const descriptionToUse = description ?? 'No description provided.';
     if (G.threat.description !== descriptionToUse) {
-      moves.updateThreat('description', descriptionToUse);
+      moves.updateThreat?.('description', descriptionToUse);
     }
 
     if (G.threat.mitigation !== mitigation) {
-      moves.updateThreat('mitigation', mitigation);
+      moves.updateThreat?.('mitigation', mitigation);
     }
 
     if (!G.threat.mitigation) {
-      moves.updateThreat('mitigation', 'No mitigation provided.');
+      moves.updateThreat?.('mitigation', 'No mitigation provided.');
     }
   };
 
   const addOrUpdate = () => {
     // update the values from the state
     saveThreat();
-    moves.addOrUpdateThreat();
+    moves.addOrUpdateThreat?.();
     setShowMitigation(false);
   };
 
@@ -86,7 +85,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
             disabled={!isOwner}
             autoComplete="off"
             value={title}
-            onBlur={(e) => moves.updateThreat('title', e.target.value)}
+            onBlur={(e) => moves.updateThreat?.('title', e.target.value)}
             onChange={(e) => setTitle(e.target.value)}
           />
         </FormGroup>
@@ -98,7 +97,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
             id="type"
             disabled={!isOwner}
             value={G.threat.type}
-            onChange={(e) => moves.updateThreat('type', e.target.value)}
+            onChange={(e) => moves.updateThreat?.('type', e.target.value)}
           >
             {getSuits(G.gameMode).map((suit) => (
               <option value={suit} key={`threat-category-${suit}`}>
@@ -115,7 +114,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
             id="severity"
             disabled={!isOwner}
             value={G.threat.severity}
-            onChange={(e) => moves.updateThreat('severity', e.target.value)}
+            onChange={(e) => moves.updateThreat?.('severity', e.target.value)}
           >
             <option>Low</option>
             <option>Medium</option>
@@ -131,7 +130,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
             disabled={!isOwner}
             style={{ height: 150 }}
             value={description}
-            onBlur={(e) => moves.updateThreat('description', e.target.value)}
+            onBlur={(e) => moves.updateThreat?.('description', e.target.value)}
             onChange={(e) => setDescription(e.target.value)}
           />
         </FormGroup>
@@ -157,7 +156,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
             disabled={!isOwner}
             style={{ height: 150 }}
             value={mitigation}
-            onBlur={(e) => moves.updateThreat('mitigation', e.target.value)}
+            onBlur={(e) => moves.updateThreat?.('mitigation', e.target.value)}
             onChange={(e) => setMitigation(e.target.value)}
           />
         </FormGroup>
@@ -189,7 +188,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
             disabled={!isOwner}
             autoComplete="off"
             value={title}
-            onBlur={(e) => moves.updateThreat('title', e.target.value)}
+            onBlur={(e) => moves.updateThreat?.('title', e.target.value)}
             onChange={(e) => setTitle(e.target.value)}
           />
         </FormGroup>
@@ -202,7 +201,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
     <Modal isOpen={isOpen}>
       <Form>
         <ModalHeader
-          toggle={isOwner ? () => moves.toggleModal() : undefined}
+          toggle={isOwner ? () => moves.toggleModal?.() : undefined}
           style={{ width: '100%' }}
         >
           {G.threat.new ? 'Add' : 'Update'} Threat &mdash;{' '}
@@ -226,7 +225,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
             >
               Save
             </Button>
-            <Button color="secondary" onClick={() => moves.toggleModal()}>
+            <Button color="secondary" onClick={() => moves.toggleModal?.()}>
               Cancel
             </Button>
           </ModalFooter>

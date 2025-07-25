@@ -13,8 +13,6 @@ import {
   SPECTATOR,
   Suit,
 } from '@eop/shared';
-import type { PlayerID } from 'boardgame.io';
-import _ from 'lodash';
 import { ChangeEvent, Component, JSX } from 'react';
 import {
   Button,
@@ -45,8 +43,8 @@ type CreateProps = Record<string, never>;
 interface CreateState {
   players: number;
   matchID: string;
-  names: Record<PlayerID, string>;
-  secret: Record<PlayerID, string>;
+  names: string[];
+  secret: string[];
   spectatorSecret: string;
   creating: boolean;
   created: boolean;
@@ -66,18 +64,15 @@ class Create extends Component<CreateProps, CreateState> {
 
   constructor(props: CreateProps) {
     super(props);
-    const initialPlayerNames: Record<number, string> = {};
-    const initialSecrets: Record<number, string> = {};
-    _.range(MAX_NUMBER_PLAYERS).forEach((n) => {
-      initialPlayerNames[n] = `Player ${n + 1}`;
-      initialSecrets[n] = ``;
-    });
 
     this.state = {
       players: 3,
       matchID: '',
-      names: initialPlayerNames,
-      secret: initialSecrets,
+      names: Array.from(
+        { length: MAX_NUMBER_PLAYERS },
+        (_, n) => `Player ${n + 1}`,
+      ),
+      secret: Array.from({ length: MAX_NUMBER_PLAYERS }, () => ''),
       spectatorSecret: ``,
       creating: false,
       created: false,
@@ -104,7 +99,6 @@ class Create extends Component<CreateProps, CreateState> {
     // FormData object (with file if required)
     const formData = new FormData();
 
-    formData.append('players', `${this.state.players}`);
     formData.append('modelType', this.state.modelType);
     if (this.state.modelType !== ModelType.PRIVACY_ENHANCED) {
       formData.append(
@@ -114,9 +108,9 @@ class Create extends Component<CreateProps, CreateState> {
           : JSON.stringify(this.state.model),
       );
     }
-    for (let i = 0; i < this.state.players; i++) {
-      formData.append('names[]', this.state.names[`${i}`]);
-    }
+    this.state.names
+      .slice(0, this.state.players)
+      .forEach((name) => formData.append('names[]', name));
     formData.append('startSuit', this.state.startSuit);
     formData.append('turnDuration', `${this.state.turnDuration}`);
     formData.append('gameMode', this.state.gameMode);
@@ -129,7 +123,7 @@ class Create extends Component<CreateProps, CreateState> {
       body: formData,
     });
 
-    // TODO: zod validation
+    // TODO: valibot validation
     const r = (await response.json()) as {
       game: string;
       credentials: string[];
@@ -139,7 +133,7 @@ class Create extends Component<CreateProps, CreateState> {
     const gameId = r.game;
 
     this.setState({
-      secret: Object.fromEntries(r.credentials.map((s, i) => [i, s])),
+      secret: [...r.credentials],
       spectatorSecret: r.spectatorCredential,
       matchID: gameId,
       created: true,
@@ -201,10 +195,7 @@ class Create extends Component<CreateProps, CreateState> {
 
   onNameUpdated(idx: number, e: ChangeEvent<HTMLInputElement>): void {
     this.setState((prevState) => ({
-      names: {
-        ...prevState.names,
-        [idx]: e.target.value,
-      },
+      names: prevState.names.toSpliced(idx, 1, e.target.value),
     }));
   }
 
@@ -222,7 +213,8 @@ class Create extends Component<CreateProps, CreateState> {
 
   isFormValid(): boolean {
     for (let i = 0; i < this.state.players; i++) {
-      if (_.isEmpty(this.state.names[`${i}`])) {
+      const name = this.state.names[i];
+      if (name === undefined || name === '') {
         return false;
       }
     }
@@ -245,7 +237,7 @@ class Create extends Component<CreateProps, CreateState> {
     });
   }
 
-  url(playerId: PlayerID): string {
+  url(playerId: number | typeof SPECTATOR): string {
     const secret =
       playerId === SPECTATOR
         ? this.state.spectatorSecret
@@ -259,7 +251,7 @@ class Create extends Component<CreateProps, CreateState> {
       Array(this.state.players)
         .fill(0)
         .map((_, i) => {
-          return `${this.state.names[i]}:\t${this.url(`${i}`)}`;
+          return `${this.state.names[i]}:\t${this.url(i)}`;
         })
         .join('\n\n')
     );
@@ -282,13 +274,14 @@ class Create extends Component<CreateProps, CreateState> {
                 onChange={(e) => this.onPlayersUpdated(e)}
                 value={this.state.players}
               >
-                {_.range(MIN_NUMBER_PLAYERS, MAX_NUMBER_PLAYERS + 1).map(
-                  (n) => (
-                    <option key={`players-${n}`} value={n}>
-                      {n}
-                    </option>
-                  ),
-                )}
+                {Array.from(
+                  { length: MAX_NUMBER_PLAYERS - MIN_NUMBER_PLAYERS },
+                  (_, i) => i + MIN_NUMBER_PLAYERS,
+                ).map((n) => (
+                  <option key={`players-${n}`} value={n}>
+                    {n}
+                  </option>
+                ))}
               </Input>
             </Col>
           </FormGroup>
@@ -304,7 +297,10 @@ class Create extends Component<CreateProps, CreateState> {
                   <Input
                     autoComplete={'off'}
                     type="text"
-                    invalid={_.isEmpty(this.state.names[i])}
+                    invalid={
+                      this.state.names[i] === undefined ||
+                      this.state.names[i] === ''
+                    }
                     name={`p${i}`}
                     id={`p${i}`}
                     onChange={(e) => this.onNameUpdated(i, e)}
@@ -486,12 +482,7 @@ class Create extends Component<CreateProps, CreateState> {
           Alternatively, if you do not want to play a full game you can just
           select a few random cards.
         </p>
-        <Button
-          block
-          size="lg"
-          color="secondary"
-          onClick={() => (window.location.href = `/random-card`)}
-        >
+        <Button block size="lg" color="secondary" href="/random-card" tag="a">
           Draw a random card
         </Button>
       </div>
@@ -513,15 +504,15 @@ class Create extends Component<CreateProps, CreateState> {
                   <td className="c-td-name">{this.state.names[i]}</td>
                   <td>
                     <a
-                      href={`${this.url(`${i}`)}`}
+                      href={`${this.url(i)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {this.url(`${i}`)}
+                      {this.url(i)}
                     </a>
                   </td>
                   <td>
-                    <CopyButton text={this.url(`${i}`)} />
+                    <CopyButton text={this.url(i)} />
                   </td>
                 </tr>
               ))}

@@ -19,7 +19,7 @@ export interface GameState {
   selectedComponent: string;
   selectedThreat: string;
   threat: Threat;
-  identifiedThreats: (Record<string, Record<string, Threat>> | null)[];
+  identifiedThreats: Record<string, Record<string, Threat>>[];
   startingCard: string;
   gameMode: GameMode;
   turnDuration: number;

@@ -44,7 +44,6 @@
 - 9c51094: Replace CRA with Vite
 
   BREAKING CHANGE:
-
   - Environment variables now need to be prefixed with `VITE_` instead of `REACT_APP_`
 
 - 8b5f27f: Separate package into subpackages and add support for Node.js 18, 20 and 22.

@@ -1,6 +1,6 @@
 import { GameMode, ModelType, SPECTATOR } from '@eop/shared';
 import request from 'supertest';
-import { describe, it, expect, afterAll, beforeAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import {
   gameServer,
@@ -9,26 +9,29 @@ import {
   publicApiServerHandle,
 } from './main';
 
-import type { LobbyAPI, Server, State } from 'boardgame.io';
 import type { ThreatDragonModel } from '@eop/shared';
+import type { LobbyAPI, Server, State } from 'boardgame.io';
 
 it('gameServer is not undefined', () => {
   expect(gameServer).toBeDefined();
 });
 
 it('creates a game without a model', async () => {
-  const players = 3;
+  const names = ['P1', 'P2', 'P3'];
   const response = await request(publicApiServer.callback())
     .post('/game/create')
-    .field('players', players)
-    .field('names[]', ['P1', 'P2', 'P3']);
+    .field('startSuit', 'A')
+    .field('gameMode', 'Elevation of Privilege')
+    .field('modelType', 'Default')
+    .field('turnDuration', '5')
+    .field('names[]', names);
   const body = response.body as {
     game: string;
     credentials: string[];
     spectatorCredential: string;
   };
   expect(body.game).toStrictEqual(expect.any(String));
-  expect(body.credentials.length).toBe(players);
+  expect(body.credentials.length).toBe(names.length);
   body.credentials.forEach((credential) =>
     expect(credential).toStrictEqual(expect.any(String)),
   );
@@ -36,11 +39,13 @@ it('creates a game without a model', async () => {
 });
 
 it('retrieves player info for a game', async () => {
-  const players = 3;
   const names = ['P1', 'P2', 'P3'];
   const createResponse = await request(publicApiServer.callback())
     .post('/game/create')
-    .field('players', players)
+    .field('startSuit', 'A')
+    .field('gameMode', 'Elevation of Privilege')
+    .field('modelType', 'Default')
+    .field('turnDuration', '5')
     .field('names[]', names);
 
   const createBody = createResponse.body as {
@@ -51,24 +56,26 @@ it('retrieves player info for a game', async () => {
 
   const playersResponse = await request(publicApiServer.callback())
     .get(`/game/${createBody.game}/players`)
-    .auth('0', createBody.credentials[0]);
+    .auth('0', createBody.credentials[0]!);
 
   const playersBody = playersResponse.body as LobbyAPI.Match;
 
-  expect(playersBody.players.length).toBe(players);
+  expect(playersBody.players.length).toBe(names.length);
   playersBody.players.forEach((p, i: number) => {
     expect(p.name).toBe(names[i]);
   });
 });
 
 it('creates a game with a model', async () => {
-  const players = 3;
+  const names = ['P1', 'P2', 'P3'];
   const response = await request(publicApiServer.callback())
     .post('/game/create')
-    .field('players', players)
-    .field('names[]', ['P1', 'P2', 'P3'])
+    .field('startSuit', 'A')
+    .field('gameMode', 'Elevation of Privilege')
+    .field('turnDuration', '5')
+    .field('names[]', names)
     .field('modelType', ModelType.THREAT_DRAGON)
-    .field('model', JSON.stringify({})); // TODO: add proper model because this will fail when validation is added
+    .field('model', JSON.stringify({})); // TODO: add proper model because this will fail when validation of the model is added
 
   const body = response.body as {
     game: string;
@@ -76,7 +83,7 @@ it('creates a game with a model', async () => {
     spectatorCredential: string;
   };
   expect(body.game).toStrictEqual(expect.any(String));
-  expect(body.credentials.length).toBe(players);
+  expect(body.credentials.length).toBe(names.length);
   body.credentials.forEach((credential) =>
     expect(credential).toStrictEqual(expect.any(String)),
   );
@@ -84,13 +91,15 @@ it('creates a game with a model', async () => {
 });
 
 it('retrieve the model for a game', async () => {
-  const players = 3;
-  const model = { foo: 'bar' }; // TODO add proper model because this will break when validation is added
+  const model = { foo: 'bar' }; // TODO add proper model because this will break when validation of the model is added
 
+  const names = ['P1', 'P2', 'P3'];
   const createResponse = await request(publicApiServer.callback())
     .post('/game/create')
-    .field('players', players)
-    .field('names[]', ['P1', 'P2', 'P3'])
+    .field('startSuit', 'A')
+    .field('gameMode', 'Elevation of Privilege')
+    .field('turnDuration', '5')
+    .field('names[]', names)
     .field('modelType', ModelType.THREAT_DRAGON)
     .field('model', JSON.stringify(model));
 
@@ -103,7 +112,7 @@ it('retrieve the model for a game', async () => {
   // retrieve the model
   const modelResponse = await request(publicApiServer.callback())
     .get(`/game/${createBody.game}/model`)
-    .auth('0', createBody.credentials[0]);
+    .auth('0', createBody.credentials[0]!);
 
   expect(modelResponse.body).toStrictEqual(model);
 });
@@ -217,14 +226,14 @@ it('download the final model for a game', async () => {
     .auth('0', 'abc123');
 
   const body = response.body as ThreatDragonModel;
-  const threats = body.detail.diagrams[0].diagramJson.cells![0].threats!;
+  const threats = body.detail.diagrams[0]?.diagramJson.cells?.[0]?.threats;
 
-  expect(threats[0].id).toBe('0');
-  expect(threats[0].type).toBe('Spoofing');
-  expect(threats[0].title).toBe('title');
-  expect(threats[0].description).toBe('description');
-  expect(threats[0].mitigation).toBe('mitigation');
-  expect(threats[0].game).toBe(matchID);
+  expect(threats?.[0]?.id).toBe('0');
+  expect(threats?.[0]?.type).toBe('Spoofing');
+  expect(threats?.[0]?.title).toBe('title');
+  expect(threats?.[0]?.description).toBe('description');
+  expect(threats?.[0]?.mitigation).toBe('mitigation');
+  expect(threats?.[0]?.game).toBe(matchID);
 });
 
 it('Download threat file', async () => {
@@ -474,12 +483,13 @@ describe('authentication', () => {
 
   beforeAll(async () => {
     // first create game
-    const players = 3;
-
+    const names = ['P1', 'P2', 'P3'];
     const response = await request(publicApiServer.callback())
       .post('/game/create')
-      .field('players', players)
-      .field('names[]', ['P1', 'P2', 'P3'])
+      .field('startSuit', 'A')
+      .field('gameMode', 'Elevation of Privilege')
+      .field('turnDuration', '5')
+      .field('names[]', names)
       .field('modelType', ModelType.PRIVACY_ENHANCED);
 
     const body = response.body as {
@@ -489,7 +499,7 @@ describe('authentication', () => {
     };
 
     expect(body.game).toBeDefined();
-    expect(body.credentials.length).toBe(players);
+    expect(body.credentials.length).toBe(names.length);
 
     matchID = body.game;
     credentials = body.credentials;

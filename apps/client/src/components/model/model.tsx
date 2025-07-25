@@ -19,8 +19,8 @@ type ModelProps = {
   model: ThreatDragonModel;
   selectedDiagram: number;
   selectedComponent: string;
-  onSelectDiagram: (id: number) => void;
-  onSelectComponent: (id: string) => void;
+  onSelectDiagram?: (id: number) => void;
+  onSelectComponent?: (id: string) => void;
 };
 
 const Model: FC<ModelProps> = ({
@@ -63,7 +63,7 @@ const Model: FC<ModelProps> = ({
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    graph.fromJSON(model.detail.diagrams[selectedDiagram].diagramJson);
+    graph.fromJSON(model.detail.diagrams[selectedDiagram]?.diagramJson);
     //paper.fitToContent(1, 1, 10, { allowNewOrigin: "any" });
   }, [graph, model, selectedDiagram]);
 
@@ -86,12 +86,12 @@ const Model: FC<ModelProps> = ({
   useEffect(() => {
     const onCellPointerClick = (cellView: joint.dia.CellView) => {
       if (cellView.model.attributes.type !== 'tm.Boundary') {
-        onSelectComponent(cellView.model.id.toString());
+        onSelectComponent?.(cellView.model.id.toString());
       }
     };
 
     const onBlankPointerClick = () => {
-      onSelectComponent('');
+      onSelectComponent?.('');
     };
 
     const setDragPositionScaled = (x: number, y: number) => {
@@ -177,7 +177,7 @@ const Model: FC<ModelProps> = ({
                 className={classnames({
                   active: selectedDiagram === idx,
                 })}
-                onClick={() => onSelectDiagram(idx)}
+                onClick={() => onSelectDiagram?.(idx)}
               >
                 {d.title}
               </NavLink>

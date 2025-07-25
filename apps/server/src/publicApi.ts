@@ -1,10 +1,10 @@
-import type { Server } from 'node:http';
+import { SPECTATOR } from '@eop/shared';
 import cors from '@koa/cors';
 import auth from 'basic-auth';
 import Koa from 'koa';
 import koaBody from 'koa-body';
 import Router from 'koa-router';
-import { SPECTATOR } from '@eop/shared';
+import type { Server } from 'node:http';
 import { API_PORT } from './config';
 import {
   createGame,
@@ -64,6 +64,9 @@ const authMiddleware =
         const credentials = auth.parse(authorizationHeader);
 
         if (credentials) {
+          if (ctx.params.matchID === undefined) {
+            return ctx.throw('Missing required parameter matchID', 400);
+          }
           const game = await gameServer.db.fetch(ctx.params.matchID, {
             metadata: true,
           });
@@ -80,7 +83,7 @@ const authMiddleware =
 
           if (
             credentials.pass ===
-            metadata.players[Number.parseInt(credentials.name)].credentials
+            metadata.players[Number.parseInt(credentials.name)]?.credentials
           ) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return await next();
