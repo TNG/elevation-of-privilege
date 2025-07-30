@@ -20,7 +20,7 @@
     "boardgame.io": "^0.50.2",
     "koa": "^2.16.1",
     "koa-body": "^6.0.1",
-    "koa-router": "^12.0.1",
+    "koa-router": "^13.1.1",
     "koa-send": "^5.0.1",
     "node-persist": "^4.0.4",
     "uuid": "^11.0.5"
