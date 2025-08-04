@@ -561,6 +561,6 @@ function getCardSuit(card: Card, gameMode: GameMode): SuitDetails | undefined {
   );
 }
 
-export function isSuitInDeck(suit: Suit, gameMode: GameMode): boolean {
+export function isSuitInDeck(suit: string, gameMode: GameMode): suit is Suit {
   return Object.keys(CARD_DECKS[gameMode]).includes(suit);
 }
