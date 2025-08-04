@@ -1,6 +1,15 @@
 import { GameMode, ModelType, SPECTATOR } from '@eop/shared';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 
 import {
   gameServer,
@@ -11,6 +20,15 @@ import {
 
 import type { ThreatDragonModel } from '@eop/shared';
 import type { LobbyAPI, Server, State } from 'boardgame.io';
+
+beforeEach(() => {
+  const mockDate = new Date('2025-08-04T14:27:39');
+  vi.setSystemTime(mockDate);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 it('gameServer is not undefined', () => {
   expect(gameServer).toBeDefined();
