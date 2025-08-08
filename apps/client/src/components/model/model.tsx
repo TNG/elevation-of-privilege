@@ -2,7 +2,6 @@ import classnames from 'classnames';
 import * as joint from 'jointjs';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { Nav, NavItem, NavLink } from 'reactstrap';
-import Helmet from 'react-helmet';
 
 import 'jointjs/dist/joint.css';
 
@@ -166,9 +165,7 @@ const Model: FC<ModelProps> = ({
   return (
     <div className="model">
       <div>
-        <Helmet>
-          <title>EoP - {model.summary.title}</title>
-        </Helmet>
+        <title>EoP - {model.summary.title}</title>
         <h1 style={{ padding: '10px 15px' }}>{model.summary.title}</h1>
         <Nav tabs>
           {model.detail.diagrams.map((d, idx) => (
