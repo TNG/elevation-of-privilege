@@ -4,15 +4,17 @@ import {
   DEFAULT_MODEL,
   escapeMarkdownText,
   GameMode,
+  gameName,
   GameState,
   getImageExtension,
   getSuitDisplayName,
   isSuit,
   logEvent,
   ModelType,
+  SetupData,
+  SUITS,
   ThreatDragonModel,
   ThreatDragonThreat,
-  gameName,
 } from '@eop/shared';
 import { LobbyClient } from 'boardgame.io/client';
 import send from 'koa-send';
@@ -21,10 +23,20 @@ import { v4 as uuidv4 } from 'uuid';
 import { INTERNAL_API_PORT } from './config';
 import { getDbImagesFolder } from './filesystem';
 
-import type { GameServer } from './gameServer';
-import type { IMiddleware } from 'koa-router';
 import type { Server, State } from 'boardgame.io';
-import type { SetupData } from '@eop/shared';
+import type { IMiddleware } from 'koa-router';
+import * as v from 'valibot';
+import type { GameServer } from './gameServer';
+
+const createGameBodySchema = v.object({
+  startSuit: v.picklist(SUITS),
+  gameMode: v.enum(GameMode),
+  modelType: v.enum(ModelType),
+  modelReference: v.optional(v.string()),
+  turnDuration: v.pipe(v.string(), v.transform(parseInt), v.number()),
+  names: v.array(v.string()),
+  model: v.optional(v.string()),
+});
 
 export const createGame =
   (gameServer: GameServer): IMiddleware =>
@@ -33,50 +45,31 @@ export const createGame =
 
     try {
       // Create game
-
-      // TODO: validation of body
-      const body = ctx.request.body as Omit<
-        SetupData,
-        'spectatorCredential' | 'turnDuration'
-      > & {
-        turnDuration: `${number}`;
-        players: `${number}`;
-        names: string[];
-        model?: string;
-      };
+      const body = v.parse(createGameBodySchema, ctx.request.body);
 
       const lobbyClient = new LobbyClient({
         server: `http://localhost:${INTERNAL_API_PORT}`,
       });
 
-      const numPlayers = Number.parseInt(body.players);
-      const turnDuration = Number.parseInt(body.turnDuration);
-
-      console.log(typeof body.players);
-      console.log(body.players);
-
       const { matchID } = await lobbyClient.createMatch(gameName, {
-        numPlayers,
+        numPlayers: body.names.length,
         setupData: {
           startSuit: body.startSuit,
-          turnDuration,
+          turnDuration: body.turnDuration,
           gameMode: body.gameMode,
           modelType: body.modelType,
           modelReference: body.modelReference,
           spectatorCredential,
-        },
+        } satisfies SetupData,
       });
 
       const credentials = [];
 
-      for (let i = 0; i < numPlayers; i++) {
+      for (const [index, name] of body.names.entries()) {
         const { playerCredentials } = await lobbyClient.joinMatch(
           gameName,
           matchID,
-          {
-            playerID: i.toString(),
-            playerName: body.names[i],
-          },
+          { playerID: index.toString(), playerName: name },
         );
 
         credentials.push(playerCredentials);
@@ -160,6 +153,9 @@ export const createGame =
 // TODO: This returns more than just the players: It returns the requested match. We should probably adjust the name (and the path). See https://boardgame.io/documentation/#/api/Lobby?id=getting-a-specific-match-by-its-id
 export const getPlayerNames = (): IMiddleware => async (ctx) => {
   const matchID = ctx.params.matchID;
+  if (matchID === undefined) {
+    return ctx.throw('Missing required parameter matchID', 400);
+  }
 
   const lobbyClient = new LobbyClient({
     server: `http://localhost:${INTERNAL_API_PORT}`,
@@ -172,6 +168,10 @@ export const getModel =
   (gameServer: GameServer): IMiddleware =>
   async (ctx) => {
     const matchID = ctx.params.matchID;
+    if (matchID === undefined) {
+      return ctx.throw('Missing required parameter matchID', 400);
+    }
+
     const game = await gameServer.db.fetch(matchID, { model: true });
 
     ctx.body = game.model;
@@ -181,6 +181,10 @@ export const getImage =
   (gameServer: GameServer): IMiddleware =>
   async (ctx) => {
     const matchID = ctx.params.matchID;
+    if (matchID === undefined) {
+      return ctx.throw('Missing required parameter matchID', 400);
+    }
+
     const game = await gameServer.db.fetch(matchID, { model: true });
 
     if (!game.model || !('extension' in game.model)) {
@@ -215,6 +219,10 @@ export const downloadThreatDragonModel =
   (gameServer: GameServer): IMiddleware =>
   async (ctx) => {
     const matchID = ctx.params.matchID;
+    if (matchID === undefined) {
+      return ctx.throw('Missing required parameter matchID', 400);
+    }
+
     const game = await gameServer.db.fetch(matchID, {
       state: true,
       metadata: true,
@@ -242,31 +250,31 @@ export const downloadThreatDragonModel =
         return;
       }
       Object.keys(threatsForComponent).forEach((componentIdx) => {
-        const diagram = model.detail.diagrams[diagramIdx].diagramJson;
-        const cell = diagram.cells?.find((c) => c.id === componentIdx);
+        const diagram = model.detail.diagrams[diagramIdx]?.diagramJson;
+        const cell = diagram?.cells?.find((c) => c.id === componentIdx);
 
-        if (cell !== undefined) {
+        if (
+          cell !== undefined &&
+          threatsForComponent[componentIdx] !== undefined
+        ) {
           const threats: ThreatDragonThreat[] = cell.threats ?? [];
-          Object.keys(threatsForComponent[componentIdx]).forEach(
-            (threatIdx) => {
-              const t = threatsForComponent[componentIdx][threatIdx];
-              threats.push({
-                description: t.description ?? '',
-                mitigation: t.mitigation ?? '',
-                modelType: getMethodologyName(state.G.gameMode),
-                severity: t.severity ?? '',
-                status: 'Open',
-                title: t.title ?? '',
-                type: getSuitDisplayName(state.G.gameMode, t.type),
+          Object.values(threatsForComponent[componentIdx]).forEach((t) =>
+            threats.push({
+              description: t.description ?? '',
+              mitigation: t.mitigation ?? '',
+              modelType: getMethodologyName(state.G.gameMode),
+              severity: t.severity ?? '',
+              status: 'Open',
+              title: t.title ?? '',
+              type: getSuitDisplayName(state.G.gameMode, t.type),
 
-                owner:
-                  t.owner !== undefined
-                    ? game.metadata.players[Number.parseInt(t.owner)]?.name
-                    : undefined,
-                id: t.id,
-                game: matchID,
-              });
-            },
+              owner:
+                t.owner !== undefined
+                  ? game.metadata.players[Number.parseInt(t.owner)]?.name
+                  : undefined,
+              id: t.id,
+              game: matchID,
+            }),
           );
           cell.threats = threats;
         }
@@ -288,6 +296,9 @@ export const downloadThreatsMarkdownFile =
   async (ctx) => {
     //get some variables that might be useful
     const matchID = ctx.params.matchID;
+    if (matchID === undefined) {
+      return ctx.throw('Missing required parameter matchID', 400);
+    }
     const game = await gameServer.db.fetch(matchID, {
       state: true,
       metadata: true,
@@ -359,22 +370,23 @@ function getThreats(
   gameState.G.identifiedThreats.forEach((identifiedThreats) => {
     if (identifiedThreats !== null) {
       Object.keys(identifiedThreats).forEach((componentId) => {
-        Object.keys(identifiedThreats[componentId]).forEach((threatId) => {
-          const threat = identifiedThreats[componentId][threatId];
-          threats.push({
-            ...threat,
-            owner:
-              threat.owner !== undefined
-                ? metadata.players[Number.parseInt(threat.owner)]?.name
-                : undefined,
-            status: 'NA',
-            description: threat.description ?? '',
-            mitigation: threat.mitigation ?? '',
-            severity: threat.severity ?? 'Low',
-            title: threat.title ?? '',
-            type: threat.type ?? '',
+        if (identifiedThreats[componentId] !== undefined) {
+          Object.values(identifiedThreats[componentId]).forEach((threat) => {
+            threats.push({
+              ...threat,
+              owner:
+                threat.owner !== undefined
+                  ? metadata.players[Number.parseInt(threat.owner)]?.name
+                  : undefined,
+              status: 'NA',
+              description: threat.description ?? '',
+              mitigation: threat.mitigation ?? '',
+              severity: threat.severity ?? 'Low',
+              title: threat.title ?? '',
+              type: threat.type ?? '',
+            });
           });
-        });
+        }
       });
     }
   });

@@ -1,31 +1,36 @@
 import { Client } from 'boardgame.io/client';
 import { Local } from 'boardgame.io/multiplayer';
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { getStartingCard } from '../utils/cardDefinitions';
 import { DEFAULT_START_SUIT } from '../utils/constants';
 import { DEFAULT_GAME_MODE } from '../utils/GameMode';
 import { ElevationOfPrivilege } from './eop';
+import { GameState } from './gameState';
 
-// TODO: refactor so that tests do not depend on each other
 describe('game', () => {
-  const spec = {
-    game: ElevationOfPrivilege,
-    numPlayers: 3,
-    multiplayer: Local(),
-  };
-  const players = {
-    '0': Client({ ...spec, playerID: '0' }),
-    '1': Client({ ...spec, playerID: '1' }),
-    '2': Client({ ...spec, playerID: '2' }),
-  };
+  let players: Record<'0' | '1' | '2', ReturnType<typeof Client<GameState>>>;
+  let startingPlayer: keyof typeof players;
+  let matchID = 0;
 
-  let createdThreat: string | undefined;
+  beforeEach(() => {
+    const spec = {
+      game: ElevationOfPrivilege,
+      numPlayers: 3,
+      multiplayer: Local(),
+      matchID: (matchID++).toString(),
+    };
+    players = {
+      '0': Client({ ...spec, playerID: '0' }),
+      '1': Client({ ...spec, playerID: '1' }),
+      '2': Client({ ...spec, playerID: '2' }),
+    };
+    Object.values(players).forEach((p) => p.start());
+    startingPlayer = players['0'].getState()!.ctx
+      .currentPlayer as keyof typeof players;
+  });
+
   const STARTING_CARD = getStartingCard(DEFAULT_GAME_MODE, DEFAULT_START_SUIT);
-
-  Object.values(players).forEach((p) => p.start());
-
-  const startingPlayer = players['0'].getState()!.ctx.currentPlayer;
 
   it("shouldn't start in a stage/phase", () => {
     expect(players['0'].getState()?.ctx.activePlayers).toBe(null);
@@ -42,13 +47,13 @@ describe('game', () => {
   });
 
   it('should move to the threats stage when the first player makes a move', () => {
-    const starting = players['0'].getState()?.ctx
-      .currentPlayer as keyof typeof players;
-    players[starting].moves.draw(STARTING_CARD);
+    // when
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
 
+    // then
     const state = players['0'].getState();
     expect(state?.G.dealt).toContain(STARTING_CARD);
-    expect(state?.G.dealtBy).toBe(starting);
+    expect(state?.G.dealtBy).toBe(startingPlayer);
     expect(state?.G.suit).toBe(STARTING_CARD.slice(0, 1));
     expect(players['0'].getState()?.ctx.activePlayers).toStrictEqual({
       '0': 'threats',
@@ -58,115 +63,189 @@ describe('game', () => {
   });
 
   it('the played card should not be present in the deck', () => {
-    const lastPlayer = players['0'].getState()?.G
-      .dealtBy as keyof typeof players;
-    const cards = players[lastPlayer].getState()?.G.players[lastPlayer];
+    // when
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+
+    // then
+    const cards = players[startingPlayer].getState()?.G.players[startingPlayer];
     expect(cards?.includes(STARTING_CARD)).toBe(false);
   });
 
   it('player should not be able to draw again', () => {
-    const lastPlayer = players['0'].getState()?.G
-      .dealtBy as keyof typeof players;
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
 
-    const cards = players[lastPlayer].getState()!.G.players[lastPlayer];
-    const card = cards[Math.floor(Math.random() * cards.length)];
+    const cards = players[startingPlayer].getState()!.G.players[startingPlayer];
+    const card = cards?.[Math.floor(Math.random() * cards.length)];
 
-    players[lastPlayer].moves.draw(card);
+    // when
+    players[startingPlayer].moves.draw?.(card);
 
+    // then
     const state = players['0'].getState();
-
-    expect(state?.G.dealt.includes(card)).toBe(false);
+    expect(state?.G.dealt.includes(card!)).toBe(false);
   });
 
   it('anyone should be able to select diagrams in a threats stage', () => {
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+
     Object.values(players).forEach((p, i) => {
-      p.moves.selectDiagram(i);
+      // when
+      p.moves.selectDiagram?.(i);
+
+      // then
       const state = players['0'].getState();
       expect(state?.G.selectedDiagram).toBe(i);
     });
   });
 
   it('anyone should be able to select components in a threats stage', () => {
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+
     Object.values(players).forEach((p, i) => {
-      p.moves.selectComponent(`${i}`);
+      // when
+      p.moves.selectComponent?.(`${i}`);
+
+      // then
       const state = players['0'].getState();
       expect(state?.G.selectedComponent).toBe(`${i}`);
     });
   });
 
   it('anyone should be able to select threats in a threats stage', () => {
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+
     Object.values(players).forEach((p, i) => {
-      p.moves.selectThreat(`${i}`);
+      // when
+      p.moves.selectThreat?.(`${i}`);
+
+      // then
       const state = players['0'].getState();
       expect(state?.G.selectedThreat).toBe(`${i}`);
     });
   });
 
   it('anyone should be able to toggle the threat add modal in a threats stage', () => {
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+
     Object.values(players).forEach((p) => {
-      p.moves.toggleModal();
+      // when
+      p.moves.toggleModal?.();
+
+      // then
       const state = players['0'].getState();
       expect(state?.G.threat.modal).toBe(true);
       expect(state?.G.threat.owner).toBe(p.playerID);
 
+      // when
       // only the owner should be able to toggle the modal again
-      p.moves.toggleModal();
+      p.moves.toggleModal?.();
+
+      // then
       const state2 = players['0'].getState();
       expect(state2?.G.threat.modal).toBe(false);
     });
   });
 
   it('the players who pass in the threats stage should not be able to toggle the modal', () => {
-    players['0'].moves.pass();
-    players['0'].moves.pass();
-    players['0'].moves.toggleModal();
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+    players['0'].moves.pass?.();
+
+    // when
+    players['0'].moves.toggleModal?.();
+
+    // then
     const state = players['0'].getState();
     expect(state?.G.threat.modal).toBe(false);
   });
 
   it('the players who have passed should not be able to select a diagram', () => {
-    players['0'].moves.selectDiagram('foo');
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+    players['0'].moves.pass?.();
+
+    // when
+    players['0'].moves.selectDiagram?.('foo');
+
+    // then
     const state = players['0'].getState();
     expect(state?.G.selectedDiagram).not.toBe('foo');
   });
 
   it('the players who have passed should not be able to select a component', () => {
-    players['0'].moves.selectComponent('foo');
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+    players['0'].moves.pass?.();
+
+    // when
+    players['0'].moves.selectComponent?.('foo');
+
+    // then
     const state = players['0'].getState();
     expect(state?.G.selectedComponent).not.toBe('foo');
   });
 
   it('the players who have passed should not be able to select a threat', () => {
-    players['0'].moves.selectThreat('foo');
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+    players['0'].moves.pass?.();
+
+    // when
+    players['0'].moves.selectThreat?.('foo');
+
+    // then
     const state = players['0'].getState();
     expect(state?.G.selectedThreat).not.toBe('foo');
   });
 
   it('the players who have not passed should be able to add a threat', () => {
-    players['1'].moves.toggleModal();
-    const state = players['0'].getState();
-    const diagram = state?.G.selectedDiagram;
-    const component = state?.G.selectedComponent;
-    createdThreat = state?.G.threat.id;
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+    players['0'].moves.pass?.();
 
-    players['1'].moves.updateThreat('title', 'foo');
-    players['1'].moves.updateThreat('description', 'bar');
-    players['1'].moves.updateThreat('mitigation', 'baz');
-    players['1'].moves.addOrUpdateThreat();
+    // when
+    players['1'].moves.toggleModal?.();
 
-    const state2 = players['0'].getState();
+    const stateBeforeUpdating = players['0'].getState();
+    const diagram = stateBeforeUpdating?.G.selectedDiagram;
+    const component = stateBeforeUpdating?.G.selectedComponent;
+    const createdThreat = stateBeforeUpdating?.G.threat.id;
 
+    players['1'].moves.updateThreat?.('title', 'foo');
+    players['1'].moves.updateThreat?.('description', 'bar');
+    players['1'].moves.updateThreat?.('mitigation', 'baz');
+    players['1'].moves.addOrUpdateThreat?.();
+
+    // then
+    const stateAfterUpdating = players['0'].getState();
     const t =
-      state2!.G.identifiedThreats[diagram!]![component!][createdThreat!];
-    expect(t.id).toBe(createdThreat);
-    expect(t.owner).toBe('1');
-    expect(t.title).toBe('foo');
-    expect(t.description).toBe('bar');
-    expect(t.mitigation).toBe('baz');
+      stateAfterUpdating!.G.identifiedThreats[diagram!]![component!]![
+        createdThreat!
+      ];
+    expect(t?.id).toBe(createdThreat);
+    expect(t?.owner).toBe('1');
+    expect(t?.title).toBe('foo');
+    expect(t?.description).toBe('bar');
+    expect(t?.mitigation).toBe('baz');
   });
 
-  it('the players who have not passed and are owners should be able to toggle modal update', () => {
-    players['1'].moves.toggleModalUpdate({
+  it('the players who have not passed and are owners of a created threat should be able to toggle modal update', () => {
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+    players['0'].moves.pass?.();
+    players['1'].moves.toggleModal?.();
+    players['1'].moves.updateThreat?.('title', 'foo');
+    players['1'].moves.updateThreat?.('description', 'bar');
+    players['1'].moves.updateThreat?.('mitigation', 'baz');
+    players['1'].moves.addOrUpdateThreat?.();
+
+    // when
+    players['1'].moves.toggleModalUpdate?.({
       owner: '1',
       title: 'foo',
       description: 'bar',
@@ -174,15 +253,27 @@ describe('game', () => {
     });
     const state = players['0'].getState();
     expect(state?.G.threat.new).toBe(false);
-    players['1'].moves.toggleModal();
+    players['1'].moves.toggleModal?.();
   });
 
   it('the threat owners should be able to delete threats', () => {
-    players['1'].moves.deleteThreat({
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+    players['0'].moves.pass?.();
+    players['1'].moves.toggleModal?.();
+    players['1'].moves.updateThreat?.('title', 'foo');
+    players['1'].moves.updateThreat?.('description', 'bar');
+    players['1'].moves.updateThreat?.('mitigation', 'baz');
+    players['1'].moves.addOrUpdateThreat?.();
+    const createdThreat = players['0'].getState()?.G.threat.id;
+
+    // when
+    players['1'].moves.deleteThreat?.({
       owner: '1',
       id: createdThreat,
     });
 
+    // then
     const state = players['0'].getState();
     const diagram = state?.G.selectedDiagram;
     const component = state?.G.selectedComponent;
@@ -191,13 +282,24 @@ describe('game', () => {
   });
 
   it('should move on when all players have passed', () => {
-    players['1'].moves.pass();
-    players['2'].moves.pass();
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
 
+    // when
+    Object.values(players).forEach((p) => p.moves.pass?.());
+
+    // then
     expect(players['0'].getState()?.ctx.activePlayers).toBe(null);
   });
 
   it('should respect the play order', () => {
+    // given
+    players[startingPlayer].moves.draw?.(STARTING_CARD);
+
+    // when
+    Object.values(players).forEach((p) => p.moves.pass?.());
+
+    // then
     const state = players['0'].getState()!;
     const nextPlayer = (parseInt(startingPlayer) + 1) % state.ctx.numPlayers;
     expect(state.ctx.currentPlayer).toBe(nextPlayer.toString());

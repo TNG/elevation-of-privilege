@@ -482,7 +482,7 @@ export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
       ? suit
       : getDefaultStartingSuit(gameMode);
 
-  return CARD_DECKS[gameMode][usedSuit].cards[0];
+  return CARD_DECKS[gameMode][usedSuit].cards[0]!; // TODO: FInd a way to make this properly type safe
 }
 
 function getDefaultStartingSuit(gameMode: GameMode): Suit {
@@ -561,6 +561,6 @@ function getCardSuit(card: Card, gameMode: GameMode): SuitDetails | undefined {
   );
 }
 
-export function isSuitInDeck(suit: Suit, gameMode: GameMode): boolean {
+export function isSuitInDeck(suit: string, gameMode: GameMode): suit is Suit {
   return Object.keys(CARD_DECKS[gameMode]).includes(suit);
 }

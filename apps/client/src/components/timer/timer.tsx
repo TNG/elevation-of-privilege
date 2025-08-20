@@ -3,7 +3,7 @@ import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 
 import './timer.css';
 
-const renderTime: FC<{ remainingTime: number }> = ({ remainingTime }) => {
+const renderTime = ({ remainingTime }: { remainingTime: number }) => {
   return (
     <div className="timer">
       <div className="value">
