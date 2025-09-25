@@ -32,6 +32,9 @@ const Board: FC<BoardProps> = ({
   playerID,
   credentials,
 }) => {
+  
+  console.log('🧠 DEBUG → G.gameMode:', G.gameMode); 
+
   const initialNames = Array.from<string>({
     length: ctx.numPlayers,
   }).fill('No Name');
