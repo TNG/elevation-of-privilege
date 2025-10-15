@@ -1,5 +1,17 @@
 # @eop/client
 
+## 2.0.0
+
+### Major Changes
+
+- Updated Depedencies
+
+### Patch Changes
+
+- Updated dependencies
+  - @eop/cornucopia-cards@2.0.0
+  - @eop/shared@2.0.0
+
 ## 1.1.2
 
 ### Patch Changes
