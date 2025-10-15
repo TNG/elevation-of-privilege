@@ -1,5 +1,17 @@
 # @eop/client
 
+## 2.0.0
+
+### Major Changes
+
+- Updated Depedencies
+
+### Patch Changes
+
+- Updated dependencies
+  - @eop/cornucopia-cards@2.0.0
+  - @eop/shared@2.0.0
+
 ## 1.1.2
 
 ### Patch Changes
@@ -44,6 +56,7 @@
 - 9c51094: Replace CRA with Vite
 
   BREAKING CHANGE:
+
   - Environment variables now need to be prefixed with `VITE_` instead of `REACT_APP_`
 
 - 8b5f27f: Separate package into subpackages and add support for Node.js 18, 20 and 22.
