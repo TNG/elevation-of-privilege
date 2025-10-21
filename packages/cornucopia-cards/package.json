@@ -14,7 +14,7 @@
   "devDependencies": {
     "@eop/eslint-config": "*",
     "@eop/prettier-config": "*",
-    "eslint": "^9.32.0",
+    "eslint": "^9.38.0",
     "prettier": "^3.6.2"
   },
   "private": true
