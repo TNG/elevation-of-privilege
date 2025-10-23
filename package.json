@@ -2,7 +2,7 @@
   "name": "@eop/root",
   "devDependencies": {
     "@changesets/cli": "^2.29.6",
-    "sherif": "^1.6.1",
+    "sherif": "^1.7.0",
     "turbo": "^2.5.5"
   },
   "workspaces": [
