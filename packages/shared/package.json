@@ -1,14 +1,14 @@
 {
   "name": "@eop/shared",
   "type": "commonjs",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "main": "./dist/cjs/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "require": "./dist/cjs/index.js",
-      "import": "./dist/esm/index.js",
-      "types": "./dist/types/index.d.ts"
+      "import": "./dist/esm/index.js"
     }
   },
   "scripts": {
@@ -22,23 +22,21 @@
   },
   "dependencies": {
     "boardgame.io": "^0.50.2",
-    "lodash": "^4.17.21",
-    "uuid": "^11.0.5"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eop/eslint-config": "*",
     "@eop/prettier-config": "*",
     "@eop/typescript-config": "*",
-    "@types/lodash": "^4.17.15",
     "@types/seedrandom": "^3.0.8",
     "@types/uuid": "^10.0.0",
-    "eslint": "^9.21.0",
-    "prettier": "^3.4.2",
+    "eslint": "^9.38.0",
+    "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "seedrandom": "^3.0.5",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.19.1",
-    "vitest": "^2.1.9"
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.0",
+    "vitest": "^3.2.4"
   },
   "private": true
 }

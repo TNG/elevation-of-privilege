@@ -1,7 +1,7 @@
 {
   "name": "@eop/eslint-config",
   "type": "module",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "exports": {
     "./base": {
       "default": "./base.js"
@@ -16,15 +16,15 @@
   },
   "devDependencies": {
     "@eop/prettier-config": "*",
-    "@eslint/js": "^9.17.0",
-    "eslint": "^9.21.0",
-    "eslint-config-prettier": "^10.1.1",
-    "prettier": "^3.4.2",
-    "typescript-eslint": "^8.19.1"
+    "@eslint/js": "^9.37.0",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "typescript-eslint": "^8.39.0"
   },
   "peerDependencies": {
     "@eslint/js": "^9.9.0",
-    "eslint-config-prettier": "^10.1.1",
+    "eslint-config-prettier": "^10.1.8",
     "typescript-eslint": "^8.2.0"
   },
   "private": true

@@ -1,8 +1,8 @@
 import type { PlayerID } from 'boardgame.io';
 import type { GameState } from '../game/gameState';
+import type { ThreatDragonComponent } from '../game/ThreatDragonModel';
 import type { Card, Suit } from './cardDefinitions';
 import { ModelType } from './constants';
-import type { ThreatDragonComponent } from '../game/ThreatDragonModel';
 
 export function getDealtCard(G: GameState): string {
   if (G.dealt.length > 0 && G.dealtBy) {
@@ -16,14 +16,7 @@ export function resolvePlayerNames(
   names: string[],
   current: PlayerID | null,
 ): string[] {
-  const resolved = [];
-  for (let i = 0; i < players.length; i++) {
-    const c = Number.parseInt(players[i]);
-    resolved.push(
-      current !== null && c === Number.parseInt(current) ? 'You' : names[c],
-    );
-  }
-  return resolved;
+  return players.map((player) => resolvePlayerName(player, names, current));
 }
 
 export function resolvePlayerName(
@@ -31,10 +24,7 @@ export function resolvePlayerName(
   names: string[],
   current: PlayerID | null,
 ): string {
-  return current !== null &&
-    Number.parseInt(player) === Number.parseInt(current)
-    ? 'You'
-    : names[Number.parseInt(player)];
+  return player === current ? 'You' : (names[Number.parseInt(player)] ?? '');
 }
 
 export function grammarJoin(arr: string[]): string | undefined {
@@ -61,7 +51,7 @@ export function getComponentName(
   const prefix = component.type.slice(3);
 
   if (component.type === 'tm.Flow') {
-    return `${prefix}: ${component.labels?.[0].attrs.text.text}`;
+    return `${prefix}: ${component.labels?.[0]?.attrs.text.text}`;
   }
 
   return `${prefix}: ${component.attrs.text?.text}`;

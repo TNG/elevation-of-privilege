@@ -90,7 +90,7 @@ const Sidebar: FC<SidebarProps> = ({
           className="pass"
           size="lg"
           block
-          onClick={() => moves.pass()}
+          onClick={() => moves.pass?.()}
         >
           Pass
         </Button>

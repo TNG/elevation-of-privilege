@@ -30,3 +30,6 @@ deploy/
 
 # Turbo
 .turbo
+
+# Opencode agents
+AGENTS.md

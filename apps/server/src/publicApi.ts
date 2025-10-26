@@ -1,10 +1,10 @@
-import type { Server } from 'node:http';
+import { SPECTATOR } from '@eop/shared';
 import cors from '@koa/cors';
 import auth from 'basic-auth';
 import Koa from 'koa';
 import koaBody from 'koa-body';
-import Router from 'koa-router';
-import { SPECTATOR } from '@eop/shared';
+import Router from '@koa/router';
+import type { Server } from 'node:http';
 import { API_PORT } from './config';
 import {
   createGame,
@@ -26,8 +26,7 @@ const runPublicApi = (gameServer: GameServer): [Koa, Server] => {
     prefix: '/game',
   });
 
-  //require authentication for all routes starting with `/:matchID/*`
-  router.use('/:matchID/', authMiddleware(gameServer));
+  const authMiddlewareInstance = authMiddleware(gameServer);
 
   router.post(
     '/create',
@@ -37,12 +36,17 @@ const runPublicApi = (gameServer: GameServer): [Koa, Server] => {
     }),
     createGame(gameServer),
   );
-  router.get('/:matchID/players', getPlayerNames());
-  router.get('/:matchID/model', getModel(gameServer));
-  router.get('/:matchID/image', getImage(gameServer));
-  router.get('/:matchID/download', downloadThreatDragonModel(gameServer));
+  router.get('/:matchID/players', authMiddlewareInstance, getPlayerNames());
+  router.get('/:matchID/model', authMiddlewareInstance, getModel(gameServer));
+  router.get('/:matchID/image', authMiddlewareInstance, getImage(gameServer));
+  router.get(
+    '/:matchID/download',
+    authMiddlewareInstance,
+    downloadThreatDragonModel(gameServer),
+  );
   router.get(
     '/:matchID/download/text',
+    authMiddlewareInstance,
     downloadThreatsMarkdownFile(gameServer),
   );
 
@@ -56,7 +60,7 @@ const runPublicApi = (gameServer: GameServer): [Koa, Server] => {
 };
 
 const authMiddleware =
-  (gameServer: GameServer): Router.IMiddleware =>
+  (gameServer: GameServer): Router.Middleware =>
   async (ctx, next) => {
     const authorizationHeader = ctx.header.authorization;
     if (authorizationHeader) {
@@ -64,6 +68,9 @@ const authMiddleware =
         const credentials = auth.parse(authorizationHeader);
 
         if (credentials) {
+          if (ctx.params.matchID === undefined) {
+            return ctx.throw('Missing required parameter matchID', 400);
+          }
           const game = await gameServer.db.fetch(ctx.params.matchID, {
             metadata: true,
           });
@@ -80,7 +87,7 @@ const authMiddleware =
 
           if (
             credentials.pass ===
-            metadata.players[Number.parseInt(credentials.name)].credentials
+            metadata.players[Number.parseInt(credentials.name)]?.credentials
           ) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return await next();

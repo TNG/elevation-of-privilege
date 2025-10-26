@@ -1,7 +1,7 @@
 {
   "name": "@eop/cornucopia-cards",
   "type": "module",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "description": "a version of the playing cards OWASP Cornucopia adapted for this game",
   "author": "TNG Technology Consulting",
   "license": "CC-BY-SA-3.0",
@@ -14,8 +14,8 @@
   "devDependencies": {
     "@eop/eslint-config": "*",
     "@eop/prettier-config": "*",
-    "eslint": "^9.21.0",
-    "prettier": "^3.4.2"
+    "eslint": "^9.38.0",
+    "prettier": "^3.6.2"
   },
   "private": true
 }

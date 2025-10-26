@@ -1,5 +1,17 @@
 # @eop/server
 
+## 2.0.0
+
+### Major Changes
+
+- Updated Depedencies
+- feb1e27: Drop official support for Node.js 18
+
+### Patch Changes
+
+- Updated dependencies
+  - @eop/shared@2.0.0
+
 ## 1.1.2
 
 ### Patch Changes
