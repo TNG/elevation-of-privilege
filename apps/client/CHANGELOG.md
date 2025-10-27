@@ -1,5 +1,17 @@
 # @eop/client
 
+## 2.1.0
+
+### Minor Changes
+
+- 5f96bdd: Update to Cumulus Version 1.2.0
+
+### Patch Changes
+
+- Updated dependencies [5f96bdd]
+  - @eop/shared@2.1.0
+  - @eop/cornucopia-cards@2.1.0
+
 ## 2.0.0
 
 ### Major Changes
@@ -56,6 +68,7 @@
 - 9c51094: Replace CRA with Vite
 
   BREAKING CHANGE:
+
   - Environment variables now need to be prefixed with `VITE_` instead of `REACT_APP_`
 
 - 8b5f27f: Separate package into subpackages and add support for Node.js 18, 20 and 22.

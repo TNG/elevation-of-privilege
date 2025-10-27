@@ -1,5 +1,11 @@
 # @eop/shared
 
+## 2.1.0
+
+### Minor Changes
+
+- 5f96bdd: Update to Cumulus Version 1.2.0
+
 ## 2.0.0
 
 ### Major Changes
