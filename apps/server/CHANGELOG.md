@@ -1,5 +1,12 @@
 # @eop/server
 
+## 2.1.0
+
+### Patch Changes
+
+- Updated dependencies [5f96bdd]
+  - @eop/shared@2.1.0
+
 ## 2.0.0
 
 ### Major Changes
