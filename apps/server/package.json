@@ -32,7 +32,7 @@
     "@eop/typescript-config": "*",
     "@types/basic-auth": "^1.1.8",
     "@types/koa": "2.15.0",
-    "@types/koa-router": "^7.4.8",
+    "@types/koa-router": "^7.4.9",
     "@types/koa-send": "^4.1.6",
     "@types/koa__cors": "^5.0.0",
     "@types/node": "^20.19.9",
