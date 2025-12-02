@@ -24,7 +24,7 @@
     "koa-send": "^5.0.1",
     "node-persist": "^4.0.4",
     "uuid": "^11.1.0",
-    "valibot": "^1.1.0"
+    "valibot": "^1.2.0"
   },
   "devDependencies": {
     "@eop/eslint-config": "*",
