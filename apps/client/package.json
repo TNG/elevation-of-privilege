@@ -41,7 +41,7 @@
     "@types/react-dom": "^19.1.7",
     "@types/react-helmet": "^6.1.11",
     "@vitejs/plugin-react-swc": "^4.2.2",
-    "eslint": "^9.38.0",
+    "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5",
     "jsdom": "^27.0.1",
     "nock": "^14.0.10",
