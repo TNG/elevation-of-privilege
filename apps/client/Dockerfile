@@ -22,7 +22,7 @@ ENV VITE_EOP_PRIVACY=$VITE_EOP_PRIVACY
 ENV VITE_EOP_BANNER_TEXT=$VITE_EOP_BANNER_TEXT
 RUN npx turbo run build
 
-FROM nginxinc/nginx-unprivileged:1.29.2-alpine
+FROM nginxinc/nginx-unprivileged:1.29.3-alpine
 COPY --from=builder /app/apps/client/nginx/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --from=builder /app/apps/client/nginx/etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/apps/client/build /usr/share/nginx/html/
