@@ -1,7 +1,7 @@
 {
   "name": "@eop/root",
   "devDependencies": {
-    "@changesets/cli": "^2.29.6",
+    "@changesets/cli": "^2.29.8",
     "sherif": "^1.7.0",
     "turbo": "^2.5.8"
   },
