@@ -30,7 +30,7 @@
     "@eop/typescript-config": "*",
     "@types/seedrandom": "^3.0.8",
     "@types/uuid": "^10.0.0",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "prettier": "^3.6.2",
     "rimraf": "^6.1.2",
     "seedrandom": "^3.0.5",
