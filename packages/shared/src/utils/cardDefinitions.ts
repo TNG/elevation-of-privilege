@@ -1,7 +1,7 @@
 import { GameMode } from './GameMode';
 
 export type Card = string;
-export const SUITS = ['A', 'B', 'C', 'D', 'E', 'T'] as const;
+export const SUITS = ['A', 'B', 'C', 'D', 'E', 'T', 'F', 'G', 'H', 'I'] as const;
 export type Suit = (typeof SUITS)[number];
 
 interface SuitDetails {
@@ -144,6 +144,46 @@ export const CARD_DECKS: CardDeckDefinitions = {
       isTrump: true,
       isDefault: false,
     },
+    F: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    G: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    H: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    I: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+  },
+  [GameMode.PRIVACY]: {
+    A: { name: 'Spoofing', abbreviation: 'S', cards: ['A2','A3','A4','A5','A6','A7','A8','A9','A10','AJ','AQ','AK','AA','AE'], isTrump: false, isDefault: false },
+    B: { name: 'Tampering', abbreviation: 'T', cards: ['B2','B3','B4','B5','B6','B7','B8','B9','B10','BJ','BQ','BK','BA'], isTrump: false, isDefault: false },
+    C: { name: 'Repudiation', abbreviation: 'R', cards: ['C2','C3','C4','C5','C6','C7','C8','C9','C10','CJ','CQ','CK','CA','CE','CF','CG','CH'], isTrump: false, isDefault: false },
+    D: { name: 'Information Disclosure', abbreviation: 'I', cards: ['D2','D3','D4','D5','D6','D7','D8','D9','D10','DJ','DQ','DK','DA','DE','DF'], isTrump: false, isDefault: false },
+    E: { name: 'Denial of Service', abbreviation: 'DoS', cards: ['E2','E3','E4','E5','E6','E7','E8','E9','E10','EJ','EQ','EK','EA','EE'], isTrump: false, isDefault: false },
+    T: { name: 'Elevation of Privilege', abbreviation: 'EoP', cards: ['T2','T3','T4','T5','T6','T7','T8','T9','T10','TJ','TQ','TK','TA'], isTrump: true, isDefault: false },
+    F: { name: 'Transfer', abbreviation: 'TR', cards: ['F2','F3','F4','F5','F6','F7','F8','F9','FA'], isTrump: false, isDefault: false },
+    G: { name: 'Retention', abbreviation: 'RE', cards: ['G2','G3','G4','G5','G6','G7','G8','G9','G10','GJ','GA'], isTrump: false, isDefault: false },
+    H: { name: 'Inference', abbreviation: 'INF', cards: ['H2','H3','H4','H5','H6','H7','H8','H9','H10','HA'], isTrump: false, isDefault: false },
+    I: { name: 'Minimisation', abbreviation: 'MIN', cards: ['I2','I3','I4','I5','I6','IA'], isTrump: false, isDefault: true },
   },
   [GameMode.CORNUCOPIA]: {
     A: {
@@ -272,6 +312,34 @@ export const CARD_DECKS: CardDeckDefinitions = {
       isTrump: true,
       isDefault: false,
     },
+    F: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    G: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    H: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    I: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    }, 
   },
   [GameMode.CUMULUS]: {
     A: {
@@ -381,6 +449,34 @@ export const CARD_DECKS: CardDeckDefinitions = {
       isTrump: true,
       isDefault: true,
     },
+    F: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    G: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    H: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    I: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
   },
   [GameMode.EOMLSEC]: {
     A: {
@@ -481,11 +577,39 @@ export const CARD_DECKS: CardDeckDefinitions = {
       isTrump: true,
       isDefault: false,
     },
+    F: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    G: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    H: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
+    I: {
+      name: undefined,
+      abbreviation: undefined,
+      cards: [],
+      isTrump: false,
+      isDefault: false,
+    },
   },
 };
 
 export function isSuit(str: string): str is Suit {
-  return ['A', 'B', 'C', 'D', 'E', 'T'].includes(str);
+  return ['A', 'B', 'C', 'D', 'E', 'T', 'F', 'G', 'H', 'I'].includes(str);
 }
 
 export function getStartingCard(gameMode: GameMode, suit: Suit): Card {
