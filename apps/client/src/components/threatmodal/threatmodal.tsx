@@ -197,9 +197,16 @@ const ThreatModal: FC<ThreatModalProps> = ({
     [isOwner, title, moves],
   );
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isInvalid) {
+      addOrUpdate();
+    }
+  };
+
   return (
     <Modal isOpen={isOpen}>
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <ModalHeader
           toggle={isOwner ? () => moves.toggleModal?.() : undefined}
           style={{ width: '100%' }}
@@ -221,7 +228,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
               color="primary"
               className="mr-auto"
               disabled={isInvalid}
-              onClick={() => addOrUpdate()}
+              type="submit"
             >
               Save
             </Button>
