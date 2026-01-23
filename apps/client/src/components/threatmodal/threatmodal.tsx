@@ -199,7 +199,7 @@ const ThreatModal: FC<ThreatModalProps> = ({
 
   return (
     <Modal isOpen={isOpen}>
-      <Form>
+      <Form onSubmit={(e) => e.preventDefault()}>
         <ModalHeader
           toggle={isOwner ? () => moves.toggleModal?.() : undefined}
           style={{ width: '100%' }}
