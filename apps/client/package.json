@@ -26,7 +26,7 @@
     "react-countdown-circle-timer": "^3.2.1",
     "react-dom": "^19.1.1",
     "react-map-interaction": "^2.1.0",
-    "react-router-dom": "^7.9.4",
+    "react-router-dom": "^7.13.0",
     "reactstrap": "^9.2.3"
   },
   "devDependencies": {
