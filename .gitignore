@@ -34,3 +34,7 @@ deploy/
 # Agents
 .agents
 .opencode
+
+# Playwright
+.playwright
+.playwright-cli
