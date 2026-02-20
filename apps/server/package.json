@@ -42,7 +42,7 @@
     "eslint": "^9.39.2",
     "prettier": "^3.8.1",
     "rimraf": "^6.1.2",
-    "supertest": "^7.1.4",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "ts-toolbelt": "^9.6.0",
     "typescript": "^5.9.2",
