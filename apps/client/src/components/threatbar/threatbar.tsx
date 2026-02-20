@@ -154,6 +154,11 @@ const Threatbar: FC<ThreatbarProps> = ({
                     <Col xs="6">
                       <Button
                         block
+                        disabled={
+                          !isInThreatStage ||
+                          G.passed.includes(playerID ?? '') ||
+                          !active
+                        }
                         onClick={() => moves.toggleModalUpdate?.(val)}
                       >
                         <FontAwesomeIcon icon={faEdit} /> Update
@@ -163,6 +168,11 @@ const Threatbar: FC<ThreatbarProps> = ({
                       <Button
                         block
                         color="danger"
+                        disabled={
+                          !isInThreatStage ||
+                          G.passed.includes(playerID ?? '') ||
+                          !active
+                        }
                         onClick={() => setThreatToBeDeleted(val)}
                       >
                         <FontAwesomeIcon icon={faTrash} /> Remove
