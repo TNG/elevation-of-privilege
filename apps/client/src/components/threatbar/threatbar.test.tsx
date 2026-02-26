@@ -1,10 +1,10 @@
-import { GameMode, ModelType } from '@eop/shared';
+import {GameMode, ModelType, ThreatDragonModelV2} from '@eop/shared';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 
 import Threatbar from './threatbar';
 
-import type { GameState, ThreatDragonModel } from '@eop/shared';
+import type { GameState } from '@eop/shared';
 
 describe('<Threatbar>', () => {
   const selectedDiagram = 0;
@@ -49,28 +49,37 @@ describe('<Threatbar>', () => {
   };
 
   it('shows identified threats in reverse order', () => {
-    const model: ThreatDragonModel = {
+
+    const model: ThreatDragonModelV2 = {
+      version: '2.5.0',
       summary: {
         title: 'title',
       },
       detail: {
+        contributors: [],
         diagrams: [
           {
             id: 0,
-            diagramJson: {
-              cells: [
-                {
-                  size: { width: 0, height: 0 },
-                  position: { x: 0, y: 0 },
-                  angle: 0,
-                  z: 0,
-                  id: 'component1',
-                  type: 'tm.Actor',
-                  attrs: {
-                    text: {
-                      text: 'text',
-                    },
+            title: '',
+            diagramType: 'STRIDE',
+            thumbnail: '',
+            version: '2.5.0',
+            cells: [
+              {
+                id: 'component1',
+                shape: 'actor',
+                zIndex: 0,
+                position: { x: 0, y: 0 },
+                size: { width: 0, height: 0 },
+                angle: 0,
+                attrs: {
+                  text: {
+                    text: 'text',
                   },
+                },
+                data: {
+                  type: 'tm.Actor',
+                  name: 'text',            // aus attrs.text.text übernommen (du hattest keinen separaten Namen)
                   hasOpenThreats: true,
                   threats: [
                     {
@@ -91,14 +100,13 @@ describe('<Threatbar>', () => {
                     },
                   ],
                 },
-              ],
-            },
-            diagramType: 'STRIDE',
-            size: { width: 0, height: 0 },
-            thumbnail: '',
-            title: '',
+              },
+            ],
           },
         ],
+        diagramTop: 1,
+        reviewer: '',
+        threatTop: 2,
       },
     };
 
@@ -121,28 +129,40 @@ describe('<Threatbar>', () => {
   });
 
   it('shows existing threats in reverse order', () => {
-    const model: ThreatDragonModel = {
+
+    const model: ThreatDragonModelV2 = {
+      version: '2.5.0',
       summary: {
         title: 'title',
       },
       detail: {
+        contributors: [],
+        reviewer: '',
+        diagramTop: 1,
+        threatTop: 2,
         diagrams: [
           {
             id: 0,
-            diagramJson: {
-              cells: [
-                {
-                  size: { width: 0, height: 0 },
-                  position: { x: 0, y: 0 },
-                  angle: 0,
-                  z: 0,
-                  id: 'component1',
-                  type: 'tm.Actor',
-                  attrs: {
-                    text: {
-                      text: 'text',
-                    },
+            title: '',
+            diagramType: 'STRIDE',
+            thumbnail: '',
+            version: '2.5.0',
+            cells: [
+              {
+                id: 'component1',
+                shape: 'actor',             // aus type: "tm.Actor"
+                zIndex: 0,                  // aus z: 0
+                angle: 0,
+                position: { x: 0, y: 0 },
+                size: { width: 0, height: 0 },
+                attrs: {
+                  text: {
+                    text: 'text',
                   },
+                },
+                data: {
+                  type: 'tm.Actor',
+                  name: 'text',              // aus attrs.text.text übernommen
                   hasOpenThreats: true,
                   threats: [
                     {
@@ -163,16 +183,13 @@ describe('<Threatbar>', () => {
                     },
                   ],
                 },
-              ],
-            },
-            diagramType: 'STRIDE',
-            size: { width: 0, height: 0 },
-            thumbnail: '',
-            title: '',
+              },
+            ],
           },
         ],
       },
     };
+
 
     render(
       <Threatbar

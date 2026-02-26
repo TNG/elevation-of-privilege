@@ -1,385 +1,343 @@
+
 /**
- * The threat models used by OWASP Threat Dragon
+ * Threat Dragon V2 threat model types
  *
- * This type is based on the schema at https://owasp.org/www-project-threat-dragon/assets/schemas/owasp.threat-dragon.schema.V1.json
+ * References:
+ * - OWASP Threat Dragon schema V2:
+ *   https://owasp.org/www-project-threat-dragon/assets/schemas/owasp.threat-dragon.schema.V2.json
+ * - Threat Dragon V2 data structure documentation (cells/data/threats):
+ *   https://deepwiki.com/OWASP/threat-dragon/2.1-threat-model-data-structure
+ *
+ * Notes:
+ * - V2 diagrams contain `cells` directly (no `diagramJson`).
+ * - Cells use `shape` and `zIndex` and store domain data in `data`.
+ * - Real-world V2 models may contain additional properties not strictly described by schema;
+ *   therefore most objects include `[k: string]: unknown` for forward compatibility.
  */
-export interface ThreatDragonModel {
-  /**
-   * Threat Dragon version used in the model
-   */
-  version?: string;
 
-  /**
-   * Threat model project meta-data
-   */
-  summary: {
-    /**
-     * Description of the threat model used for report outputs
-     */
-    description?: string;
-    /**
-     * A unique identifier for this main threat model object
-     */
-    id?: number;
-    /**
-     * The original creator or overall owner of the model
-     */
-    owner?: string;
-    /**
-     * Threat model title
-     */
-    title: string;
-  };
-  /**
-   * Threat model definition
-   */
-  detail: {
-    /**
-     * An array of contributors to the threat model project
-     */
-    contributors?: Contributor[];
-    /**
-     * An array of single or multiple threat data-flow diagrams
-     */
-    diagrams: Diagram[];
-  };
+export interface ThreatDragonModelV2 {
+  /** Threat Dragon version used in the model (required in V2) */
+  version: string;
+
+  /** Threat model project meta-data */
+  summary: ThreatDragonSummaryV2;
+
+  /** Threat model definition */
+  detail: ThreatDragonDetailV2;
+
+  [k: string]: unknown;
 }
 
-interface Contributor {
-  /**
-   * The name of the contributor
-   */
-  name: string;
-}
-
-interface Diagram {
-  /**
-   * The methodology used by the data-flow diagram
-   */
-  diagramType: string;
-  /**
-   * The sequence number of the diagram
-   */
-  id: number;
-  /**
-   * The size of the diagram drawing canvas
-   */
-  size: {
-    /**
-     * The height of the diagram drawing canvas
-     */
-    height: number;
-    /**
-     * The width of the diagram drawing canvas
-     */
-    width: number;
-  };
-  /**
-   * The path to the thumbnail image for the diagram
-   */
-  thumbnail: string;
-  /**
-   * The title of the data-flow diagram
-   */
+export interface ThreatDragonSummaryV2 {
+  /** Threat model title (required) */
   title: string;
-  /**
-   * Threat Dragon version used in the diagram
-   */
-  version?: string;
-  /**
-   * The data-flow diagram components
-   */
-  diagramJson: DiagramJson;
-  /**
-   * The highest diagram number in the threat model
-   */
-  diagramTop?: number;
-  /**
-   * The reviewer of the overall threat model
-   */
-  reviewer?: string;
-  /**
-   * The highest threat number in the threat model
-   */
-  threatTop?: number;
-}
 
-interface DiagramJson {
-  /**
-   * The individual diagram components
-   */
-  cells?: ThreatDragonComponent[];
-}
+  /** The original creator or overall owner of the model */
+  owner?: string;
 
-export interface ThreatDragonComponent {
-  /**
-   * The component display attributes
-   */
-  attrs: {
-    /**
-     * The component shape attributes
-     */
-    '.element-shape'?: {
-      /**
-       * The component shape display attributes
-       */
-      class?: string;
-    };
-    /**
-     * The component text
-     */
-    text?: {
-      /**
-       * The component text contents
-       */
-      text: string;
-    };
-    /**
-     * The component text attributes
-     */
-    '.element-text'?: {
-      /**
-       * The component text display attributes
-       */
-      class?: string;
-    };
-  };
-  /**
-   * The component rotation angle
-   */
-  angle?: number;
-  /**
-   * The component description
-   */
+  /** Description of the threat model used for report outputs */
   description?: string;
-  /**
-   * The component flag set if the process handles credit card payment
-   */
-  handlesCardPayment?: boolean;
-  /**
-   * The component flag set if the process is part of a retail site
-   */
-  handlesGoodsOrServices?: boolean;
-  /**
-   * The component flag set if there are open threats
-   */
-  hasOpenThreats?: boolean;
-  /**
-   * The component unique identifier (UUID)
-   */
+
+  /** A unique identifier for this main threat model object */
+  id?: number;
+
+  [k: string]: unknown;
+}
+
+export interface ThreatDragonDetailV2 {
+  /** Contributors (required in V2 schema) */
+  contributors: ContributorV2[];
+
+  /** An array of one or more diagrams (required) */
+  diagrams: DiagramV2[];
+
+  /** Counter used to generate unique diagram IDs */
+  diagramTop: number;
+
+  /** Counter used to generate unique threat IDs */
+  threatTop: number;
+
+  /** The reviewer of the overall threat model */
+  reviewer: string;
+
+  [k: string]: unknown;
+}
+
+export interface ContributorV2 {
+  name: string;
+  [k: string]: unknown;
+}
+
+export interface DiagramV2 {
+  id: number;
+  title: string;
+
+  /** Methodology type: STRIDE, LINDDUN, CIA, DIE, PLOT4ai, Generic, ... */
+  diagramType: string;
+
+  /** Diagram description (optional) */
+  description?: string;
+
+  /** Placeholder text used when description is empty (optional) */
+  placeholder?: string;
+
+  /** The path to the thumbnail image for the diagram */
+  thumbnail: string;
+
+  /** Threat Dragon version used in the diagram */
+  version: string;
+
+  /** Diagram cells (required in V2) */
+  cells: CellV2[];
+
+  [k: string]: unknown;
+}
+
+/** Common point type (used for positions and vertices) */
+export interface PointV2 {
+  x: number;
+  y: number;
+  [k: string]: unknown;
+}
+
+/**
+ * Cell definition (V2)
+ * - Nodes typically have: position + size + ports (optional)
+ * - Edges typically have: source + target + vertices (optional) + labels (optional)
+ */
+export interface CellV2 {
   id: string;
+
   /**
-   * The component flag set if the store contains logs
+   * The visual shape type, e.g.:
+   * - "process" | "actor" | "store" | "flow"
+   * - "trust-boundary-curve" | "trust-boundary-box"
+   * - "td-text-block"
    */
-  isALog?: boolean;
+  shape: string;
+
+  /** Z-index for layering elements */
+  zIndex: number;
+
+  /** Visual attributes (shape-dependent) */
+  attrs?: Record<string, unknown>;
+
+  /** Domain/business data (type/name/flags/threats) */
+  data: CellDataV2;
+
+  /** Visibility flag (commonly present in V2 files) */
+  visible?: boolean;
+
+  /** Node geometry */
+  position?: PointV2;
+  size?: { width: number; height: number; [k: string]: unknown };
+
+  /** Edge geometry (for flows and boundary curves) */
+  source?: EdgeEndV2;
+  target?: EdgeEndV2;
+  vertices?: PointV2[];
+  connector?: string;
+
+  /** Edge labels (commonly present for flows/boundaries) */
+  labels?: EdgeLabelV2[];
+
+  /** Ports (commonly present for nodes and used by edges via source.port/target.port) */
+  ports?: PortsV2;
+
+  /** Some V2 exports include width/height for edges too */
+  width?: number;
+  height?: number;
+
+  [k: string]: unknown;
+}
+
+/** Source/target endpoint for edges */
+export interface EdgeEndV2 {
   /**
-   * The component flag set if the process is a web application
+   * For edges (flows): reference to a node cell id
+   * Example: { cell: "<uuid>", port: "<uuid>" }
    */
-  isWebApplication?: boolean;
+  cell?: string;
+
+  /** Port id at the endpoint (optional) */
+  port?: string;
+
   /**
-   * The component flag set if the data flow or store is encrypted
+   * For boundary curves: coordinates can be used instead of cell reference
+   * Example: { x: 820, y: 40 }
    */
-  isEncrypted?: boolean;
-  /**
-   * The component flag set if the data store uses signatures
-   */
-  isSigned?: boolean;
-  /**
-   * The flag set if the component is a trust boundary curve or trust boundary box
-   */
-  isTrustBoundary?: boolean;
-  /**
-   * The floating labels used for boundary or data-flow
-   */
-  labels?: Label[];
-  /**
-   * The component flag set if it is not in scope
-   */
-  outOfScope?: boolean;
-  /**
-   * The component position
-   */
+  x?: number;
+  y?: number;
+
+  [k: string]: unknown;
+}
+
+/**
+ * Edge label structure as seen in V2 models.
+ * V2 labels can contain markup and positioning metadata.
+ */
+export interface EdgeLabelV2 {
+  attrs?: Record<string, unknown>;
+  markup?: Array<{ tagName: string; selector: string; [k: string]: unknown }>;
   position?: {
-    /**
-     * The component horizontal position
-     */
-    x: number;
-    /**
-     * The component vertical position
-     */
-    y: number;
+    distance?: number;
+    args?: Record<string, unknown>;
     [k: string]: unknown;
   };
-  /**
-   * The component's level of privilege/permissions
-   */
-  privilegeLevel?: string;
-  /**
-   * The component description if out of scope
-   */
-  reasonOutOfScope?: string;
-  /**
-   * The component size
-   */
-  size: {
-    /**
-     * The component height
-     */
-    height: number;
-    /**
-     * The component width
-     */
-    width: number;
-  };
-  /**
-   * The component curve type, for data flows and boundaries
-   */
-  smooth?: boolean;
-  /**
-   * The component curve source
-   */
-  source?: {
-    /**
-     * The data-flow source component
-     */
-    id?: string;
-    /**
-     * The boundary horizontal curve source
-     */
-    x?: number;
-    /**
-     * The boundary vertical curve source
-     */
-    y?: number;
-  };
-  /**
-   * The component flag set if store contains credentials/PII
-   */
-  storesCredentials?: boolean;
-  /**
-   * The component flag set if store is part of a retail web application
-   */
-  storesInventory?: boolean;
-  /**
-   * The component curve target
-   */
-  target?: {
-    /**
-     * The data-flow target component
-     */
-    id?: string;
-    /**
-     * The boundary horizontal curve target
-     */
-    x?: number;
-    /**
-     * The boundary vertical curve target
-     */
-    y?: number;
-  };
-  /**
-   * The threats associated with the component
-   */
-  threats?: ThreatDragonThreat[];
-  type: CellType;
-  /**
-   * The boundary or data-flow curve points
-   */
-  vertices?: {
-    /**
-     * The horizontal value of the curve point
-     */
-    x: number;
-    /**
-     * The vertical value of the curve point
-     */
-    y: number;
-  };
-  z: number;
+  [k: string]: unknown;
 }
 
-interface Label {
-  /**
-   * The label position
-   */
-  position: number;
-  /**
-   * The label text attributes
-   */
-  attrs: {
-    /**
-     * The text attributes
-     */
-    text: {
-      /**
-       * The text size
-       */
-      'font-size': string;
-      /**
-       * The text weight
-       */
-      'font-weight': string;
-      /**
-       * The text content
-       */
-      text: string;
-    };
-  };
+/** Ports definition used by V2 cells (nodes) */
+export interface PortsV2 {
+  groups?: Record<
+    string,
+    {
+      position?: string;
+      attrs?: Record<string, unknown>;
+      [k: string]: unknown;
+    }
+  >;
+
+  items?: Array<{
+    group: string;
+    id: string;
+    [k: string]: unknown;
+  }>;
+
+  [k: string]: unknown;
 }
 
-type CellType =
-  | 'tm.Process'
-  | 'tm.Store'
-  | 'tm.Actor'
-  | 'tm.Flow'
-  | 'tm.Boundary';
-
-export interface ThreatDragonThreat {
-  /**
-   * The threat description
-   */
-  description: string;
-  /**
-   * The threat mitigation
-   */
-  mitigation: string;
-  /**
-   * The threat methodology type
-   */
-  modelType?: string;
-  /**
-   * The unique number for the threat
-   */
-  number?: number;
-  /**
-   * The custom score/risk for the threat
-   */
-  score?: string;
-  /**
-   * The threat severity as High, Medium or Low
-   */
-  severity: string;
-  /**
-   * The threat status as NA, Open or Mitigated
-   */
-  status: Status;
-  /**
-   * The threat ID as a UUID
-   */
+/**
+ * Threats in V2:
+ * - In practice, threats are usually stored under cell.data.threats[]
+ * - Schema variants may contain threatId or id; we allow both.
+ */
+export interface ThreatV2 {
+  id?: string;
   threatId?: string;
-  /**
-   * The threat title
-   */
+
+  number?: number;
+
   title: string;
-  /**
-   * The threat type, selection according to modelType
-   */
+  status: "NA" | "Open" | "Mitigated" | string;
+
+  severity: "Low" | "Medium" | "High" | "Critical" | string;
+
+  /** Category depends on methodology (e.g., STRIDE categories, CIA categories, etc.) */
   type: string;
 
-  // our custom properties
-  owner?: string;
-  id?: string;
-  game?: string;
+  description: string;
+  mitigation: string;
+
+  modelType?: string;
+  score?: string;
+
+  /** sometimes present in exported models */
+  new?: boolean;
+
+  [k: string]: unknown;
 }
 
-type Status = 'NA' | 'Open' | 'Mitigated';
+/** Base properties common across V2 cell data types */
+export interface BaseCellDataV2 {
+  /** Type identifier, e.g. tm.Process, tm.Actor, tm.Store, tm.Flow, tm.Boundary, tm.Text, tm.BoundaryBox */
+  type: string;
+
+  /** Display name */
+  name: string;
+
+  /** Optional description */
+  description?: string;
+
+  /** Out-of-scope flags */
+  outOfScope?: boolean;
+  reasonOutOfScope?: string;
+
+  /** Flag whether there are open threats */
+  hasOpenThreats: boolean;
+
+  /** For boundaries */
+  isTrustBoundary?: boolean;
+
+  /** Associated threats */
+  threats?: ThreatV2[];
+
+  [k: string]: unknown;
+}
+
+/**
+ * Discriminated union for common V2 cell data types.
+ * Includes types seen in real models (e.g., tm.BoundaryBox, tm.Text).
+ */
+export type CellDataV2 =
+  | ProcessDataV2
+  | StoreDataV2
+  | ActorDataV2
+  | FlowDataV2
+  | BoundaryDataV2
+  | BoundaryBoxDataV2
+  | TextBlockDataV2
+  | (BaseCellDataV2 & { type: string }); // fallback for forward compatibility
+
+export interface ProcessDataV2 extends BaseCellDataV2 {
+  type: "tm.Process";
+  handlesCardPayment?: boolean;
+  handlesGoodsOrServices?: boolean;
+  isWebApplication?: boolean;
+  privilegeLevel?: string;
+
+  /** present in some models */
+  threatFrequency?: Record<string, number>;
+
+  [k: string]: unknown;
+}
+
+export interface StoreDataV2 extends BaseCellDataV2 {
+  type: "tm.Store";
+  isALog?: boolean;
+  isEncrypted?: boolean;
+  isSigned?: boolean;
+  storesCredentials?: boolean;
+  storesInventory?: boolean;
+
+  [k: string]: unknown;
+}
+
+export interface ActorDataV2 extends BaseCellDataV2 {
+  type: "tm.Actor";
+  providesAuthentication?: boolean;
+
+  [k: string]: unknown;
+}
+
+export interface FlowDataV2 extends BaseCellDataV2 {
+  type: "tm.Flow";
+  isBidirectional?: boolean;
+  isEncrypted?: boolean;
+  isPublicNetwork?: boolean;
+  protocol?: string;
+
+  [k: string]: unknown;
+}
+
+export interface BoundaryDataV2 extends BaseCellDataV2 {
+  type: "tm.Boundary";
+  isTrustBoundary: boolean;
+
+  [k: string]: unknown;
+}
+
+/** Appears in some V2 models for trust boundary boxes */
+export interface BoundaryBoxDataV2 extends BaseCellDataV2 {
+  type: "tm.BoundaryBox";
+  isTrustBoundary: boolean;
+
+  [k: string]: unknown;
+}
+
+/** Appears in some V2 models for free text blocks */
+export interface TextBlockDataV2 extends BaseCellDataV2 {
+  type: "tm.Text";
+  [k: string]: unknown;
+}
+

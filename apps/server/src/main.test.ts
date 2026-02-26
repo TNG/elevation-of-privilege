@@ -18,7 +18,7 @@ import {
   publicApiServerHandle,
 } from './main';
 
-import type { ThreatDragonModel } from '@eop/shared';
+import type { ThreatDragonModelV2 } from '@eop/shared';
 import type { LobbyAPI, Server, State } from 'boardgame.io';
 
 beforeEach(() => {
@@ -192,43 +192,56 @@ it('download the final model for a game', async () => {
     updatedAt: 0,
   };
 
-  const model: ThreatDragonModel = {
+
+  const model: ThreatDragonModelV2 = {
+    version: '2.5.0',
     summary: {
       title: 'Foo',
     },
     detail: {
+      contributors: [],
+      reviewer: '',
+      diagramTop: 1,
+      threatTop: 0,
       diagrams: [
         {
           id: 0,
-          diagramJson: {
-            cells: [
-              {
-                id: 'component-1',
+          title: '',
+          diagramType: 'STRIDE',
+          thumbnail: '',
+          version: '2.5.0',
+          cells: [
+            {
+              id: 'component-1',
+              shape: 'actor',          // V2 shape derived from tm.Actor
+              zIndex: 0,
+              position: { x: 0, y: 0 },
+              size: { width: 0, height: 0 },
+              angle: 0,
+              attrs: {},
+              data: {
                 type: 'tm.Actor',
+                name: '',
                 hasOpenThreats: false,
                 threats: [],
-                size: { height: 0, width: 0 },
-                attrs: {},
-                angle: 0,
-                position: { x: 0, y: 0 },
-                z: 0,
               },
-              {
-                id: 'component-2',
+            },
+            {
+              id: 'component-2',
+              shape: 'actor',
+              zIndex: 0,
+              position: { x: 0, y: 0 },
+              size: { width: 0, height: 0 },
+              angle: 0,
+              attrs: {},
+              data: {
                 type: 'tm.Actor',
+                name: '',
                 hasOpenThreats: false,
-                size: { height: 0, width: 0 },
-                attrs: {},
-                angle: 0,
-                position: { x: 0, y: 0 },
-                z: 0,
+                threats: [],
               },
-            ],
-          },
-          diagramType: 'STRIDE',
-          size: { width: 0, height: 0 },
-          thumbnail: '',
-          title: '',
+            },
+          ],
         },
       ],
     },
@@ -243,8 +256,8 @@ it('download the final model for a game', async () => {
     .get(`/game/${matchID}/download`)
     .auth('0', 'abc123');
 
-  const body = response.body as ThreatDragonModel;
-  const threats = body.detail.diagrams[0]?.diagramJson.cells?.[0]?.threats;
+  const body = response.body as ThreatDragonModelV2;
+  const threats = body.detail.diagrams[0]?.cells?.[0]?.data?.threats;
 
   expect(threats?.[0]?.id).toBe('0');
   expect(threats?.[0]?.type).toBe('Spoofing');
@@ -303,17 +316,37 @@ it('Download threat file', async () => {
   } as State;
 
   //Maybe I should put these jsons into a file
-  const model: ThreatDragonModel = {
+
+
+  const model: ThreatDragonModelV2 = {
+    version: '2.5.0',
     summary: {
       title: '  Demo Threat Model ',
     },
     detail: {
+      contributors: [],
+      reviewer: '',
+      diagramTop: 1,
+      threatTop: 4,
       diagrams: [
         {
           id: 0,
-          diagramJson: {
-            cells: [
-              {
+          title: '',
+          diagramType: 'STRIDE',
+          thumbnail: '',
+          version: '2.5.0',
+          cells: [
+            {
+              id: '00000000-0000-0000-0000-000000000001',
+              shape: 'actor',
+              zIndex: 0,
+              position: { x: 0, y: 0 },
+              size: { width: 0, height: 0 },
+              attrs: {},
+              data: {
+                type: 'tm.Actor',
+                name: '',
+                hasOpenThreats: true,
                 threats: [
                   {
                     status: 'Open',
@@ -325,16 +358,19 @@ it('Download threat file', async () => {
                     type: 'Information disclosure',
                   },
                 ],
-                hasOpenThreats: true,
-                angle: 0,
-                attrs: {},
-                id: '',
-                position: { x: 0, y: 0 },
-                size: { height: 0, width: 0 },
-                type: 'tm.Actor',
-                z: 0,
               },
-              {
+            },
+            {
+              id: '00000000-0000-0000-0000-000000000002',
+              shape: 'actor',
+              zIndex: 0,
+              position: { x: 0, y: 0 },
+              size: { width: 0, height: 0 },
+              attrs: {},
+              data: {
+                type: 'tm.Actor',
+                name: '',
+                hasOpenThreats: true,
                 threats: [
                   {
                     status: 'Mitigated',
@@ -357,16 +393,19 @@ it('Download threat file', async () => {
                     owner: 'The Model',
                   },
                 ],
-                hasOpenThreats: true,
-                angle: 0,
-                attrs: {},
-                id: '',
-                position: { x: 0, y: 0 },
-                size: { height: 0, width: 0 },
-                type: 'tm.Actor',
-                z: 0,
               },
-              {
+            },
+            {
+              id: '00000000-0000-0000-0000-000000000003',
+              shape: 'actor',
+              zIndex: 0,
+              position: { x: 0, y: 0 },
+              size: { width: 0, height: 0 },
+              attrs: {},
+              data: {
+                type: 'tm.Actor',
+                name: '',
+                hasOpenThreats: false,
                 threats: [
                   {
                     status: 'Open',
@@ -380,41 +419,37 @@ it('Download threat file', async () => {
                       "The Message Queue credentials should be encrypted.\n\n\n\n\nnewlines shouldn't\nbreak the formatting",
                   },
                 ],
-                hasOpenThreats: false,
-                angle: 0,
-                attrs: {},
-                id: '',
-                position: { x: 0, y: 0 },
-                size: { height: 0, width: 0 },
-                type: 'tm.Actor',
-                z: 0,
               },
-              {
-                hasOpenThreats: false,
-                angle: 0,
-                attrs: {},
-                id: '',
-                position: { x: 0, y: 0 },
-                size: { height: 0, width: 0 },
+            },
+            {
+              id: '00000000-0000-0000-0000-000000000004',
+              shape: 'actor',
+              zIndex: 0,
+              position: { x: 0, y: 0 },
+              size: { width: 0, height: 0 },
+              attrs: {},
+              data: {
                 type: 'tm.Actor',
-                z: 0,
+                name: '',
+                hasOpenThreats: false,
+                threats: [],
               },
-              {
+            },
+            {
+              id: '00000000-0000-0000-0000-000000000005',
+              shape: 'actor',
+              zIndex: 0,
+              position: { x: 0, y: 0 },
+              size: { width: 0, height: 0 },
+              attrs: {},
+              data: {
+                type: 'tm.Actor',
+                name: '',
                 hasOpenThreats: true,
-                angle: 0,
-                attrs: {},
-                id: '',
-                position: { x: 0, y: 0 },
-                size: { height: 0, width: 0 },
-                type: 'tm.Actor',
-                z: 0,
+                threats: [],
               },
-            ],
-          },
-          diagramType: 'STRIDE',
-          size: { width: 0, height: 0 },
-          thumbnail: '',
-          title: '',
+            },
+          ],
         },
       ],
     },

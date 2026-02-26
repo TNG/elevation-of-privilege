@@ -1,8 +1,8 @@
-import type { PlayerID } from 'boardgame.io';
-import type { GameState } from '../game/gameState';
-import type { ThreatDragonComponent } from '../game/ThreatDragonModel';
-import type { Card, Suit } from './cardDefinitions';
-import { ModelType } from './constants';
+import type {PlayerID} from 'boardgame.io';
+import type {GameState} from '../game/gameState';
+import type {Card, Suit} from './cardDefinitions';
+import {ModelType} from './constants';
+import {CellV2} from "../game/ThreatDragonModel";
 
 export function getDealtCard(G: GameState): string {
   if (G.dealt.length > 0 && G.dealtBy) {
@@ -43,18 +43,21 @@ export function getPlayers(count: number): string[] {
   return players;
 }
 
-export function getComponentName(
-  component: ThreatDragonComponent | undefined,
-): string {
-  if (component === undefined) return '';
+export function getComponentName(component: CellV2 | undefined): string {
+  if (!component) return '';
 
-  const prefix = component.type.slice(3);
+  const type = getV2CellType(component);
+  const prefix = type.startsWith('tm.') ? type.slice(3) : type;
 
-  if (component.type === 'tm.Flow') {
-    return `${prefix}: ${component.labels?.[0]?.attrs.text.text}`;
+  if (type === 'tm.Flow') {
+    const flowLabel = getV2FlowLabel(component);
+    const fallbackName = getV2CellDisplayName(component);
+    const name = flowLabel || fallbackName;
+    return name ? `${prefix}: ${name}` : `${prefix}`;
   }
 
-  return `${prefix}: ${component.attrs.text?.text}`;
+  const name = getV2CellDisplayName(component);
+  return name ? `${prefix}: ${name}` : `${prefix}`;
 }
 
 export function getValidMoves(
@@ -80,9 +83,8 @@ function getCardsOfSuit(cards: Card[], suit: Suit | undefined): Card[] {
 }
 
 export function escapeMarkdownText(text: string): string {
-  //replaces certain characters with an escaped version
-  //doesn't escape * or _ to allow users to format the descriptions
-
+  // replaces certain characters with an escaped version
+  // doesn't escape * or _ to allow users to format the descriptions
   return text
     .replace(/[![\]()]/gm, '\\$&')
     .replace(/</gm, '&lt;')
@@ -116,4 +118,41 @@ export function logEvent(message: string): void {
 
 export function isModelType(value: string): value is ModelType {
   return Object.values<string>(ModelType).includes(value);
+}
+
+
+function getV2CellType(cell: CellV2): string {
+  return typeof cell.data?.type === 'string' ? cell.data.type : '';
+}
+
+function getV2CellDisplayName(cell: CellV2): string {
+  const dataName = cell.data?.name;
+  if (typeof dataName === 'string' && dataName.trim()) return dataName;
+
+  const attrs = cell.attrs;
+  if (attrs && typeof attrs === 'object') {
+    const t1 = (attrs as { text?: { text?: unknown } }).text?.text;
+    if (typeof t1 === 'string' && t1.trim()) return t1;
+
+    const t2 = (attrs as { label?: { text?: unknown } }).label?.text;
+    if (typeof t2 === 'string' && t2.trim()) return t2;
+  }
+
+  return '';
+}
+
+function getV2FlowLabel(cell: CellV2): string {
+  const labels = cell.labels ?? [];
+  if (!Array.isArray(labels) || labels.length === 0) return '';
+
+  const attrs = labels[0]?.attrs;
+  if (!attrs || typeof attrs !== 'object') return '';
+
+  const labelText = (attrs as { labelText?: { text?: unknown } }).labelText?.text;
+  if (typeof labelText === 'string' && labelText.trim()) return labelText;
+
+  const label = (attrs as { label?: { text?: unknown } }).label?.text;
+  if (typeof label === 'string' && label.trim()) return label;
+
+  return '';
 }

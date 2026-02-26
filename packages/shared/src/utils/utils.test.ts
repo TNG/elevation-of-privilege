@@ -15,6 +15,7 @@ import {
 } from './utils';
 
 import type { GameState } from '../game/gameState';
+import type { CellV2 } from '../game/ThreatDragonModel';
 
 const baseG: GameState = {
   dealt: [],
@@ -102,40 +103,47 @@ it('creates player array correctly', () => {
 
 it('makes correct component name', () => {
   expect(getComponentName(undefined)).toBe('');
-  expect(
-    getComponentName({
+
+  const actorCell: CellV2 = {
+    id: 'some-id',
+    shape: 'actor',
+    zIndex: 0,
+    attrs: {
+      text: {
+        text: 'Bar',
+      },
+    },
+    data: {
       type: 'tm.Actor',
-      attrs: {
-        text: {
-          text: 'Bar',
+      name: '',
+      hasOpenThreats: false,
+    },
+  };
+
+  expect(getComponentName(actorCell)).toBe('Actor: Bar');
+
+  const flowCell: CellV2 = {
+    id: 'some-id',
+    shape: 'flow',
+    zIndex: 0,
+    attrs: {},
+    labels: [
+      {
+        attrs: {
+          labelText: {
+            text: 'Bar',
+          },
         },
       },
-      id: 'some-id',
-      size: { width: 0, height: 0 },
-      z: 0,
-    }),
-  ).toBe('Actor: Bar');
-  expect(
-    getComponentName({
+    ],
+    data: {
       type: 'tm.Flow',
-      labels: [
-        {
-          attrs: {
-            text: {
-              text: 'Bar',
-              'font-size': '12pt',
-              'font-weight': 'bold',
-            },
-          },
-          position: 0,
-        },
-      ],
-      attrs: {},
-      id: 'some-id',
-      size: { width: 0, height: 0 },
-      z: 0,
-    }),
-  ).toBe('Flow: Bar');
+      name: '',
+      hasOpenThreats: false,
+    },
+  };
+
+  expect(getComponentName(flowCell)).toBe('Flow: Bar');
 });
 
 it('produces valid moves', () => {

@@ -1,4 +1,4 @@
-import { getComponentName, getSuitDisplayName } from '@eop/shared';
+import {getComponentName, getSuitDisplayName, ThreatDragonModelV2} from '@eop/shared';
 import {
   faBolt,
   faEdit,
@@ -26,8 +26,7 @@ import './threatbar.css';
 
 import type {
   GameState,
-  ThreatDragonModel,
-  ThreatDragonThreat,
+  ThreatV2,
 } from '@eop/shared';
 import type { BoardProps } from 'boardgame.io/react';
 import type { FC } from 'react';
@@ -35,38 +34,47 @@ import { Threat } from '../../../../../packages/shared/dist/types/game/threat';
 import { nl2br } from '../../utils/nl2br';
 
 type ThreatbarProps = {
-  model?: ThreatDragonModel;
+  model?: ThreatDragonModelV2;
   active: boolean;
   names: string[];
   isInThreatStage: boolean;
 } & Pick<BoardProps<GameState>, 'G' | 'moves' | 'playerID'>;
 
 const Threatbar: FC<ThreatbarProps> = ({
-  playerID,
-  model,
-  G,
-  moves,
-  active,
-  names,
-  isInThreatStage,
-}) => {
+                                         playerID,
+                                         model,
+                                         G,
+                                         moves,
+                                         active,
+                                         names,
+                                         isInThreatStage,
+                                       }) => {
+
   const getSelectedComponent = () => {
-    if (G.selectedComponent === '' || model === undefined) {
+    if (G.selectedComponent === '' || !model) {
       return undefined;
     }
 
-    const diagram = model.detail.diagrams[G.selectedDiagram]?.diagramJson;
-    return diagram?.cells?.find((cell) => cell.id === G.selectedComponent);
+    const diagram = model.detail.diagrams[G.selectedDiagram];
+    if (!diagram) return undefined;
+
+    return diagram.cells?.find((cell) => cell.id === G.selectedComponent);
   };
 
-  const getThreatsForSelectedComponent = (): ThreatDragonThreat[] => {
+  const getThreatsForSelectedComponent = (): Threat[] => {
     const component = getSelectedComponent();
 
     return (
-      component?.threats?.map((threat, index) => ({
-        ...threat,
-        // add ids if they are missing
-        id: threat.id ?? `${index}`,
+      component?.data?.threats?.map((threat: ThreatV2, index: number): Threat => ({
+        modal: false,
+        new: false,
+        owner: typeof threat.owner === 'string' ? threat.owner : undefined,
+        title: threat.title,
+        type: threat.type as Threat['type'],
+        severity: threat.severity,
+        description: threat.description,
+        mitigation: threat.mitigation,
+        id: threat.id ?? threat.threatId ?? `${index}`,
       })) ?? []
     );
   };
@@ -179,7 +187,7 @@ const Threatbar: FC<ThreatbarProps> = ({
             </em>
           )}
           <hr />
-          {threats.map((val: ThreatDragonThreat, idx: number) => (
+          {threats.map((val: Threat, idx: number) => (
             <Card key={idx}>
               <CardHeader
                 className="hoverable"
