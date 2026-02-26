@@ -15,8 +15,13 @@
   "packageManager": "npm@10.8.1+sha512.0e9d42e92bd2318408ed81eaff2da5f78baf23ee7d12a6eed44a6e2901d0f29d7ab715d1b918ade601f72e769a824d9a5c322383f22bbbda5dd396e79de2a077",
   "private": true,
   "overrides": {
+    "cookie": "^1.1.1",
+    "@koa/cors": "^5.0.0",
     "react": "^19.1.1",
+    "socket.io": "^4.5.0",
     "react-dom": "^19.1.1",
-    "react-is": "^19.1.1"
+    "react-is": "^19.1.1",
+    "svelte":"^4.2.19",
+    "ws":"^8.17.1"
   }
 }
