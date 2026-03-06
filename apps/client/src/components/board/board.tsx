@@ -78,8 +78,10 @@ const Board: FC<BoardProps> = ({
 
   const updateNames = useCallback(async () => {
     // TODO: Type with valibot and consider using react-query.
-    const body = await apiGetRequest<PlayersResponse>('players');
-    for (const player of body?.players ?? []) {
+    const body = await apiGetRequest('players');
+    for (const player of (
+      body as { players: { id: number; name: string }[] } | undefined
+    )?.players ?? []) {
       if (typeof player.name !== 'undefined') {
         updateName(player.id, player.name);
       }
@@ -88,8 +90,11 @@ const Board: FC<BoardProps> = ({
 
   const updateModel = useCallback(async () => {
     // TODO: Type with valibot and consider using react-query.
-    const body = await apiGetRequest<ThreatDragonModelV2>('model');
-    setModel(body);
+    const body = await apiGetRequest('model');
+
+    const model = body as ThreatDragonModelV2 | undefined;
+
+    setModel(model);
   }, [apiGetRequest]);
 
   // consider using react-query instead
