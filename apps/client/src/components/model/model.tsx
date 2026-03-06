@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import * as joint from 'jointjs';
-import React, {FC, useCallback, useEffect, useState} from 'react';
-import {Nav, NavItem, NavLink} from 'reactstrap';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import { Nav, NavItem, NavLink } from 'reactstrap';
 
 import 'jointjs/dist/joint.css';
 
@@ -10,7 +10,7 @@ import '../../jointjs/shapes';
 
 import './model.css';
 
-import type {CellV2, DiagramV2, ThreatDragonModelV2} from '@eop/shared';
+import type { CellV2, DiagramV2, ThreatDragonModelV2 } from '@eop/shared';
 
 const SCROLL_SPEED = 1000;
 
@@ -23,12 +23,12 @@ type ModelProps = {
 };
 
 const Model: FC<ModelProps> = ({
-                                 model,
-                                 selectedDiagram,
-                                 selectedComponent,
-                                 onSelectDiagram,
-                                 onSelectComponent,
-                               }) => {
+  model,
+  selectedDiagram,
+  selectedComponent,
+  onSelectDiagram,
+  onSelectComponent,
+}) => {
   const [graph] = useState(
     new joint.dia.Graph({}, { cellNamespace: joint.shapes }),
   );
@@ -110,7 +110,11 @@ const Model: FC<ModelProps> = ({
       setDragPosition({ x: x * scale.sx, y: y * scale.sy });
     };
 
-    const onBlankPointerDown = (event: joint.dia.Event, x: number, y: number) => {
+    const onBlankPointerDown = (
+      event: joint.dia.Event,
+      x: number,
+      y: number,
+    ) => {
       setDragging(true);
       setDragPositionScaled(x, y);
     };
@@ -120,7 +124,12 @@ const Model: FC<ModelProps> = ({
       setDragPositionScaled(x, y);
     };
 
-    const onCellPointerUp = (cellView: joint.dia.CellView, event: joint.dia.Event, x: number, y: number) => {
+    const onCellPointerUp = (
+      cellView: joint.dia.CellView,
+      event: joint.dia.Event,
+      x: number,
+      y: number,
+    ) => {
       stopDragging(x, y);
     };
 
@@ -207,9 +216,7 @@ const offsetToLocalPoint = (
   const svgPoint = paper.svg.createSVGPoint();
   svgPoint.x = offsetX;
   svgPoint.y = offsetY;
-  return svgPoint.matrixTransform(
-    paper.layers.getCTM()?.inverse(),
-  );
+  return svgPoint.matrixTransform(paper.layers.getCTM()?.inverse());
 };
 
 /* =============================================================================
@@ -295,8 +302,8 @@ function v2CellToJointCell(cell: CellV2): JointCell | null {
   if (cell.position && cell.size) {
     return {
       ...base,
-      position: {x: cell.position.x, y: cell.position.y},
-      size: {width: cell.size.width, height: cell.size.height},
+      position: { x: cell.position.x, y: cell.position.y },
+      size: { width: cell.size.width, height: cell.size.height },
 
       description: cell.data?.description ?? '',
       hasOpenThreats: !!cell.data?.hasOpenThreats,
@@ -318,7 +325,10 @@ function v2CellToJointCell(cell: CellV2): JointCell | null {
         ? cell.vertices.map((v) => ({ x: v.x, y: v.y }))
         : [],
 
-      smooth: typeof cell.connector === 'string' ? cell.connector === 'smooth' : undefined,
+      smooth:
+        typeof cell.connector === 'string'
+          ? cell.connector === 'smooth'
+          : undefined,
 
       description: cell.data?.description ?? '',
       hasOpenThreats: !!cell.data?.hasOpenThreats,
@@ -389,7 +399,10 @@ function mapEdgeEnd(end: CellV2['source']): JointEdgeEnd {
 
   // flows use cell/port in V2; map to JointJS id/port
   if (typeof end.cell === 'string') {
-    return { id: end.cell, port: typeof end.port === 'string' ? end.port : undefined };
+    return {
+      id: end.cell,
+      port: typeof end.port === 'string' ? end.port : undefined,
+    };
   }
 
   return {};
@@ -443,18 +456,22 @@ function mapEdgeLabels(cell: CellV2): JointLabel[] {
     if (!attrs || typeof attrs !== 'object') continue;
 
     // Prefer labelText.text; fallback to label.text
-    const labelText = (attrs as { labelText?: { text?: unknown } }).labelText?.text;
+    const labelText = (attrs as { labelText?: { text?: unknown } }).labelText
+      ?.text;
     const fallback = (attrs as { label?: { text?: unknown } }).label?.text;
 
     const text =
-      (typeof labelText === 'string' && labelText.trim())
+      typeof labelText === 'string' && labelText.trim()
         ? labelText
-        : (typeof fallback === 'string' ? fallback : '');
+        : typeof fallback === 'string'
+          ? fallback
+          : '';
 
     if (!text || !text.trim()) continue;
 
     out.push({
-      position: typeof l.position?.distance === 'number' ? l.position.distance : 0.5,
+      position:
+        typeof l.position?.distance === 'number' ? l.position.distance : 0.5,
       attrs: {
         text: { text },
       },

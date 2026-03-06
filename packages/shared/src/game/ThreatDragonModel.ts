@@ -1,4 +1,3 @@
-
 /**
  * Threat Dragon V2 threat model types
  *
@@ -219,9 +218,9 @@ export interface ThreatV2 {
   number?: number;
 
   title: string;
-  status: "NA" | "Open" | "Mitigated" | string;
+  status: 'NA' | 'Open' | 'Mitigated' | string;
 
-  severity: "Low" | "Medium" | "High" | "Critical" | string;
+  severity: 'Low' | 'Medium' | 'High' | 'Critical' | string;
 
   /** Category depends on methodology (e.g., STRIDE categories, CIA categories, etc.) */
   type: string;
@@ -280,7 +279,7 @@ export type CellDataV2 =
   | (BaseCellDataV2 & { type: string }); // fallback for forward compatibility
 
 export interface ProcessDataV2 extends BaseCellDataV2 {
-  type: "tm.Process";
+  type: 'tm.Process';
   handlesCardPayment?: boolean;
   handlesGoodsOrServices?: boolean;
   isWebApplication?: boolean;
@@ -293,7 +292,7 @@ export interface ProcessDataV2 extends BaseCellDataV2 {
 }
 
 export interface StoreDataV2 extends BaseCellDataV2 {
-  type: "tm.Store";
+  type: 'tm.Store';
   isALog?: boolean;
   isEncrypted?: boolean;
   isSigned?: boolean;
@@ -304,14 +303,14 @@ export interface StoreDataV2 extends BaseCellDataV2 {
 }
 
 export interface ActorDataV2 extends BaseCellDataV2 {
-  type: "tm.Actor";
+  type: 'tm.Actor';
   providesAuthentication?: boolean;
 
   [k: string]: unknown;
 }
 
 export interface FlowDataV2 extends BaseCellDataV2 {
-  type: "tm.Flow";
+  type: 'tm.Flow';
   isBidirectional?: boolean;
   isEncrypted?: boolean;
   isPublicNetwork?: boolean;
@@ -321,7 +320,7 @@ export interface FlowDataV2 extends BaseCellDataV2 {
 }
 
 export interface BoundaryDataV2 extends BaseCellDataV2 {
-  type: "tm.Boundary";
+  type: 'tm.Boundary';
   isTrustBoundary: boolean;
 
   [k: string]: unknown;
@@ -329,7 +328,7 @@ export interface BoundaryDataV2 extends BaseCellDataV2 {
 
 /** Appears in some V2 models for trust boundary boxes */
 export interface BoundaryBoxDataV2 extends BaseCellDataV2 {
-  type: "tm.BoundaryBox";
+  type: 'tm.BoundaryBox';
   isTrustBoundary: boolean;
 
   [k: string]: unknown;
@@ -337,7 +336,6 @@ export interface BoundaryBoxDataV2 extends BaseCellDataV2 {
 
 /** Appears in some V2 models for free text blocks */
 export interface TextBlockDataV2 extends BaseCellDataV2 {
-  type: "tm.Text";
+  type: 'tm.Text';
   [k: string]: unknown;
 }
-

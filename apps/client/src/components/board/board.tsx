@@ -1,4 +1,9 @@
-import {getDealtCard, ModelType, SPECTATOR, ThreatDragonModelV2} from '@eop/shared';
+import {
+  getDealtCard,
+  ModelType,
+  SPECTATOR,
+  ThreatDragonModelV2,
+} from '@eop/shared';
 import type { BoardProps as BoardgameIOBoardProps } from 'boardgame.io/react';
 import { FC, useCallback, useEffect, useState } from 'react';
 
@@ -19,28 +24,28 @@ import './board.css';
 
 import type { GameState } from '@eop/shared';
 
-type PlayersResponse = { players: Array<{ id: number; name: string }> };
-
 type BoardProps = Pick<
   BoardgameIOBoardProps<GameState>,
   'G' | 'ctx' | 'matchID' | 'moves' | 'playerID' | 'credentials'
 >;
 
 const Board: FC<BoardProps> = ({
-                                 G,
-                                 ctx,
-                                 matchID,
-                                 moves,
-                                 playerID,
-                                 credentials,
-                               }) => {
+  G,
+  ctx,
+  matchID,
+  moves,
+  playerID,
+  credentials,
+}) => {
   const initialNames = Array.from<string>({
     length: ctx.numPlayers,
   }).fill('No Name');
 
   const [names, setNames] = useState(initialNames);
 
-  const [model, setModel] = useState<ThreatDragonModelV2 | undefined>(undefined);
+  const [model, setModel] = useState<ThreatDragonModelV2 | undefined>(
+    undefined,
+  );
   const apiBase = '/api';
 
   const updateName = useCallback((index: number, name: string) => {

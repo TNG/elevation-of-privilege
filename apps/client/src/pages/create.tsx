@@ -54,7 +54,9 @@ const Create: FC = () => {
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
   const [modelType, setModelType] = useState(ModelType.IMAGE);
-  const [model, setModel] = useState<ThreatDragonModelV2 | undefined>(undefined);
+  const [model, setModel] = useState<ThreatDragonModelV2 | undefined>(
+    undefined,
+  );
   const [image, setImage] = useState<File | undefined>(undefined);
   const [startSuit, setStartSuit] = useState<Suit>(DEFAULT_START_SUIT);
   const [turnDuration, setTurnDuration] = useState(DEFAULT_TURN_DURATION);

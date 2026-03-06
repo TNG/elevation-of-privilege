@@ -1,4 +1,4 @@
-import type {ThreatDragonModelV2} from '../game/ThreatDragonModel';
+import type { ThreatDragonModelV2 } from '../game/ThreatDragonModel';
 
 export enum ModelType {
   THREAT_DRAGON = 'Threat Dragon',
@@ -12,7 +12,6 @@ export const CARD_LIMIT = 26;
 export const MIN_NUMBER_PLAYERS = 2;
 export const MAX_NUMBER_PLAYERS = 9;
 export const DEFAULT_TURN_DURATION = 300;
-
 
 export const DEFAULT_MODEL: ThreatDragonModelV2 = {
   version: '2.5.0',
@@ -39,7 +38,11 @@ export const DEFAULT_MODEL: ThreatDragonModelV2 = {
             size: { width: 160, height: 80 },
             attrs: {
               text: { text: 'Application' },
-              body: { stroke: '#333333', strokeWidth: 1.5, strokeDasharray: null },
+              body: {
+                stroke: '#333333',
+                strokeWidth: 1.5,
+                strokeDasharray: null,
+              },
             },
 
             data: {
@@ -61,6 +64,5 @@ export const DEFAULT_MODEL: ThreatDragonModelV2 = {
     reviewer: '',
   },
 };
-
 
 export const SPECTATOR = 'spectator';

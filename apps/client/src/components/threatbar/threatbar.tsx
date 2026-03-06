@@ -1,4 +1,8 @@
-import {getComponentName, getSuitDisplayName, ThreatDragonModelV2} from '@eop/shared';
+import {
+  getComponentName,
+  getSuitDisplayName,
+  ThreatDragonModelV2,
+} from '@eop/shared';
 import {
   faBolt,
   faEdit,
@@ -24,10 +28,7 @@ import ThreatModal from '../threatmodal/threatmodal';
 
 import './threatbar.css';
 
-import type {
-  GameState,
-  ThreatV2,
-} from '@eop/shared';
+import type { GameState, ThreatV2 } from '@eop/shared';
 import type { BoardProps } from 'boardgame.io/react';
 import type { FC } from 'react';
 import { Threat } from '../../../../../packages/shared/dist/types/game/threat';
@@ -41,15 +42,14 @@ type ThreatbarProps = {
 } & Pick<BoardProps<GameState>, 'G' | 'moves' | 'playerID'>;
 
 const Threatbar: FC<ThreatbarProps> = ({
-                                         playerID,
-                                         model,
-                                         G,
-                                         moves,
-                                         active,
-                                         names,
-                                         isInThreatStage,
-                                       }) => {
-
+  playerID,
+  model,
+  G,
+  moves,
+  active,
+  names,
+  isInThreatStage,
+}) => {
   const getSelectedComponent = () => {
     if (G.selectedComponent === '' || !model) {
       return undefined;
@@ -65,17 +65,19 @@ const Threatbar: FC<ThreatbarProps> = ({
     const component = getSelectedComponent();
 
     return (
-      component?.data?.threats?.map((threat: ThreatV2, index: number): Threat => ({
-        modal: false,
-        new: false,
-        owner: typeof threat.owner === 'string' ? threat.owner : undefined,
-        title: threat.title,
-        type: threat.type as Threat['type'],
-        severity: threat.severity,
-        description: threat.description,
-        mitigation: threat.mitigation,
-        id: threat.id ?? threat.threatId ?? `${index}`,
-      })) ?? []
+      component?.data?.threats?.map(
+        (threat: ThreatV2, index: number): Threat => ({
+          modal: false,
+          new: false,
+          owner: typeof threat.owner === 'string' ? threat.owner : undefined,
+          title: threat.title,
+          type: threat.type as Threat['type'],
+          severity: threat.severity,
+          description: threat.description,
+          mitigation: threat.mitigation,
+          id: threat.id ?? threat.threatId ?? `${index}`,
+        }),
+      ) ?? []
     );
   };
 

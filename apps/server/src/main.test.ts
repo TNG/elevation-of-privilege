@@ -192,7 +192,6 @@ it('download the final model for a game', async () => {
     updatedAt: 0,
   };
 
-
   const model: ThreatDragonModelV2 = {
     version: '2.5.0',
     summary: {
@@ -213,7 +212,7 @@ it('download the final model for a game', async () => {
           cells: [
             {
               id: 'component-1',
-              shape: 'actor',          // V2 shape derived from tm.Actor
+              shape: 'actor', // V2 shape derived from tm.Actor
               zIndex: 0,
               position: { x: 0, y: 0 },
               size: { width: 0, height: 0 },
@@ -316,7 +315,6 @@ it('Download threat file', async () => {
   } as State;
 
   //Maybe I should put these jsons into a file
-
 
   const model: ThreatDragonModelV2 = {
     version: '2.5.0',

@@ -1,8 +1,8 @@
-import type {PlayerID} from 'boardgame.io';
-import type {GameState} from '../game/gameState';
-import type {Card, Suit} from './cardDefinitions';
-import {ModelType} from './constants';
-import {CellV2} from "../game/ThreatDragonModel";
+import type { PlayerID } from 'boardgame.io';
+import type { GameState } from '../game/gameState';
+import type { Card, Suit } from './cardDefinitions';
+import { ModelType } from './constants';
+import { CellV2 } from '../game/ThreatDragonModel';
 
 export function getDealtCard(G: GameState): string {
   if (G.dealt.length > 0 && G.dealtBy) {
@@ -120,7 +120,6 @@ export function isModelType(value: string): value is ModelType {
   return Object.values<string>(ModelType).includes(value);
 }
 
-
 function getV2CellType(cell: CellV2): string {
   return typeof cell.data?.type === 'string' ? cell.data.type : '';
 }
@@ -148,7 +147,8 @@ function getV2FlowLabel(cell: CellV2): string {
   const attrs = labels[0]?.attrs;
   if (!attrs || typeof attrs !== 'object') return '';
 
-  const labelText = (attrs as { labelText?: { text?: unknown } }).labelText?.text;
+  const labelText = (attrs as { labelText?: { text?: unknown } }).labelText
+    ?.text;
   if (typeof labelText === 'string' && labelText.trim()) return labelText;
 
   const label = (attrs as { label?: { text?: unknown } }).label?.text;

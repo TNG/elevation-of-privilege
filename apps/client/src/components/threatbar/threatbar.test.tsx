@@ -1,4 +1,4 @@
-import {GameMode, ModelType, ThreatDragonModelV2} from '@eop/shared';
+import { GameMode, ModelType, ThreatDragonModelV2 } from '@eop/shared';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 
@@ -49,7 +49,6 @@ describe('<Threatbar>', () => {
   };
 
   it('shows identified threats in reverse order', () => {
-
     const model: ThreatDragonModelV2 = {
       version: '2.5.0',
       summary: {
@@ -79,7 +78,7 @@ describe('<Threatbar>', () => {
                 },
                 data: {
                   type: 'tm.Actor',
-                  name: 'text',            // aus attrs.text.text übernommen (du hattest keinen separaten Namen)
+                  name: 'text', // aus attrs.text.text übernommen (du hattest keinen separaten Namen)
                   hasOpenThreats: true,
                   threats: [
                     {
@@ -129,7 +128,6 @@ describe('<Threatbar>', () => {
   });
 
   it('shows existing threats in reverse order', () => {
-
     const model: ThreatDragonModelV2 = {
       version: '2.5.0',
       summary: {
@@ -150,8 +148,8 @@ describe('<Threatbar>', () => {
             cells: [
               {
                 id: 'component1',
-                shape: 'actor',             // aus type: "tm.Actor"
-                zIndex: 0,                  // aus z: 0
+                shape: 'actor', // aus type: "tm.Actor"
+                zIndex: 0, // aus z: 0
                 angle: 0,
                 position: { x: 0, y: 0 },
                 size: { width: 0, height: 0 },
@@ -162,7 +160,7 @@ describe('<Threatbar>', () => {
                 },
                 data: {
                   type: 'tm.Actor',
-                  name: 'text',              // aus attrs.text.text übernommen
+                  name: 'text', // aus attrs.text.text übernommen
                   hasOpenThreats: true,
                   threats: [
                     {
@@ -189,7 +187,6 @@ describe('<Threatbar>', () => {
         ],
       },
     };
-
 
     render(
       <Threatbar

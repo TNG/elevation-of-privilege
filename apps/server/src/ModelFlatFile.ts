@@ -2,7 +2,7 @@ import { FlatFile } from 'boardgame.io/server';
 
 import type { StorageAPI } from 'boardgame.io';
 import type { Object } from 'ts-toolbelt';
-import {ThreatDragonModelV2} from "@eop/shared";
+import { ThreatDragonModelV2 } from '@eop/shared';
 
 interface ModelFetchOpts extends StorageAPI.FetchOpts {
   model?: boolean;
