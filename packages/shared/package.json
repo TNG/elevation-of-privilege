@@ -1,7 +1,7 @@
 {
   "name": "@eop/shared",
   "type": "commonjs",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "main": "./dist/cjs/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
@@ -30,13 +30,13 @@
     "@eop/typescript-config": "*",
     "@types/seedrandom": "^3.0.8",
     "@types/uuid": "^10.0.0",
-    "eslint": "^9.38.0",
-    "prettier": "^3.6.2",
-    "rimraf": "^6.0.1",
+    "eslint": "^9.39.2",
+    "prettier": "^3.8.1",
+    "rimraf": "^6.1.2",
     "seedrandom": "^3.0.5",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.39.0",
-    "vitest": "^3.2.4"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.1",
+    "vitest": "^4.0.17"
   },
   "private": true
 }

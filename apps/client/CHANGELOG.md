@@ -1,5 +1,17 @@
 # @eop/client
 
+## 2.1.0
+
+### Minor Changes
+
+- 5f96bdd: Update to Cumulus Version 1.2.0
+
+### Patch Changes
+
+- Updated dependencies [5f96bdd]
+  - @eop/shared@2.1.0
+  - @eop/cornucopia-cards@2.1.0
+
 ## 2.0.0
 
 ### Major Changes

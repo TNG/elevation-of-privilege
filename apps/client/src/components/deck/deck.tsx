@@ -39,6 +39,9 @@ const Deck: React.FC<DeckProps> = ({
       <ul className="hand">
         {cards.map((card) => (
           <li
+            aria-label={`Card in hand: ${card}${
+              validMoves.includes(card) ? ' (can be played)' : ''
+            }`}
             key={`card-in-hand-${card}`}
             className={`playing-card ${getCardCssClass(gameMode, card)} ${
               validMoves.includes(card) ? 'active' : ''
