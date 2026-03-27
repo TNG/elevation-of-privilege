@@ -24,7 +24,7 @@
     "jointjs": "^3.7.7",
     "react": "^19.1.1",
     "react-countdown-circle-timer": "^3.2.1",
-    "react-dom": "^19.1.1",
+    "react-dom": "^19.2.4",
     "react-map-interaction": "^2.1.0",
     "react-router-dom": "^7.13.0",
     "reactstrap": "^9.2.3"
@@ -38,7 +38,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/backbone": "^1.4.23",
     "@types/react": "^19.1.9",
-    "@types/react-dom": "^19.1.7",
+    "@types/react-dom": "^19.2.3",
     "@types/react-helmet": "^6.1.11",
     "@vitejs/plugin-react-swc": "^4.2.3",
     "eslint": "^9.39.2",
