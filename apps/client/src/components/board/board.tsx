@@ -1,4 +1,9 @@
-import { getDealtCard, ModelType, SPECTATOR } from '@eop/shared';
+import {
+  getDealtCard,
+  ModelType,
+  SPECTATOR,
+  ThreatDragonModelV2,
+} from '@eop/shared';
 import type { BoardProps as BoardgameIOBoardProps } from 'boardgame.io/react';
 import { FC, useCallback, useEffect, useState } from 'react';
 
@@ -17,7 +22,7 @@ import Timer from '../timer/timer';
 
 import './board.css';
 
-import type { GameState, ThreatDragonModel } from '@eop/shared';
+import type { GameState } from '@eop/shared';
 
 type BoardProps = Pick<
   BoardgameIOBoardProps<GameState>,
@@ -38,7 +43,9 @@ const Board: FC<BoardProps> = ({
 
   const [names, setNames] = useState(initialNames);
 
-  const [model, setModel] = useState<ThreatDragonModel | undefined>(undefined);
+  const [model, setModel] = useState<ThreatDragonModelV2 | undefined>(
+    undefined,
+  );
   const apiBase = '/api';
 
   const updateName = useCallback((index: number, name: string) => {
@@ -50,20 +57,21 @@ const Board: FC<BoardProps> = ({
   }, []);
 
   const apiGetRequest = useCallback(
-    async (endpoint: string): Promise<unknown> => {
+    async <T,>(endpoint: string): Promise<T | undefined> => {
       if (credentials !== undefined) {
         try {
           return await fetch(`${apiBase}/game/${matchID}/${endpoint}`, {
             headers: {
               Authorization: `Basic ${btoa((playerID ?? SPECTATOR) + ':' + credentials)}`,
             },
-          }).then((response) => response.json());
+          }).then((response) => response.json() as Promise<T>);
         } catch (err) {
           console.error(err);
         }
       } else {
         console.error('Credentials are missing.');
       }
+      return undefined;
     },
     [apiBase, matchID, playerID, credentials],
   );
@@ -84,7 +92,7 @@ const Board: FC<BoardProps> = ({
     // TODO: Type with valibot and consider using react-query.
     const body = await apiGetRequest('model');
 
-    const model = body as ThreatDragonModel | undefined;
+    const model = body as ThreatDragonModelV2 | undefined;
 
     setModel(model);
   }, [apiGetRequest]);
