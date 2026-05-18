@@ -177,7 +177,7 @@ const About: FC = () => {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="http://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf"
+                    href="https://download.microsoft.com/download/F/A/E/FAE1434F-6D22-4581-9804-8B60C04354E4/EoP_Whitepaper.pdf"
                   >
                     EoP Whitepaper
                   </a>{' '}
