@@ -3,7 +3,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
     "sherif": "^1.10.0",
-    "turbo": "^2.5.8"
+    "turbo": "^2.9.14"
   },
   "workspaces": [
     "./apps/*",
