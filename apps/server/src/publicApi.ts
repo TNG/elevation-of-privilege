@@ -51,6 +51,22 @@ const runPublicApi = (gameServer: GameServer): [Koa, Server] => {
   );
 
   app.use(cors());
+  app.use(async (ctx, next) => {
+    await next();
+    // Prevent MIME-type sniffing so an attacker-controlled extension stored on
+    // disk cannot cause the browser to interpret an upload as active content.
+    ctx.set('X-Content-Type-Options', 'nosniff');
+    // Restrict where this origin may be embedded to prevent clickjacking.
+    ctx.set('X-Frame-Options', 'DENY');
+    // Defense-in-depth against stored XSS via uploaded content: only allow
+    // same-origin scripts. Inline styles are permitted because the React build
+    // injects styles at runtime; images may come from data/blob URLs (client
+    // diagram rendering) or same-origin uploads. WebSockets use ws/wss.
+    ctx.set(
+      'Content-Security-Policy',
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; frame-ancestors 'none'; base-uri 'self'",
+    );
+  });
   app.use(router.routes()).use(router.allowedMethods());
   const appHandle = app.listen(API_PORT, () => {
     console.log(`Public API serving at: http://localhost:${API_PORT}/`);
