@@ -17,7 +17,7 @@ import Timer from '../timer/timer';
 
 import './board.css';
 
-import type { GameState, ThreatDragonModel } from '@eop/shared';
+import type { AnyThreatDragonModel, GameState } from '@eop/shared';
 
 type BoardProps = Pick<
   BoardgameIOBoardProps<GameState>,
@@ -38,7 +38,9 @@ const Board: FC<BoardProps> = ({
 
   const [names, setNames] = useState(initialNames);
 
-  const [model, setModel] = useState<ThreatDragonModel | undefined>(undefined);
+  const [model, setModel] = useState<AnyThreatDragonModel | undefined>(
+    undefined,
+  );
   const apiBase = '/api';
 
   const updateName = useCallback((index: number, name: string) => {
@@ -84,7 +86,7 @@ const Board: FC<BoardProps> = ({
     // TODO: Type with valibot and consider using react-query.
     const body = await apiGetRequest('model');
 
-    const model = body as ThreatDragonModel | undefined;
+    const model = body as AnyThreatDragonModel | undefined;
 
     setModel(model);
   }, [apiGetRequest]);

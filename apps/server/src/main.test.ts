@@ -18,7 +18,7 @@ import {
   publicApiServerHandle,
 } from './main';
 
-import type { ThreatDragonModel } from '@eop/shared';
+import type { ThreatDragonModelV1, ThreatDragonModelV2 } from '@eop/shared';
 import type { LobbyAPI, Server, State } from 'boardgame.io';
 
 beforeEach(() => {
@@ -86,6 +86,21 @@ it('retrieves player info for a game', async () => {
 
 it('creates a game with a model', async () => {
   const names = ['P1', 'P2', 'P3'];
+  const model: ThreatDragonModelV1 = {
+    summary: { title: 'Test' },
+    detail: {
+      diagrams: [
+        {
+          id: 0,
+          title: '',
+          diagramType: 'STRIDE',
+          thumbnail: '',
+          size: { width: 0, height: 0 },
+          diagramJson: { cells: [] },
+        },
+      ],
+    },
+  };
   const response = await request(publicApiServer.callback())
     .post('/game/create')
     .field('startSuit', 'A')
@@ -93,7 +108,7 @@ it('creates a game with a model', async () => {
     .field('turnDuration', '5')
     .field('names[]', names)
     .field('modelType', ModelType.THREAT_DRAGON)
-    .field('model', JSON.stringify({})); // TODO: add proper model because this will fail when validation of the model is added
+    .field('model', JSON.stringify(model));
 
   const body = response.body as {
     game: string;
@@ -109,7 +124,21 @@ it('creates a game with a model', async () => {
 });
 
 it('retrieve the model for a game', async () => {
-  const model = { foo: 'bar' }; // TODO add proper model because this will break when validation of the model is added
+  const model: ThreatDragonModelV1 = {
+    summary: { title: 'Test' },
+    detail: {
+      diagrams: [
+        {
+          id: 0,
+          title: '',
+          diagramType: 'STRIDE',
+          thumbnail: '',
+          size: { width: 0, height: 0 },
+          diagramJson: { cells: [] },
+        },
+      ],
+    },
+  };
 
   const names = ['P1', 'P2', 'P3'];
   const createResponse = await request(publicApiServer.callback())
@@ -192,7 +221,7 @@ it('download the final model for a game', async () => {
     updatedAt: 0,
   };
 
-  const model: ThreatDragonModel = {
+  const model: ThreatDragonModelV1 = {
     summary: {
       title: 'Foo',
     },
@@ -243,7 +272,7 @@ it('download the final model for a game', async () => {
     .get(`/game/${matchID}/download`)
     .auth('0', 'abc123');
 
-  const body = response.body as ThreatDragonModel;
+  const body = response.body as ThreatDragonModelV1;
   const threats = body.detail.diagrams[0]?.diagramJson.cells?.[0]?.threats;
 
   expect(threats?.[0]?.id).toBe('0');
@@ -252,6 +281,99 @@ it('download the final model for a game', async () => {
   expect(threats?.[0]?.description).toBe('description');
   expect(threats?.[0]?.mitigation).toBe('mitigation');
   expect(threats?.[0]?.game).toBe(matchID);
+});
+
+it('download the final model for a game (V2)', async () => {
+  const matchID = 'v2-download-test';
+
+  const state = {
+    G: {
+      modelType: ModelType.THREAT_DRAGON,
+      gameMode: GameMode.EOP,
+      identifiedThreats: [
+        {
+          'component-1': {
+            'threat-1': {
+              id: '0',
+              severity: 'High',
+              type: 'D',
+              title: 'title',
+              description: 'description',
+              mitigation: 'mitigation',
+              owner: '0',
+            },
+          },
+        },
+      ],
+    },
+  } as State;
+
+  const metadata: Server.MatchData = {
+    gameName: 'some game',
+    players: {
+      0: { id: 0, name: 'P1', credentials: 'abc123' },
+      1: { id: 1, name: 'P2', credentials: '123abc' },
+    },
+    createdAt: 0,
+    updatedAt: 0,
+  };
+
+  const model: ThreatDragonModelV2 = {
+    version: '2.0.0',
+    summary: { title: 'Bar' },
+    detail: {
+      contributors: [],
+      reviewer: '',
+      diagramTop: 1,
+      threatTop: 0,
+      diagrams: [
+        {
+          id: 0,
+          title: '',
+          diagramType: 'STRIDE',
+          thumbnail: '',
+          version: '2.0.0',
+          cells: [
+            {
+              id: 'component-1',
+              shape: 'actor',
+              zIndex: 0,
+              position: { x: 0, y: 0 },
+              size: { width: 0, height: 0 },
+              attrs: {},
+              data: {
+                type: 'tm.Actor',
+                name: '',
+                hasOpenThreats: false,
+                threats: [],
+              },
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  await gameServer.db.setMetadata(matchID, metadata);
+  await gameServer.db.setModel(matchID, model);
+  await gameServer.db.setState(matchID, state);
+
+  const response = await request(publicApiServer.callback())
+    .get(`/game/${matchID}/download`)
+    .auth('0', 'abc123');
+
+  const body = response.body as ThreatDragonModelV2;
+  const threats = body.detail.diagrams[0]?.cells?.[0]?.data?.threats;
+
+  expect(threats?.[0]?.id).toBe('0');
+  expect(threats?.[0]?.type).toBe('Spoofing');
+  expect(threats?.[0]?.title).toBe('title');
+  expect(threats?.[0]?.description).toBe('description');
+  expect(threats?.[0]?.mitigation).toBe('mitigation');
+  expect(threats?.[0]?.game).toBe(matchID);
+  // V2 structure preserved
+  expect(body.version).toBe('2.0.0');
+  expect(body.detail.diagramTop).toBe(1);
 });
 
 it('Download threat file', async () => {
@@ -303,7 +425,7 @@ it('Download threat file', async () => {
   } as State;
 
   //Maybe I should put these jsons into a file
-  const model: ThreatDragonModel = {
+  const model: ThreatDragonModelV1 = {
     summary: {
       title: '  Demo Threat Model ',
     },

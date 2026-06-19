@@ -12,7 +12,9 @@ import {
   ModelType,
   SPECTATOR,
   Suit,
+  validateThreatDragonModel,
 } from '@eop/shared';
+import type { AnyThreatDragonModel } from '@eop/shared';
 import { ChangeEvent, FC, useState } from 'react';
 import {
   Button,
@@ -53,7 +55,10 @@ const Create: FC = () => {
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
   const [modelType, setModelType] = useState(ModelType.IMAGE);
-  const [model, setModel] = useState<Record<string, unknown> | undefined>(
+  const [model, setModel] = useState<AnyThreatDragonModel | undefined>(
+    undefined,
+  );
+  const [modelVersion, setModelVersion] = useState<'v1' | 'v2' | undefined>(
     undefined,
   );
   const [image, setImage] = useState<File | undefined>(undefined);
@@ -112,7 +117,15 @@ const Create: FC = () => {
       );
     }
 
-    setModel(JSON.parse(await readFileAsText(file)) as Record<string, unknown>);
+    const parsed: unknown = JSON.parse(await readFileAsText(file));
+    const { valid, version, errors } = validateThreatDragonModel(parsed);
+    if (!valid) {
+      setModel(undefined);
+      setModelVersion(undefined);
+      throw new Error(`Invalid Threat Dragon model: ${errors.join('; ')}`);
+    }
+    setModel(parsed as AnyThreatDragonModel);
+    setModelVersion(version);
   };
 
   const updateImage = (e: ChangeEvent<HTMLInputElement>) => {
@@ -369,15 +382,32 @@ const Create: FC = () => {
                   >
                     Threat Dragon
                   </a>
-                  . Or download a{' '}
+                  . Schema versions 1 and 2 are both supported. Or download a{' '}
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
                     href="https://raw.githubusercontent.com/mike-goodwin/owasp-threat-dragon-demo/master/ThreatDragonModels/Demo%20Threat%20Model/Demo%20Threat%20Model.json"
                   >
-                    sample model
+                    sample v1 model
+                  </a>{' '}
+                  or a{' '}
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://raw.githubusercontent.com/OWASP/threat-dragon/main/ThreatDragonModels/v2-threat-model.json"
+                  >
+                    sample v2 model
                   </a>{' '}
                   to try it out.
+                  {model !== undefined && modelVersion !== undefined && (
+                    <>
+                      {' '}
+                      <span className="text-success">
+                        (Valid {modelVersion === 'v2' ? 'V2' : 'V1'} model
+                        loaded)
+                      </span>
+                    </>
+                  )}
                 </FormText>
               </FormGroup>
             </FormGroup>

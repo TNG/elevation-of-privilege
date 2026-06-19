@@ -1,6 +1,5 @@
 import type { PlayerID } from 'boardgame.io';
 import type { GameState } from '../game/gameState';
-import type { ThreatDragonComponent } from '../game/ThreatDragonModel';
 import type { Card, Suit } from './cardDefinitions';
 import { ModelType } from './constants';
 
@@ -41,20 +40,6 @@ export function getPlayers(count: number): string[] {
     players.push(i + '');
   }
   return players;
-}
-
-export function getComponentName(
-  component: ThreatDragonComponent | undefined,
-): string {
-  if (component === undefined) return '';
-
-  const prefix = component.type.slice(3);
-
-  if (component.type === 'tm.Flow') {
-    return `${prefix}: ${component.labels?.[0]?.attrs.text.text}`;
-  }
-
-  return `${prefix}: ${component.attrs.text?.text}`;
 }
 
 export function getValidMoves(

@@ -7,15 +7,17 @@ import {
   gameName,
   GameState,
   getImageExtension,
+  getModelAdapter,
   getSuitDisplayName,
   isSuit,
   logEvent,
   ModelType,
   SetupData,
   SUITS,
-  ThreatDragonModel,
   ThreatDragonThreat,
+  validateThreatDragonModel,
 } from '@eop/shared';
+import type { AnyThreatDragonModel } from '@eop/shared';
 import { LobbyClient } from 'boardgame.io/client';
 import send from 'koa-send';
 import { v4 as uuidv4 } from 'uuid';
@@ -78,11 +80,15 @@ export const createGame =
       //model stuff
       switch (body.modelType) {
         case ModelType.THREAT_DRAGON: {
-          // TODO: validation
-          await gameServer.db.setModel(
-            matchID,
-            JSON.parse(body.model as string) as ThreatDragonModel,
-          );
+          const parsed: unknown = JSON.parse(body.model as string);
+          const { valid, errors } = validateThreatDragonModel(parsed);
+          if (!valid) {
+            return ctx.throw(
+              `Invalid Threat Dragon model: ${errors.join('; ')}`,
+              400,
+            );
+          }
+          await gameServer.db.setModel(matchID, parsed as AnyThreatDragonModel);
           break;
         }
 
@@ -187,7 +193,12 @@ export const getImage =
 
     const game = await gameServer.db.fetch(matchID, { model: true });
 
-    if (!game.model || !('extension' in game.model)) {
+    const model = game.model;
+    if (
+      !model ||
+      !('extension' in model) ||
+      typeof (model as { extension?: unknown }).extension !== 'string'
+    ) {
       return ctx.throw(
         'Cannot request image if none is stored, maybe the wrong model type has been set?',
         400,
@@ -195,9 +206,13 @@ export const getImage =
     }
 
     //send image
-    await send(ctx, `${matchID}.${game.model?.extension}`, {
-      root: getDbImagesFolder(),
-    });
+    await send(
+      ctx,
+      `${matchID}.${(model as { extension: string }).extension}`,
+      {
+        root: getDbImagesFolder(),
+      },
+    );
   };
 
 const getMethodologyName = (gameMode: GameMode) => {
@@ -245,19 +260,19 @@ export const downloadThreatDragonModel =
     }
 
     // update the model with the identified threats
+    const adapter = getModelAdapter(model);
     state.G.identifiedThreats.forEach((threatsForComponent, diagramIdx) => {
       if (threatsForComponent === null) {
         return;
       }
       Object.keys(threatsForComponent).forEach((componentIdx) => {
-        const diagram = model.detail.diagrams[diagramIdx]?.diagramJson;
-        const cell = diagram?.cells?.find((c) => c.id === componentIdx);
+        const cell = adapter.findCell(model, diagramIdx, componentIdx);
 
         if (
           cell !== undefined &&
           threatsForComponent[componentIdx] !== undefined
         ) {
-          const threats: ThreatDragonThreat[] = cell.threats ?? [];
+          const threats: ThreatDragonThreat[] = adapter.getCellThreats(cell);
           Object.values(threatsForComponent[componentIdx]).forEach((t) =>
             threats.push({
               description: t.description ?? '',
@@ -276,7 +291,7 @@ export const downloadThreatDragonModel =
               game: matchID,
             }),
           );
-          cell.threats = threats;
+          adapter.setCellThreats(cell, threats);
         }
       });
     });
@@ -362,7 +377,7 @@ function enrichThreatWithCategory(
 function getThreats(
   gameState: State<GameState>,
   metadata: Server.MatchData,
-  model: ThreatDragonModel | null,
+  model: AnyThreatDragonModel | null,
 ) {
   const threats: ThreatDragonThreat[] = [];
 
@@ -393,10 +408,13 @@ function getThreats(
 
   //add threats from model
   if (model) {
-    model.detail.diagrams.forEach((diagram) => {
-      diagram.diagramJson.cells?.forEach((cell) => {
-        if (cell.threats !== undefined) {
-          threats.push(...cell.threats);
+    const adapter = getModelAdapter(model);
+    model.detail.diagrams.forEach((_diagram, di) => {
+      const cells = adapter.getDiagramCells(model, di);
+      cells?.forEach((cell) => {
+        const t = adapter.getCellThreats(cell);
+        if (t.length) {
+          threats.push(...t);
         }
       });
     });

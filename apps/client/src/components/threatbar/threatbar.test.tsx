@@ -4,7 +4,7 @@ import { describe, it, expect } from 'vitest';
 
 import Threatbar from './threatbar';
 
-import type { GameState, ThreatDragonModel } from '@eop/shared';
+import type { GameState, ThreatDragonModelV1 } from '@eop/shared';
 
 describe('<Threatbar>', () => {
   const selectedDiagram = 0;
@@ -49,7 +49,7 @@ describe('<Threatbar>', () => {
   };
 
   it('shows identified threats in reverse order', () => {
-    const model: ThreatDragonModel = {
+    const model: ThreatDragonModelV1 = {
       summary: {
         title: 'title',
       },
@@ -121,7 +121,7 @@ describe('<Threatbar>', () => {
   });
 
   it('shows existing threats in reverse order', () => {
-    const model: ThreatDragonModel = {
+    const model: ThreatDragonModelV1 = {
       summary: {
         title: 'title',
       },
