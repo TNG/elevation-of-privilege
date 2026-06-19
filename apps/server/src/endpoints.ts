@@ -1,4 +1,4 @@
-import { rename } from 'node:fs/promises';
+import { readFile, rename, unlink, writeFile } from 'node:fs/promises';
 
 import {
   DEFAULT_MODEL,
@@ -22,6 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { INTERNAL_API_PORT } from './config';
 import { getDbImagesFolder } from './filesystem';
+import { isSvg, sanitizeSvg } from './svgSanitizer';
 
 import type { Server, State } from 'boardgame.io';
 import type { IMiddleware } from 'koa-router';
@@ -120,12 +121,23 @@ export const createGame =
             throw Error('Filetype not supported');
           }
 
-          await rename(
-            ctx.request.files.model.filepath,
-            `${getDbImagesFolder()}/${matchID}.${extension}`,
-          );
-          //use model object to store info about image
-          await gameServer.db.setModel(matchID, { extension });
+          const destinationPath = `${getDbImagesFolder()}/${matchID}.${extension}`;
+
+          const tempPath = ctx.request.files.model.filepath;
+          const tempBuffer = await readFile(tempPath);
+
+          if (isSvg(extension, tempBuffer)) {
+            const sanitized = sanitizeSvg(tempBuffer);
+            await writeFile(`${getDbImagesFolder()}/${matchID}.svg`, sanitized);
+            await unlink(tempPath).catch(() => {
+              // Best-effort cleanup; formidable's temp file may already be gone
+            });
+            await gameServer.db.setModel(matchID, { extension: 'svg' });
+          } else {
+            await rename(tempPath, destinationPath);
+            //use model object to store info about image
+            await gameServer.db.setModel(matchID, { extension });
+          }
 
           break;
         }
@@ -195,7 +207,17 @@ export const getImage =
     }
 
     //send image
-    await send(ctx, `${matchID}.${game.model?.extension}`, {
+    const extension = game.model?.extension;
+    if (extension === 'svg') {
+      // Prevent SVG from being rendered as a navigable document (e.g. via
+      // "Open image in new tab"), which would otherwise execute any embedded
+      // scripts under our origin. Defense-in-depth alongside upload-time
+      // sanitization: the attachment header forces a download instead of inline
+      // rendering, and the CSP blocks all script/resource execution.
+      ctx.set('Content-Disposition', 'attachment');
+      ctx.set('Content-Security-Policy', "default-src 'none'");
+    }
+    await send(ctx, `${matchID}.${extension}`, {
       root: getDbImagesFolder(),
     });
   };
