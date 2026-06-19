@@ -131,7 +131,12 @@ export const validateImageFile = (
   }
 
   const clientExtension = extractExtension(originalFilename);
-  if (clientExtension !== undefined && clientExtension !== canonicalExtension) {
+  const normalizedClientExtension =
+    clientExtension === 'jpeg' ? 'jpg' : clientExtension;
+  if (
+    normalizedClientExtension !== undefined &&
+    normalizedClientExtension !== canonicalExtension
+  ) {
     // The extension does not have to match the MIME, but if one is provided it
     // must not contradict the allowlist (e.g. `Content-Type: image/png` with
     // `evil.php` is rejected).
