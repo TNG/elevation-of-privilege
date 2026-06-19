@@ -135,6 +135,46 @@ it('retrieve the model for a game', async () => {
   expect(modelResponse.body).toStrictEqual(model);
 });
 
+it('sanitizes a malicious SVG uploaded as an image model', async () => {
+  const maliciousSvg =
+    '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(document.cookie)</script><rect width="10" height="10" onload="alert(1)"/></svg>';
+
+  const names = ['P1', 'P2', 'P3'];
+  const createResponse = await request(publicApiServer.callback())
+    .post('/game/create')
+    .field('startSuit', 'A')
+    .field('gameMode', 'Elevation of Privilege')
+    .field('modelType', ModelType.IMAGE)
+    .field('turnDuration', '5')
+    .field('names[]', names)
+    .attach('model', Buffer.from(maliciousSvg), {
+      filename: 'xss.svg',
+      contentType: 'image/svg+xml',
+    });
+
+  expect(createResponse.status).toBe(200);
+  const createBody = createResponse.body as {
+    game: string;
+    credentials: string[];
+    spectatorCredential: string;
+  };
+
+  const imageResponse = await request(publicApiServer.callback())
+    .get(`/game/${createBody.game}/image`)
+    .auth('0', createBody.credentials[0]!);
+
+  expect(imageResponse.status).toBe(200);
+  expect(imageResponse.headers['content-disposition']).toContain('attachment');
+  expect(imageResponse.headers['content-security-policy']).toBe(
+    "default-src 'none'",
+  );
+
+  const body = (imageResponse.body as Buffer).toString('utf8');
+  expect(body).not.toContain('<script');
+  expect(body).not.toContain('onload');
+  expect(body).toContain('<rect');
+});
+
 it('download the final model for a game', async () => {
   const matchID = '123456';
 

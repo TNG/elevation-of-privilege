@@ -19,6 +19,7 @@
     "@koa/router": "^14.0.0",
     "basic-auth": "^2.0.1",
     "boardgame.io": "^0.50.2",
+    "isomorphic-dompurify": "^2.36.0",
     "koa": "^3.1.1",
     "koa-body": "^6.0.1",
     "koa-send": "^5.0.1",
