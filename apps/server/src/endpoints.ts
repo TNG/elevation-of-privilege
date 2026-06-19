@@ -1,4 +1,4 @@
-import { rename } from 'node:fs/promises';
+import { readFile, rename } from 'node:fs/promises';
 
 import {
   DEFAULT_MODEL,
@@ -6,7 +6,6 @@ import {
   GameMode,
   gameName,
   GameState,
-  getImageExtension,
   getSuitDisplayName,
   isSuit,
   logEvent,
@@ -22,6 +21,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { INTERNAL_API_PORT } from './config';
 import { getDbImagesFolder } from './filesystem';
+import { validateImageFile } from './imageFileType';
 
 import type { Server, State } from 'boardgame.io';
 import type { IMiddleware } from 'koa-router';
@@ -100,25 +100,22 @@ export const createGame =
             throw Error('A single image needs to be provided');
           }
 
-          if (!ctx.request.files.model.originalFilename) {
+          const file = ctx.request.files.model;
+          const declaredMimeType = file.mimetype;
+          if (!declaredMimeType) {
+            throw Error('No mime type specified for the provided image');
+          }
+          const originalFilename = file.originalFilename;
+          if (!originalFilename) {
             throw Error('No name specified for the provided image');
           }
 
-          if (!ctx.request.files.model.mimetype) {
-            throw Error('No mime type specified for the provided image');
-          }
-
-          const extension = getImageExtension(
-            ctx.request.files.model.originalFilename,
+          const fileBuffer = await readFile(file.filepath);
+          const { extension } = validateImageFile(
+            declaredMimeType,
+            originalFilename,
+            fileBuffer,
           );
-          if (
-            !(
-              /image\/[a-z+]+$/i.test(ctx.request.files.model.mimetype) &&
-              extension
-            )
-          ) {
-            throw Error('Filetype not supported');
-          }
 
           await rename(
             ctx.request.files.model.filepath,

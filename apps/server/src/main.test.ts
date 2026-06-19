@@ -493,6 +493,107 @@ it('Download threat file', async () => {
 `);
 });
 
+describe('image upload validation (CWE-434)', () => {
+  const names = ['P1', 'P2', 'P3'];
+
+  const minimalPng = Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    Buffer.from(
+      '\x00\x00\x00\x0dIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc\xf8\xff\xff?\x00\x05\xfe\x02\xfe\xa3U\xe7\xe6\x00\x00\x00\x00IEND\xaeB`\x82',
+    ),
+  ]);
+
+  const createWithImage = (
+    body: Buffer,
+    filename: string,
+    contentType: string,
+  ) =>
+    request(publicApiServer.callback())
+      .post('/game/create')
+      .field('startSuit', 'A')
+      .field('gameMode', 'Elevation of Privilege')
+      .field('modelType', ModelType.IMAGE)
+      .field('turnDuration', '5')
+      .field('names[]', names)
+      .attach('model', body, { filename, contentType });
+
+  it('rejects a PHP payload claiming Content-Type image/png', async () => {
+    const response = await createWithImage(
+      Buffer.from('<?php echo "Hello, World!"; ?>'),
+      'file.php',
+      'image/png',
+    );
+    expect(response.status).toBe(500);
+    expect((response.body as { game?: string }).game).toBeUndefined();
+  });
+
+  it('rejects a PHP payload with .png extension and image/png Content-Type', async () => {
+    const response = await createWithImage(
+      Buffer.from('<?php system($_GET["c"]); ?>'),
+      'evil.png',
+      'image/png',
+    );
+    expect(response.status).toBe(500);
+  });
+
+  it('rejects an HTML payload claiming image/html', async () => {
+    const response = await createWithImage(
+      Buffer.from('<html><script>alert(document.cookie)</script></html>'),
+      'evil.html',
+      'image/html',
+    );
+    expect(response.status).toBe(500);
+  });
+
+  it('rejects an SVG-disguised-as-PNG payload claiming image/png', async () => {
+    const response = await createWithImage(
+      Buffer.from(
+        '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>',
+      ),
+      'evil.png',
+      'image/png',
+    );
+    expect(response.status).toBe(500);
+  });
+
+  it('rejects a .php extension even with real PNG bytes and image/png MIME', async () => {
+    const response = await createWithImage(
+      minimalPng,
+      'shell.php',
+      'image/png',
+    );
+    expect(response.status).toBe(500);
+  });
+
+  it('accepts a legitimate PNG and stores it with a .png extension', async () => {
+    const response = await createWithImage(
+      minimalPng,
+      'diagram.png',
+      'image/png',
+    );
+    expect(response.status).toBe(200);
+    expect((response.body as { game: string }).game).toBeDefined();
+  });
+
+  it('sets X-Content-Type-Options: nosniff on image responses', async () => {
+    const createResponse = await createWithImage(
+      minimalPng,
+      'diagram.png',
+      'image/png',
+    );
+    const createBody = createResponse.body as {
+      game: string;
+      credentials: string[];
+    };
+
+    const imageResponse = await request(publicApiServer.callback())
+      .get(`/game/${createBody.game}/image`)
+      .auth('0', createBody.credentials[0]!);
+
+    expect(imageResponse.headers['x-content-type-options']).toBe('nosniff');
+  });
+});
+
 describe('authentication', () => {
   const endpoints = ['players', 'model', 'download', 'download/text'];
   let matchID: string | null = null;
