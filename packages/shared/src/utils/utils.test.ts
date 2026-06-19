@@ -5,7 +5,6 @@ import { getStartingCard } from './cardDefinitions';
 import { DEFAULT_START_SUIT, ModelType } from './constants';
 import {
   escapeMarkdownText,
-  getComponentName,
   getDealtCard,
   getPlayers,
   getValidMoves,
@@ -101,41 +100,8 @@ it('creates player array correctly', () => {
 });
 
 it('makes correct component name', () => {
-  expect(getComponentName(undefined)).toBe('');
-  expect(
-    getComponentName({
-      type: 'tm.Actor',
-      attrs: {
-        text: {
-          text: 'Bar',
-        },
-      },
-      id: 'some-id',
-      size: { width: 0, height: 0 },
-      z: 0,
-    }),
-  ).toBe('Actor: Bar');
-  expect(
-    getComponentName({
-      type: 'tm.Flow',
-      labels: [
-        {
-          attrs: {
-            text: {
-              text: 'Bar',
-              'font-size': '12pt',
-              'font-weight': 'bold',
-            },
-          },
-          position: 0,
-        },
-      ],
-      attrs: {},
-      id: 'some-id',
-      size: { width: 0, height: 0 },
-      z: 0,
-    }),
-  ).toBe('Flow: Bar');
+  // getComponentName has moved to the V1/V2 adapters; see
+  // ThreatDragonModel.v1.test.ts and ThreatDragonModel.v2.test.ts.
 });
 
 it('produces valid moves', () => {

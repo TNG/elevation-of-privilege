@@ -10,12 +10,13 @@ import '../../jointjs/shapes';
 
 import './model.css';
 
-import type { ThreatDragonModel } from '@eop/shared';
+import { getModelAdapter } from '@eop/shared';
+import type { AnyThreatDragonModel } from '@eop/shared';
 
 const SCROLL_SPEED = 1000;
 
 type ModelProps = {
-  model: ThreatDragonModel;
+  model: AnyThreatDragonModel;
   selectedDiagram: number;
   selectedComponent: string;
   onSelectDiagram?: (id: number) => void;
@@ -62,17 +63,24 @@ const Model: FC<ModelProps> = ({
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    graph.fromJSON(model.detail.diagrams[selectedDiagram]?.diagramJson);
-    //paper.fitToContent(1, 1, 10, { allowNewOrigin: "any" });
+    const jointJson = getModelAdapter(model).toJointGraph(
+      model,
+      selectedDiagram,
+    );
+    if (!jointJson || !jointJson.cells || jointJson.cells.length === 0) {
+      graph.clear();
+      return;
+    }
+    graph.fromJSON(jointJson);
   }, [graph, model, selectedDiagram]);
 
   useEffect(() => {
     // unhighlight all
     paper.model.getElements().forEach((e) => {
-      paper.findViewByModel(e).unhighlight();
+      paper.findViewByModel(e)?.unhighlight();
     });
     paper.model.getLinks().forEach((e) => {
-      paper.findViewByModel(e).unhighlight();
+      paper.findViewByModel(e)?.unhighlight();
     });
 
     // highlight the selected component

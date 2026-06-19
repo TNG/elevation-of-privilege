@@ -1,6 +1,6 @@
 import { FlatFile } from 'boardgame.io/server';
 
-import type { ThreatDragonModel } from '@eop/shared';
+import type { AnyThreatDragonModel } from '@eop/shared';
 import type { StorageAPI } from 'boardgame.io';
 import type { Object } from 'ts-toolbelt';
 
@@ -8,7 +8,7 @@ interface ModelFetchOpts extends StorageAPI.FetchOpts {
   model?: boolean;
 }
 
-type Model = ThreatDragonModel | { extension: string };
+type Model = AnyThreatDragonModel | { extension: string };
 
 interface ModelFetchFields extends StorageAPI.FetchFields {
   model: Model | null;

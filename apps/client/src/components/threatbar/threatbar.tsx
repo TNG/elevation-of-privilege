@@ -1,4 +1,4 @@
-import { getComponentName, getSuitDisplayName } from '@eop/shared';
+import { getModelAdapter, getSuitDisplayName } from '@eop/shared';
 import {
   faBolt,
   faEdit,
@@ -24,18 +24,13 @@ import ThreatModal from '../threatmodal/threatmodal';
 
 import './threatbar.css';
 
-import type {
-  GameState,
-  ThreatDragonModel,
-  ThreatDragonThreat,
-} from '@eop/shared';
+import type { AnyThreatDragonModel, GameState, Threat } from '@eop/shared';
 import type { BoardProps } from 'boardgame.io/react';
 import type { FC } from 'react';
-import { Threat } from '../../../../../packages/shared/dist/types/game/threat';
 import { nl2br } from '../../utils/nl2br';
 
 type ThreatbarProps = {
-  model?: ThreatDragonModel;
+  model?: AnyThreatDragonModel;
   active: boolean;
   names: string[];
   isInThreatStage: boolean;
@@ -50,25 +45,23 @@ const Threatbar: FC<ThreatbarProps> = ({
   names,
   isInThreatStage,
 }) => {
+  const adapter = model ? getModelAdapter(model) : undefined;
+
   const getSelectedComponent = () => {
-    if (G.selectedComponent === '' || model === undefined) {
+    if (G.selectedComponent === '' || model === undefined || !adapter) {
       return undefined;
     }
-
-    const diagram = model.detail.diagrams[G.selectedDiagram]?.diagramJson;
-    return diagram?.cells?.find((cell) => cell.id === G.selectedComponent);
+    return adapter.findCell(model, G.selectedDiagram, G.selectedComponent);
   };
 
-  const getThreatsForSelectedComponent = (): ThreatDragonThreat[] => {
+  const getThreatsForSelectedComponent = () => {
     const component = getSelectedComponent();
-
-    return (
-      component?.threats?.map((threat, index) => ({
-        ...threat,
-        // add ids if they are missing
-        id: threat.id ?? `${index}`,
-      })) ?? []
-    );
+    if (!component || !adapter) return [];
+    return adapter.getCellThreats(component).map((threat, index) => ({
+      ...threat,
+      // add ids if they are missing
+      id: threat.id ?? `${index}`,
+    }));
   };
 
   const getIdentifiedThreatsForSelectedComponent = () =>
@@ -80,7 +73,7 @@ const Threatbar: FC<ThreatbarProps> = ({
   const identifiedThreats =
     getIdentifiedThreatsForSelectedComponent().reverse();
   const component = getSelectedComponent();
-  const componentName = getComponentName(component);
+  const componentName = adapter?.getComponentName(component) ?? '';
 
   const [threatToBeDeleted, setThreatToBeDeleted] = useState<
     Threat | undefined
@@ -179,7 +172,7 @@ const Threatbar: FC<ThreatbarProps> = ({
             </em>
           )}
           <hr />
-          {threats.map((val: ThreatDragonThreat, idx: number) => (
+          {threats.map((val, idx) => (
             <Card key={idx}>
               <CardHeader
                 className="hoverable"
