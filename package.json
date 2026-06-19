@@ -2,6 +2,7 @@
   "name": "@eop/root",
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
+    "jsdom": "^28.1.0",
     "sherif": "^1.10.0",
     "turbo": "^2.5.8"
   },
