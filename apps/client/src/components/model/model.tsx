@@ -96,7 +96,11 @@ const Model: FC<ModelProps> = ({
    */
   useEffect(() => {
     const onCellPointerClick = (cellView: joint.dia.CellView) => {
-      if (cellView.model.attributes.type !== 'tm.Boundary') {
+      if (
+        cellView.model.attributes.type !== 'tm.Boundary' &&
+        cellView.model.attributes.type !== 'tm.BoundaryBox' &&
+        cellView.model.attributes.type !== 'tm.Text'
+      ) {
         onSelectComponent?.(cellView.model.id.toString());
       }
     };
@@ -295,7 +299,7 @@ function v2CellToJointCell(cell: CellV2): JointCell | null {
     id: cell.id,
     type: mapToJointType(shape, dataType),
     z: cell.zIndex ? cell.zIndex : 0,
-    attrs: normalizeAttrs(cell),
+    attrs: normalizeAttrs(addCssClasses(cell)),
   };
 
   // Node cells: position + size
@@ -306,10 +310,7 @@ function v2CellToJointCell(cell: CellV2): JointCell | null {
       size: { width: cell.size.width, height: cell.size.height },
 
       description: cell.data?.description ?? '',
-      hasOpenThreats: !!cell.data?.hasOpenThreats,
-      outOfScope: !!cell.data?.outOfScope,
       reasonOutOfScope: cell.data?.reasonOutOfScope ?? '',
-      isTrustBoundary: !!cell.data?.isTrustBoundary,
       threats: cell.data?.threats ?? [],
       visible: typeof cell.visible === 'boolean' ? cell.visible : undefined,
     };
@@ -331,7 +332,7 @@ function v2CellToJointCell(cell: CellV2): JointCell | null {
           : undefined,
 
       description: cell.data?.description ?? '',
-      hasOpenThreats: !!cell.data?.hasOpenThreats,
+      hasOpenThreats: cell.data?.hasOpenThreats,
       outOfScope: !!cell.data?.outOfScope,
       reasonOutOfScope: cell.data?.reasonOutOfScope ?? '',
       isTrustBoundary: !!cell.data?.isTrustBoundary,
@@ -360,16 +361,8 @@ function v2CellToJointCell(cell: CellV2): JointCell | null {
 
 function mapToJointType(shape: string, dataType?: string): string {
   // Prefer the semantic Threat Dragon type if present
-  if (typeof dataType === 'string' && dataType.startsWith('tm.')) {
-    // V2 extra: tm.BoundaryBox -> map to tm.Boundary so existing selection logic works
-    if (dataType === 'tm.BoundaryBox') return 'tm.Boundary';
-
-    // V2 extra: tm.Text blocks. If you don't have a tm.Text shape,
-    // we map it to tm.Process so it still renders (as a basic element).
-    if (dataType === 'tm.Text') return 'tm.Process';
-
+  if (typeof dataType === 'string' && dataType.startsWith('tm.'))
     return dataType;
-  }
 
   // Fallback based on shape
   switch (shape) {
@@ -382,8 +375,11 @@ function mapToJointType(shape: string, dataType?: string): string {
     case 'flow':
       return 'tm.Flow';
     case 'trust-boundary-curve':
-    case 'trust-boundary-box':
       return 'tm.Boundary';
+    case 'trust-boundary-box':
+      return 'tm.BoundaryBox';
+    case 'td-text-block':
+      return 'tm.Text';
     default:
       return 'tm.Process';
   }
@@ -428,6 +424,35 @@ function normalizeAttrs(cell: CellV2): JointAttrs {
   return attrs;
 }
 
+function addCssClasses(cell: CellV2) {
+  const threats = cell.data?.hasOpenThreats
+    ? 'hasOpenThreats'
+    : 'hasNoOpenThreats';
+  const scope = cell.data?.outOfScope ? 'isOutOfScope' : 'isInScope';
+  const direction = cell.data?.isBidirectional
+    ? 'isBidirectional'
+    : 'isUnidirectional';
+
+  if (!cell.attrs) cell.attrs = {};
+  cell.attrs['.element-shape'] = {
+    class: ['element-shape', scope, threats].join(' '),
+  };
+  cell.attrs['.element-text'] = {
+    class: ['element-text', threats].join(' '),
+  };
+  cell.attrs['.marker-target'] = {
+    class: ['marker-target', threats].join(' '),
+  };
+  cell.attrs['.marker-source'] = {
+    class: ['marker-source', threats, direction].join(' '),
+  };
+  cell.attrs['.connection'] = {
+    class: ['connection', scope, threats].join(' '),
+  };
+
+  return cell;
+}
+
 function getV2CellName(cell: CellV2): string {
   // Prefer business name
   if (typeof cell.data?.name === 'string' && cell.data.name.trim()) {
@@ -448,30 +473,19 @@ function getV2CellName(cell: CellV2): string {
 }
 
 function mapEdgeLabels(cell: CellV2): JointLabel[] {
-  const labels = cell.labels ?? [];
+  // the schema v2 as descripted here: https://github.com/OWASP/threat-dragon/blob/main/td.vue/src/assets/schema/threat-dragon-v2.schema.json
+  // does not represent the actual model as saved with current Threat Dragon 2.6.2
+  let labels = cell.labels ?? []; // TD currently does not allow more then one label
+  // fallback
+  if (!labels) labels = [cell.data.name];
+
   const out: JointLabel[] = [];
 
-  for (const l of labels) {
-    const attrs = l.attrs;
-    if (!attrs || typeof attrs !== 'object') continue;
-
-    // Prefer labelText.text; fallback to label.text
-    const labelText = (attrs as { labelText?: { text?: unknown } }).labelText
-      ?.text;
-    const fallback = (attrs as { label?: { text?: unknown } }).label?.text;
-
-    const text =
-      typeof labelText === 'string' && labelText.trim()
-        ? labelText
-        : typeof fallback === 'string'
-          ? fallback
-          : '';
-
+  for (const text of labels) {
     if (!text || !text.trim()) continue;
 
     out.push({
-      position:
-        typeof l.position?.distance === 'number' ? l.position.distance : 0.5,
+      position: 0.5,
       attrs: {
         text: { text },
       },

@@ -138,7 +138,7 @@ export interface CellV2 {
   connector?: string;
 
   /** Edge labels (commonly present for flows/boundaries) */
-  labels?: EdgeLabelV2[];
+  labels?: string[];
 
   /** Ports (commonly present for nodes and used by edges via source.port/target.port) */
   ports?: PortsV2;

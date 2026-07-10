@@ -49,6 +49,7 @@ const Flow = dia.Link.extend({
     {
       type: 'tm.Flow',
       attrs: {
+        '.marker-source': { d: 'M 10 0 L 0 5 L 10 10 z' },
         '.marker-target': { d: 'M 10 0 L 0 5 L 10 10 z' },
       },
       smooth: true,
@@ -69,7 +70,7 @@ Object.defineProperty(Flow.prototype, 'name', {
 });
 
 defineOutOfScope(Flow.prototype, 'connection');
-defineHasOpenThreats(Flow.prototype, ['connection', 'marker-target']);
+defineHasOpenThreats(Flow.prototype, ['connection', 'marker-target', 'marker-source']);
 defineProperties(Flow.prototype, [
   'reasonOutOfScope',
   'protocol',
@@ -78,7 +79,7 @@ defineProperties(Flow.prototype, [
   'threats',
 ]);
 
-//trust boundary shape
+//trust boundary shapes
 
 const Boundary = dia.Link.extend({
   markup: [
@@ -111,7 +112,7 @@ const Boundary = dia.Link.extend({
       type: 'tm.Boundary',
       attrs: {
         '.connection': {
-          stroke: 'green',
+          stroke: 'black',
           'stroke-width': 3,
           'stroke-dasharray': '10,5',
         },
@@ -119,6 +120,57 @@ const Boundary = dia.Link.extend({
       smooth: true,
     },
     dia.Link.prototype.defaults,
+  ),
+});
+
+const BoundaryBox = shapes.basic.Generic.extend({
+  markup: [
+    '<g class="rotatable">' +
+      '<g class="scalable">' +
+      '<rect class="element-shape"/>' +
+      '<title class="tooltip"/></g>' +
+      '<text class="element-text"/></g>',
+  ].join(''),
+
+  setLabel: function (labelText) {
+    this.attributes.labels = [
+      {
+        position: 0.5,
+        attrs: {
+          text: { text: labelText, 'font-weight': '400', 'font-size': 'small' },
+        },
+      },
+    ];
+  },
+
+  defaults: util.defaultsDeep(
+    {
+      type: 'tm.BoundaryBox',
+      isTrustBoundary: true,
+      attrs: {
+        '.element-shape': {
+          fill: 'transparent',
+          stroke: 'black',
+          'stroke-width': 2,
+          'stroke-dasharray': '10,5',
+          'follow-scale': true,
+          width: 160,
+          height: 80,
+        },
+        text: {
+          'font-weight': 400,
+          'font-size': 'small',
+          fill: 'black',
+          'text-anchor': 'start',
+          'ref-x': 0.1,
+          'ref-y': 0.1,
+          'y-alignment': 'start',
+          ref: '.element-shape',
+        },
+      },
+      size: { width: 160, height: 80 },
+    },
+    shapes.basic.Generic.prototype.defaults,
   ),
 });
 
@@ -189,6 +241,19 @@ const Process = toolElement.extend({
         },
         text: { ref: '.element-shape' },
       },
+      size: { width: 100, height: 100 },
+    },
+    toolElement.prototype.defaults,
+  ),
+});
+
+const Text = toolElement.extend({
+  markup:
+    '<g class="rotatable"><g class="scalable"><title class="tooltip"/></g><text class="element-text hasNoOpenThreats isInScope"/></g>',
+
+  defaults: util.defaultsDeep(
+    {
+      type: 'tm.Text',
       size: { width: 100, height: 100 },
     },
     toolElement.prototype.defaults,
@@ -345,6 +410,8 @@ const ActorView = ToolElementView;
 
 const ProcessView = ToolElementView;
 
+const TextView = ToolElementView;
+
 const LinkView = dia.LinkView.extend({
   setSelected: function () {
     this.highlight(null, Highlighter);
@@ -358,14 +425,18 @@ const FlowView = LinkView;
 
 const BoundaryView = LinkView;
 
+const BoundaryBoxView = ToolElementView;
+
 const tm = {
   Highlighter,
   Flow,
   Boundary,
+  BoundaryBox,
   toolElement,
   Process,
   Store,
   Actor,
+  Text,
   ToolElementView,
   StoreView,
   ActorView,
@@ -373,6 +444,8 @@ const tm = {
   LinkView,
   FlowView,
   BoundaryView,
+  BoundaryBoxView,
+  TextView,
 };
 
 Object.assign(shapes, { tm });

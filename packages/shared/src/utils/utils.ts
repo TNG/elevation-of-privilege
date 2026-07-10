@@ -144,15 +144,8 @@ function getV2FlowLabel(cell: CellV2): string {
   const labels = cell.labels ?? [];
   if (!Array.isArray(labels) || labels.length === 0) return '';
 
-  const attrs = labels[0]?.attrs;
-  if (!attrs || typeof attrs !== 'object') return '';
-
-  const labelText = (attrs as { labelText?: { text?: unknown } }).labelText
-    ?.text;
-  if (typeof labelText === 'string' && labelText.trim()) return labelText;
-
-  const label = (attrs as { label?: { text?: unknown } }).label?.text;
-  if (typeof label === 'string' && label.trim()) return label;
+  const text = labels[0];
+  if (typeof text === 'string' && text.trim()) return text;
 
   return '';
 }

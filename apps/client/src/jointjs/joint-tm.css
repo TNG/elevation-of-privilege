@@ -29,6 +29,14 @@
   fill: red;
 }
 
+.marker-source.hasOpenThreats {
+  fill: red;
+}
+
+.marker-source.isUnidirectional {
+  display: none;
+}
+
 text.hasOpenThreats {
   stroke: none;
   fill: red;
