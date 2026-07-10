@@ -111,12 +111,10 @@ export const createGame =
           const extension = getImageExtension(
             ctx.request.files.model.originalFilename,
           );
-          if (
-            !(
-              /image\/[a-z+]+$/i.test(ctx.request.files.model.mimetype) &&
-              extension
-            )
-          ) {
+          if (!(
+            /image\/[a-z+]+$/i.test(ctx.request.files.model.mimetype) &&
+            extension
+          )) {
             throw Error('Filetype not supported');
           }
 
