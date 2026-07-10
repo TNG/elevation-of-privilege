@@ -12,6 +12,7 @@ import {
   ModelType,
   SPECTATOR,
   Suit,
+  ThreatDragonModelV2,
 } from '@eop/shared';
 import { ChangeEvent, FC, useState } from 'react';
 import {
@@ -53,7 +54,7 @@ const Create: FC = () => {
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
   const [modelType, setModelType] = useState(ModelType.IMAGE);
-  const [model, setModel] = useState<Record<string, unknown> | undefined>(
+  const [model, setModel] = useState<ThreatDragonModelV2 | undefined>(
     undefined,
   );
   const [image, setImage] = useState<File | undefined>(undefined);
@@ -112,7 +113,7 @@ const Create: FC = () => {
       );
     }
 
-    setModel(JSON.parse(await readFileAsText(file)) as Record<string, unknown>);
+    setModel(JSON.parse(await readFileAsText(file)) as ThreatDragonModelV2);
   };
 
   const updateImage = (e: ChangeEvent<HTMLInputElement>) => {

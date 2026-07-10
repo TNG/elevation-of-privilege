@@ -13,8 +13,8 @@ import {
   ModelType,
   SetupData,
   SUITS,
-  ThreatDragonModel,
-  ThreatDragonThreat,
+  ThreatDragonModelV2,
+  ThreatV2,
 } from '@eop/shared';
 import { LobbyClient } from 'boardgame.io/client';
 import send from 'koa-send';
@@ -75,13 +75,12 @@ export const createGame =
         credentials.push(playerCredentials);
       }
 
-      //model stuff
+      // model stuff
       switch (body.modelType) {
         case ModelType.THREAT_DRAGON: {
-          // TODO: validation
           await gameServer.db.setModel(
             matchID,
-            JSON.parse(body.model as string) as ThreatDragonModel,
+            JSON.parse(body.model as string) as ThreatDragonModelV2,
           );
           break;
         }
@@ -124,7 +123,7 @@ export const createGame =
             ctx.request.files.model.filepath,
             `${getDbImagesFolder()}/${matchID}.${extension}`,
           );
-          //use model object to store info about image
+          // use model object to store info about image
           await gameServer.db.setModel(matchID, { extension });
 
           break;
@@ -207,7 +206,6 @@ const getMethodologyName = (gameMode: GameMode) => {
   if (gameMode === GameMode.CORNUCOPIA) {
     return 'Cornucopia';
   }
-
   if (gameMode === GameMode.CUMULUS) {
     return 'Cumulus';
   }
@@ -244,51 +242,56 @@ export const downloadThreatDragonModel =
       );
     }
 
+    const tdModel: ThreatDragonModelV2 = model;
+
     // update the model with the identified threats
     state.G.identifiedThreats.forEach((threatsForComponent, diagramIdx) => {
-      if (threatsForComponent === null) {
-        return;
-      }
-      Object.keys(threatsForComponent).forEach((componentIdx) => {
-        const diagram = model.detail.diagrams[diagramIdx]?.diagramJson;
-        const cell = diagram?.cells?.find((c) => c.id === componentIdx);
+      if (threatsForComponent === null) return;
 
-        if (
-          cell !== undefined &&
-          threatsForComponent[componentIdx] !== undefined
-        ) {
-          const threats: ThreatDragonThreat[] = cell.threats ?? [];
-          Object.values(threatsForComponent[componentIdx]).forEach((t) =>
-            threats.push({
-              description: t.description ?? '',
-              mitigation: t.mitigation ?? '',
-              modelType: getMethodologyName(state.G.gameMode),
-              severity: t.severity ?? '',
-              status: 'Open',
-              title: t.title ?? '',
-              type: getSuitDisplayName(state.G.gameMode, t.type),
+      const diagram = tdModel.detail.diagrams[diagramIdx];
+      if (!diagram) return;
 
-              owner:
-                t.owner !== undefined
-                  ? game.metadata.players[Number.parseInt(t.owner)]?.name
-                  : undefined,
-              id: t.id,
-              game: matchID,
-            }),
-          );
-          cell.threats = threats;
-        }
+      Object.keys(threatsForComponent).forEach((componentId) => {
+        const cell = diagram.cells?.find((c) => c.id === componentId);
+        if (!cell) return;
+
+        const threatsInGame = threatsForComponent[componentId];
+        if (!threatsInGame) return;
+
+        const existing: ThreatV2[] = cell.data.threats ?? [];
+
+        Object.values(threatsInGame).forEach((t) => {
+          existing.push({
+            description: t.description ?? '',
+            mitigation: t.mitigation ?? '',
+            modelType: getMethodologyName(state.G.gameMode),
+            severity: t.severity ?? '',
+            status: 'Open',
+            title: t.title ?? '',
+            type: getSuitDisplayName(state.G.gameMode, t.type),
+            owner:
+              t.owner !== undefined
+                ? game.metadata.players[Number.parseInt(t.owner)]?.name
+                : undefined,
+            id: t.id,
+            game: matchID,
+          });
+        });
+
+        cell.data.threats = existing;
+        cell.data.hasOpenThreats =
+          cell.data.hasOpenThreats || existing.some((x) => x.status === 'Open');
       });
     });
 
-    const modelTitle = model.summary.title.replace(' ', '-');
+    const modelTitle = tdModel.summary.title.replace(' ', '-');
     const timestamp = new Date().toISOString().replace(':', '-');
     const filename = `${modelTitle}-${timestamp}.json`;
 
     logEvent(`Download model: ${matchID}`);
     ctx.attachment(filename);
     ctx.set('Access-Control-Expose-Headers', 'Content-Disposition');
-    ctx.body = game.model;
+    ctx.body = tdModel;
   };
 
 export const downloadThreatsMarkdownFile =
@@ -299,6 +302,7 @@ export const downloadThreatsMarkdownFile =
     if (matchID === undefined) {
       return ctx.throw('Missing required parameter matchID', 400);
     }
+
     const game = await gameServer.db.fetch(matchID, {
       state: true,
       metadata: true,
@@ -311,7 +315,8 @@ export const downloadThreatsMarkdownFile =
       state.G.modelType == ModelType.PRIVACY_ENHANCED ||
       state.G.modelType == ModelType.THREAT_DRAGON;
 
-    const model = game.model;
+    const model: ThreatDragonModelV2 | null = game.model as ThreatDragonModelV2;
+
     const threats = getThreats(
       state,
       game.metadata,
@@ -320,12 +325,11 @@ export const downloadThreatsMarkdownFile =
 
     const modelTitle =
       isJsonModel && game.model && !('extension' in game.model)
-        ? game.model
-          ? game.model?.summary.title.trim().replaceAll(' ', '-')
-          : ``
+        ? game.model.summary.title.trim().replaceAll(' ', '-')
         : state.G.gameMode
           ? state.G.gameMode.trim().replaceAll(' ', '')
           : ``;
+
     const timestamp = new Date().toISOString().replaceAll(':', '-');
     const date = new Date().toLocaleString();
     const filename = `threats-${modelTitle}-${timestamp}.md`;
@@ -341,10 +345,10 @@ export const downloadThreatsMarkdownFile =
     );
   };
 
-type ThreatWithCategory = ThreatDragonThreat & { category?: string };
+type ThreatWithCategory = ThreatV2 & { category?: string; owner?: string };
 
 function enrichThreatWithCategory(
-  threat: ThreatDragonThreat,
+  threat: ThreatV2,
   gameMode: GameMode,
 ): ThreatWithCategory {
   if (threat.type) {
@@ -362,11 +366,11 @@ function enrichThreatWithCategory(
 function getThreats(
   gameState: State<GameState>,
   metadata: Server.MatchData,
-  model: ThreatDragonModel | null,
+  model: ThreatDragonModelV2 | null,
 ) {
-  const threats: ThreatDragonThreat[] = [];
+  const threats: ThreatV2[] = [];
 
-  //add threats from G.identifiedThreats
+  // add threats from G.identifiedThreats
   gameState.G.identifiedThreats.forEach((identifiedThreats) => {
     if (identifiedThreats !== null) {
       Object.keys(identifiedThreats).forEach((componentId) => {
@@ -391,12 +395,13 @@ function getThreats(
     }
   });
 
-  //add threats from model
+  // add threats from model
   if (model) {
     model.detail.diagrams.forEach((diagram) => {
-      diagram.diagramJson.cells?.forEach((cell) => {
-        if (cell.threats !== undefined) {
-          threats.push(...cell.threats);
+      diagram.cells?.forEach((cell) => {
+        const t = cell.data?.threats;
+        if (Array.isArray(t) && t.length) {
+          threats.push(...t);
         }
       });
     });
