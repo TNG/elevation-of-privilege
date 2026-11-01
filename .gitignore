@@ -33,7 +33,6 @@ deploy/
 
 # Agents
 .agents
-.opencode
 .claude
 
 # Playwright
