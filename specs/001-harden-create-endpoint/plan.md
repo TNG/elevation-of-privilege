@@ -1,4 +1,4 @@
-# Implementation Plan: Harden Game Creation and Model Delivery Against Injected Content
+# Implementation Plan: Harden Game Creation Against Injected Content
 
 **Branch**: `fix/create-sanitization` (spec folder `001-harden-create-endpoint`) | **Date**: 2026-10-30 | **Spec**: [spec.md](spec.md)
 
@@ -6,7 +6,7 @@
 
 ## Summary
 
-The work is done in one place, `POST /game/create`. Every model and file is validated there before anything is stored. On top of that, delivery headers act as a backstop.
+The work is done in one place, `POST /game/create`. Every model and file is validated there before anything is stored. The delivery-side backstop (security response headers and the content security policy) was extracted to `specs/002-delivery-security-headers/`.
 
 - **One shared set of rules:** declarative valibot schemas in `packages/shared` cover the form fields and the Threat Dragon V1 model.
   - Top-level metadata is stripped, so keys like `extension` can't be stored.
@@ -18,10 +18,9 @@ The work is done in one place, `POST /game/create`. Every model and file is vali
   - The claimed MIME type and the filename extension must match the detected type (PR #360).
 - **`createGame` order:** validate first, then create an *unlisted* match. If a later step fails, wipe the match. Temp files are always deleted.
 - **Errors:** a 400 contract that never echoes submitted values.
-- **Delivery protections:** `koa-helmet` on the API, nginx headers for static files, and `attachment` + `default-src 'none'` for SVG images.
 - **Client:** a minimal change so the creation page shows 400 errors.
 
-This replaces PRs #358 and #360. Design decisions are in [research.md](research.md).
+This replaces PRs #358 and #360 on the input side; their delivery-side protections are implemented by `specs/002-delivery-security-headers/`. Design decisions are in [research.md](research.md).
 
 ## Technical Context
 
@@ -29,7 +28,7 @@ This replaces PRs #358 and #360. Design decisions are in [research.md](research.
 
 **Primary Dependencies**:
 - Existing: Koa 3, koa-body 6, @koa/router 14, boardgame.io 0.50, valibot 1.x (server).
-- **New for the server:** `file-type@^21`, `dompurify@^3`, `jsdom@^28`, `koa-helmet@^9`, `helmet@^8`.
+- **New for the server:** `file-type@^21`, `dompurify@^3`, `jsdom@^28`. (`koa-helmet`/`helmet` moved to spec 002 with the delivery protections.)
 - **New for shared:** `valibot`.
 
 **Storage**: boardgame.io FlatFile (node-persist) in `os.tmpdir()/db`, with images in `os.tmpdir()/db-images`. The layout doesn't change.
@@ -59,7 +58,7 @@ This replaces PRs #358 and #360. Design decisions are in [research.md](research.
 | Gate | Source | Pre-design | Post-design |
 |---|---|---|---|
 | Validate user input with Valibot schemas | CODE_CONVENTIONS "Error Handling" | ✅ planned | ✅ shared schemas (data-model §1–2) |
-| Established libraries rather than hand-written sanitizing or sniffing | maintainer reviews on PRs #358 and #360 | ✅ | ✅ file-type, DOMPurify+jsdom, helmet. `is-svg` is replaced by a stricter jsdom parse (R3), and the reason is documented |
+| Established libraries rather than hand-written sanitizing or sniffing | maintainer reviews on PRs #358 and #360 | ✅ | ✅ file-type, DOMPurify+jsdom. `is-svg` is replaced by a stricter jsdom parse (R3), and the reason is documented |
 | Vitest for all tests; Supertest for the API | CODE_CONVENTIONS "Testing" | ✅ | ✅ quickstart §1 |
 | Imports sorted; type-only imports; kebab-case for new files | CODE_CONVENTIONS | ✅ | ✅ `image-upload.ts`, `schemas/*.ts` |
 | Client only works together with the server; use `npx turbo` | AGENTS.md | ✅ | ✅ quickstart §2 |
@@ -80,8 +79,7 @@ specs/001-harden-create-endpoint/
 ├── data-model.md        # Phase 1: schemas, upload rules, state transitions
 ├── quickstart.md        # Phase 1: validation guide
 ├── contracts/
-│   ├── post-game-create.md
-│   └── response-headers.md
+│   └── post-game-create.md    # response-headers.md moved to specs/002-delivery-security-headers/
 ├── checklists/requirements.md
 └── tasks.md             # Phase 2 (/speckit.tasks), not created here
 ```
@@ -104,19 +102,17 @@ packages/shared/
             └── SOURCES.md               # URLs + Apache-2.0 attribution
 
 apps/server/
-├── package.json                         # + file-type, dompurify, jsdom, koa-helmet, helmet
+├── package.json                         # + file-type, dompurify, jsdom
 ├── tsconfig.app.json / tsconfig.test.json   # module + moduleResolution: nodenext
 └── src/
     ├── image-upload.ts                  # NEW: detect raster/SVG, sanitize SVG, check claimed type + extension
     ├── image-upload.test.ts             # NEW: R3 samples + PR #360 payloads
     ├── endpoints.ts                     # createGame: validate → createMatch(unlisted) → join → store; rollback; 400 contract.
-    │                                    # getImage: SVG attachment + CSP
     ├── ModelFlatFile.ts                 # wipe() also deletes the model key
-    ├── publicApi.ts                     # koa-helmet; /create route unchanged otherwise
+    ├── publicApi.ts                     # /create route unchanged otherwise
     └── main.test.ts                     # contract tests; fix the 2 TODO Threat Dragon tests; port the PR tests (500 → 400)
 
 apps/client/
-├── nginx/etc/nginx/conf.d/default.conf  # add_header ... always inside location /
 └── src/pages/create.tsx                 # show 400 error code and paths, reset "creating" (R10)
 
 package.json                             # engines.node >=20.19.0 <25.0.0
@@ -151,10 +147,10 @@ Ordered for test-first work. Detailed tasks come from `/speckit.tasks`.
    - `try/catch` rollback via `db.wipe` (model key and image file too);
    - `finally` deletes the temp file;
    - error mapping and `logEvent`.
-5. **Delivery headers** (R7; contracts/response-headers.md): `koa-helmet` in `publicApi.ts`, the SVG headers in `getImage`, the nginx `location /` headers.
+5. **Delivery headers**: moved to `specs/002-delivery-security-headers/` (its plan, steps 3–6); provenance is research R7 below.
 6. **Client** (R10): handle `!response.ok` in `create.tsx`.
 7. **Integration tests:** quickstart §1 table. Update the two TODO tests to use a golden model.
-8. **Wrap-up:** run `npx turbo run lint test build`, the manual quickstart §2–3, `npx changeset add`, then `git commit --signoff`.
+8. **Wrap-up:** run `npx turbo run lint test build`, the manual quickstart §2, `npx changeset add`, then `git commit --signoff`.
 
 ## Risks & Mitigations
 
@@ -164,7 +160,6 @@ Ordered for test-first work. Detailed tasks come from `/speckit.tasks`.
 | The `nodenext` switch affects other imports | Verified: `tsc --noEmit` is clean and the ts-node dev server starts. CI covers Node 20, 22 and 24. |
 | `require(esm)` isn't available on Node < 20.19 | Engines bump. CI and Docker already use newer versions. |
 | Apache-2.0 fixtures in an MIT repo | Attribution in `SOURCES.md`. Use the smallest representative subset. |
-| A CSP header breaks a client feature | The policy is derived from the client's actual needs (blob images, same-origin WebSocket). Manual check of the browser console in quickstart §3. |
 | SVG sanitization changes how editor-made SVGs look | Accepted by user decision. Removals are logged. draw.io's text fallbacks remain. |
 
 ## Complexity Tracking

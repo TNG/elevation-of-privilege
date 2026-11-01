@@ -31,6 +31,7 @@
 
 ## Notes
 
+- 2026-11-01: the delivery protections (User Story 3, FR-019–FR-022, SC-004, tasks T033–T038) were extracted into `specs/002-delivery-security-headers/`. The retired numbers stay reserved here so cross-references remain unambiguous.
 - Validation iteration 3: all items pass, after the SVG policy change made during `/speckit.plan`. SVGs are now cleaned and the cleaned copy is stored, instead of being refused (user decision based on research R3). Updated US2, FR-017, SC-001, the Edge Cases and the Assumptions.
 - Validation iteration 2: all items pass, after the revision that aligns the spec with PRs #358 and #360:
   - added delivery protections (User Story 3, FR-019–FR-022);

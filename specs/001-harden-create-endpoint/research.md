@@ -1,4 +1,4 @@
-# Research: Harden Game Creation and Model Delivery
+# Research: Harden Game Creation
 
 All findings were verified on 2026-10-30, either by running experiments or by reading code and library sources. Experiments ran in `/tmp/opencode/libtest` and `/tmp/opencode/td-golden` on Node 20.20.2 with TypeScript 5.9.2.
 
@@ -53,7 +53,7 @@ All findings were verified on 2026-10-30, either by running experiments or by re
 - **Parser differential:** jsdom stores an internal entity's replacement text as *text*, but browsers parse it as *markup*. Example: `<!ENTITY x "<script>…">` used as `&x;`. Browsers also apply DTD default attributes (`<!ATTLIST svg onload …>`) and `<?xml-stylesheet?>` instructions, which jsdom ignores. **So the raw upload must never be stored.** Storing the server's own serialization removes all of these: each was shown to be harmless after re-serialization.
 - **Stability:** sanitizing the stored output a second time removes nothing and gives the same bytes, for all 19 test samples.
 - **Policy (user decision):** sanitize and store, as in PR #358, rather than refuse. Strict refusal would have rejected Inkscape SVGs (editor metadata), draw.io SVGs (`foreignObject` labels) and Illustrator SVGs (`<use>` references, comments). Removals are still logged.
-- **Remaining risk:** `<image href="https://…">` stays in the stored file (external tracking pixel). Browsers don't load it in `<img>` context, and direct delivery uses `default-src 'none'`. Accepted.
+- **Remaining risk:** `<image href="https://…">` stays in the stored file (external tracking pixel). Browsers don't load it in `<img>` context, and direct delivery is locked down by the headers from `specs/002-delivery-security-headers/` (`default-src 'none'`). Accepted.
 
 **Alternatives considered**:
 - `is-svg`, suggested in the PR #358 review: it is a heuristic, gives no security guarantee, and is ESM-only. A real XML parse with a namespace check on the root is both stricter and the input DOMPurify needs anyway, so `is-svg` adds nothing. **Not used.** This is documented for reviewers.
@@ -109,6 +109,8 @@ If step 4 or 5 throws, call `db.wipe(matchID)` and delete the image file. Overri
 **Rationale**: FR-002/003/018. `LobbyClient.createMatch` accepts `unlisted`. `FlatFile.wipe(id)` exists, but the model key is a custom key.
 
 ## R7 — Delivery headers
+
+**Status (2026-11-01)**: moved to `specs/002-delivery-security-headers/` (research R1–R8 there). Kept below for provenance.
 
 **Decision**:
 - **API (Koa):** `koa-helmet@^9` (CJS) + `helmet@^8`, configured with:

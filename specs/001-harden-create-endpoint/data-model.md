@@ -1,4 +1,4 @@
-# Data Model: Harden Game Creation and Model Delivery
+# Data Model: Harden Game Creation
 
 All schemas are declarative valibot schemas in `packages/shared/src/schemas/`, except where noted. Notation:
 - **strict**: unknown keys are refused.

@@ -1,13 +1,13 @@
 ---
 
-description: "Task list for: Harden Game Creation and Model Delivery Against Injected Content"
+description: "Task list for: Harden Game Creation Against Injected Content"
 ---
 
-# Tasks: Harden Game Creation and Model Delivery Against Injected Content
+# Tasks: Harden Game Creation Against Injected Content
 
 **Input**: Design documents from `specs/001-harden-create-endpoint/`
 
-**Prerequisites**: plan.md, spec.md, research.md (R1–R10), data-model.md, contracts/post-game-create.md, contracts/response-headers.md, quickstart.md
+**Prerequisites**: plan.md, spec.md, research.md (R1–R10), data-model.md, contracts/post-game-create.md, quickstart.md
 
 **Tests**: Included. The plan orders the work test-first (plan.md "Implementation Outline"), and quickstart.md §1 names the test suites that prove the feature. Write each test task first and confirm it fails before implementing.
 
@@ -22,7 +22,7 @@ description: "Task list for: Harden Game Creation and Model Delivery Against Inj
 ## Conventions that apply to every task
 
 - Follow `docs/CODE_CONVENTIONS.md`: sorted imports, `import type` for type-only imports, kebab-case for new files, Vitest for tests, Supertest for API tests.
-- Never hand-write sanitizing or magic-byte logic. Use `valibot`, `file-type`, `dompurify` + `jsdom`, `koa-helmet` + `helmet` (research R1–R3, R7).
+- Never hand-write sanitizing or magic-byte logic. Use `valibot`, `file-type`, `dompurify` + `jsdom` (research R1–R3).
 - Never return valibot `message` strings or any submitted value in a response or log (FR-023, FR-025). Paths and schema expectations only.
 - No size/DoS limits (spec Assumptions, Out of Scope).
 - Commands: `npx turbo run lint`, `npx turbo run test`, `npx turbo run build` (never pnpm/yarn).
@@ -35,7 +35,7 @@ description: "Task list for: Harden Game Creation and Model Delivery Against Inj
 
 - [ ] T001 Raise `engines.node` from `">=20.0.0 < 25.0.0"` to `">=20.19.0 <25.0.0"` in `package.json` (repo root), so `require(esm)` works without a flag (research R1)
 - [ ] T002 Set `"module": "nodenext"` and `"moduleResolution": "nodenext"` in `compilerOptions` of both `apps/server/tsconfig.app.json` and `apps/server/tsconfig.test.json` (research R1); fix any import that no longer resolves (e.g. missing explicit paths) without changing behavior
-- [ ] T003 Add server dependencies `file-type@^21`, `dompurify@^3`, `jsdom@^28`, `koa-helmet@^9`, `helmet@^8` and dev dependency `@types/jsdom` via `npm install -w @eop/server …` (updates `apps/server/package.json` and `package-lock.json`)
+- [ ] T003 Add server dependencies `file-type@^21`, `dompurify@^3`, `jsdom@^28` and dev dependency `@types/jsdom` via `npm install -w @eop/server …` (updates `apps/server/package.json` and `package-lock.json`). (`koa-helmet`/`helmet` are added by `specs/002-delivery-security-headers/`, not here.)
 - [ ] T004 [P] Add dependency `valibot@^1.2.0` (same range as the server) to `packages/shared/package.json` via `npm install -w @eop/shared valibot@^1.2.0`
 - [ ] T005 Verify the platform switch has no behavior change: run `npx turbo run build`, `npx turbo run test`, `npx turbo run lint` and start `npx turbo run dev` once to confirm the ts-node dev server boots under `nodenext`. Write a throwaway check that `import { fileTypeFromBuffer } from 'file-type'` type-checks in `apps/server/src/` and delete it afterwards
 
@@ -113,25 +113,9 @@ description: "Task list for: Harden Game Creation and Model Delivery Against Inj
 
 ---
 
-## Phase 5: User Story 3 - Delivered models and pages cannot be turned against the viewer (Priority: P1)
+## Phase 5: User Story 3 - Delivered models and pages cannot be turned against the viewer (moved to spec 002)
 
-**Goal**: Every API and production static response carries `nosniff`, `X-Frame-Options: DENY` and the global CSP; SVG images are sent as attachments with `default-src 'none'`.
-
-**Independent Test**: `curl -sI` the app page, an API route and an SVG image (quickstart §3); in a browser, an injected inline script is blocked and the console shows no CSP violations during a full game.
-
-### Tests for User Story 3 ⚠️ write first, confirm they fail
-
-- [ ] T033 [P] [US3] Write header tests in `apps/server/src/main.test.ts` per contracts/response-headers.md: for `POST /game/create`, `GET /game/:id/players`, `GET /game/:id/model` and a 404 route, assert `x-content-type-options: nosniff`, `x-frame-options: DENY` and `content-security-policy` equal to exactly `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'` (compare as a set of directives to be order-independent); for an SVG game, `GET /game/:id/image` has `content-type` starting with `image/svg+xml`, `content-disposition` starting with `attachment`, and `content-security-policy: default-src 'none'`; for a PNG game, `GET /game/:id/image` has the global CSP and **no** `content-disposition: attachment` (spec edge case "Raster images … not forced to download")
-
-### Implementation for User Story 3
-
-- [ ] T034 [US3] Add `koa-helmet` in `apps/server/src/publicApi.ts` as the first middleware (before `cors()` and the router) so it also covers error responses: `helmet({ contentSecurityPolicy: { useDefaults: false, directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], imgSrc: ["'self'", 'data:', 'blob:'], connectSrc: ["'self'"], objectSrc: ["'none'"], baseUri: ["'self'"], frameAncestors: ["'none'"] } }, frameguard: { action: 'deny' } })` (research R7, FR-020, FR-021, FR-022). Export the directives object (e.g. `CONTENT_SECURITY_POLICY_DIRECTIVES` in `apps/server/src/config.ts`) so tests and docs reference one source. Confirm `crossOriginResourcePolicy`/`crossOriginEmbedderPolicy` defaults do not break the client calling the API from `localhost:5173` in dev (disable them if they do; deployment cross-origin policy is Out of Scope)
-- [ ] T035 [US3] Set SVG delivery headers in `getImage` in `apps/server/src/endpoints.ts` (FR-019): when `game.model.extension === 'svg'`, before `send(...)` call `ctx.attachment(`${matchID}.svg`)` and `ctx.set('Content-Security-Policy', "default-src 'none'")`, and add `ctx.set('Access-Control-Expose-Headers', 'Content-Disposition')` consistent with the download endpoints; raster images keep current behavior
-- [ ] T036 [US3] Verify the client still renders SVG game images after the `attachment` header: check how `apps/client` loads `/game/:id/image` (fetch → `URL.createObjectURL` → `<img>` is unaffected by `Content-Disposition`); if any component uses the image URL directly in `<img src>` or `<a href>`, switch it to the fetch + blob path. Record the outcome in the PR description
-- [ ] T037 [P] [US3] Add static-client headers in `apps/client/nginx/etc/nginx/conf.d/default.conf` **inside `location / { … }` only** (research R7): `add_header X-Content-Type-Options "nosniff" always;`, `add_header X-Frame-Options "DENY" always;`, `add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" always;` — do not add them at `server` level, so `/api/` responses keep exactly one copy from Koa
-- [ ] T038 [US3] Check the production build for CSP conflicts: run `npx turbo run build --filter=@eop/client` and inspect `apps/client/dist/index.html` for inline `<script>` blocks or inline event handlers; if Vite emits any (e.g. module preload polyfill), disable or externalize them in `apps/client/vite.config.*` so `script-src 'self'` holds (FR-021, SC-004)
-
-**Checkpoint**: US3 is complete: delivery protections apply to every API response and to the production static client.
+**Moved to `specs/002-delivery-security-headers/tasks.md`** (its Phases 3–5): the global response headers, the SVG image headers and the production-build CSP check, including tasks T033–T038 that were planned here. The task numbers T033–T038 are retired; later phases keep their numbering so the [Story] labels stay stable.
 
 ---
 
@@ -178,12 +162,12 @@ description: "Task list for: Harden Game Creation and Model Delivery Against Inj
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T048 [P] Update `docs/ARCHITECTURE.md` with a short "Game creation validation" section: shared valibot schemas in `packages/shared/src/schemas/`, `apps/server/src/image-upload.ts`, the validate → createMatch(unlisted) → join → store order with rollback, and where delivery headers are set (Koa helmet vs. nginx `location /`)
+- [ ] T048 [P] Update `docs/ARCHITECTURE.md` with a short "Game creation validation" section: shared valibot schemas in `packages/shared/src/schemas/`, `apps/server/src/image-upload.ts`, and the validate → createMatch(unlisted) → join → store order with rollback. (Where delivery headers are set is documented by `specs/002-delivery-security-headers/tasks.md` T014, not here.)
 - [ ] T049 [P] Document in `docs/CODE_CONVENTIONS.md` (Error Handling section) that request validation must use the shared schemas and `formatIssues`, and that responses/logs never echo submitted values
 - [ ] T050 Create a changeset with `npx changeset add`: `patch` for `@eop/server`, `@eop/shared`, `@eop/client`; summary "Validate game creation input, sanitize SVG uploads, detect image types from content and add security headers (supersedes #358, #360)" (file in `.changeset/`)
 - [ ] T051 Run `npx turbo run lint`, `npx turbo run test`, `npx turbo run build` and fix every finding (quickstart §1)
 - [ ] T052 Run manual quickstart §2 steps 1–5 with `npx turbo run dev` and confirm each expected result
-- [ ] T053 Run quickstart §3 with `docker compose up --build`: each of `X-Content-Type-Options`, `X-Frame-Options`, `Content-Security-Policy` appears exactly once on `/` and `/api/game/x/players`; play a full game with an uploaded PNG and an uploaded SVG and confirm the browser console shows no CSP violations; inject `<img src=x onerror=alert(1)>` via DevTools and confirm it is blocked (SC-004)
+- T053 *(moved, retired)*: the production check of the security response headers and the content security policy now lives in `specs/002-delivery-security-headers/tasks.md` (T013 there)
 - [ ] T054 Commit with sign-off (`git commit --signoff`), and in the PR description reference that PRs #358 and #360 are superseded, list the ported tests, and note the documented decisions (no `is-svg`, no `isomorphic-dompurify`, SVG sanitize-and-store policy, remaining `<image href>` tracking-pixel risk)
 
 ---
@@ -196,18 +180,18 @@ description: "Task list for: Harden Game Creation and Model Delivery Against Inj
 - **Foundational (Phase 2)**: depends on Setup. Blocks all user stories.
 - **US1 (Phase 3)**: depends on Phase 2.
 - **US2 (Phase 4)**: depends on Phase 2 (`CreateGameError`, validate-first `createGame`). Independent of US1.
-- **US3 (Phase 5)**: depends on Phase 1 only for code (`koa-helmet`); its SVG header test needs the US2 image path to create an SVG game, so implement after US2 or create the SVG game in the test by writing the file/model directly.
 - **US4 (Phase 6)**: depends on Phase 2; its tests use valid image and Threat Dragon games, so run after US1 and US2.
 - **US5 (Phase 7)**: depends on Phase 2; test (a) uses the US1 schema.
 - **Polish (Phase 8)**: after all desired stories.
+
+(US3's delivery protections moved to `specs/002-delivery-security-headers/` and no longer constrain this task list.)
 
 ### Story Dependency Graph
 
 ```text
 Setup ─► Foundational ─┬─► US1 (P1, MVP) ──┐
                        ├─► US2 (P1) ───────┼─► US4 (P2) ─┐
-                       │        └─► US3 (P1)             ├─► Polish
-                       └─► US5 (P3, needs US1 schema) ───┘
+                       └─► US5 (P3, needs US1 schema) ──┴─► Polish
 ```
 
 ### Within Each User Story
@@ -243,16 +227,14 @@ then T028 → T029 (image-upload.ts) → T030 → T031 (endpoints.ts) → T032
 
 ### User Story 3
 
-```text
-T037 nginx config  ||  T033 → T034 → T035 → T036 → T038
-```
+Moved to `specs/002-delivery-security-headers/tasks.md` (Phases 3–5 there).
 
 ### Across stories (two developers)
 
 ```text
 Dev A: US1 (packages/shared/src/schemas/threat-dragon-model.*)
 Dev B: US2 (apps/server/src/image-upload.*)
-Merge both, then US3, US4, US5 on endpoints.ts sequentially.
+Merge both, then US4, US5 on endpoints.ts sequentially.
 ```
 
 ---
@@ -270,9 +252,8 @@ Merge both, then US3, US4, US5 on endpoints.ts sequentially.
 1. Setup + Foundational → validate-first skeleton with the 400 contract.
 2. US1 → Threat Dragon models safe (MVP).
 3. US2 → uploads safe (closes PR #358/#360 gaps).
-4. US3 → delivery headers as backstop.
-5. US4 → no orphaned games, unlisted matches.
-6. US5 → client error display and log hardening.
-7. Polish → docs, changeset, full manual and Docker checks, signed-off commit.
+4. US4 → no orphaned games, unlisted matches.
+5. US5 → client error display and log hardening.
+6. Polish → docs, changeset, full manual checks, signed-off commit.
 
-All three P1 stories (US1–US3) should ship together in one PR, because the spec supersedes PRs #358 and #360 and dropping their delivery protections would be a regression.
+US1 and US2 (both P1) should ship together in one PR, because the spec supersedes the input-side approaches of PRs #358 and #360. Their delivery-side protections now ship from `specs/002-delivery-security-headers/`.

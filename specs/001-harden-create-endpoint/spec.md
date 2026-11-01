@@ -1,4 +1,4 @@
-# Feature Specification: Harden Game Creation and Model Delivery Against Injected Content
+# Feature Specification: Harden Game Creation Against Injected Content
 
 **Feature Branch**: `fix/create-sanitization`
 
@@ -14,7 +14,7 @@
 - validate before anything is stored;
 - return clear client errors.
 
-Extended after reviewing open pull requests TNG/elevation-of-privilege#358 (SVG upload XSS) and #360 (file type bypass via a spoofed Content-Type). This feature supersedes both. It also takes over their delivery-side protections.
+Extended after reviewing open pull requests TNG/elevation-of-privilege#358 (SVG upload XSS) and #360 (file type bypass via a spoofed Content-Type). This feature supersedes both. Their delivery-side protections were extracted into a dedicated spec: `specs/002-delivery-security-headers/`.
 
 ## Context
 
@@ -26,7 +26,7 @@ Anyone can create a game without logging in. The person creating a game supplies
 - **Cross-game image access.** A model can include a field that makes the server deliver another game's image.
 - **Half-created games.** A game is created before its model is checked, so failed requests leave broken games behind.
 
-This feature fixes these weaknesses at the point where games are created. It also adds the protective response instructions from PRs #358 and #360 for when models and the application are delivered to browsers. Other weaknesses are listed under Out of Scope.
+This feature fixes these weaknesses at the point where games are created. The protective response instructions for when models and the application are delivered to browsers were extracted into `specs/002-delivery-security-headers/`. Other weaknesses are listed under Out of Scope.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -80,27 +80,9 @@ A facilitator creates a game from an uploaded image of the architecture. The sys
 
 ---
 
-### User Story 3 - Delivered models and pages cannot be turned against the viewer (Priority: P1)
+### User Story 3 - Delivered models and pages cannot be turned against the viewer (moved to spec 002)
 
-When a participant's browser loads the application or a game's image, the response tells the browser to:
-- treat the content strictly as its declared type;
-- refuse to embed the application in other sites;
-- run only the application's own scripts.
-
-An uploaded SVG is never shown as a standalone page, even if a participant opens it directly.
-
-**Why this priority**: This is the safety net if any upload check ever has a gap. PR #358 and PR #360 introduced these protections and the maintainer agreed with them, so dropping them would be a regression.
-
-**Independent Test**:
-- Fetch the application page, an API response and a game's SVG image, and check the protective instructions on each response.
-- In a browser, try to run an inline script injected into the page and verify the browser blocks it.
-
-**Acceptance Scenarios**:
-
-1. **Given** a game with an SVG image, **When** the image is requested, **Then** the response tells the browser to download it rather than display it as a page, and forbids it from running any script or loading any resource.
-2. **Given** any response of the application (static pages and API), **When** it is delivered, **Then** it forbids the browser from guessing a content type other than the declared one.
-3. **Given** any response of the application, **When** it is delivered, **Then** it forbids embedding the application in frames of other sites.
-4. **Given** any response of the application, **When** it is delivered, **Then** it lets the browser run only the application's own script files. Inline scripts and inline event handlers are blocked. The application keeps working: styles, images (including in-page image previews), and the live game connection.
+**Moved to `specs/002-delivery-security-headers/`** (its User Stories 1–3). The delivery protections — security response instructions on every response and SVG images delivered as downloads — are specified, planned and implemented there. The requirement and success-criterion numbers they had here (FR-019–FR-022, SC-004) are retired below so existing references remain unambiguous.
 
 ---
 
@@ -145,7 +127,6 @@ When a facilitator's own legitimate input is refused (for example an unusual mod
 - **SVG made with an editor** (Inkscape metadata, draw.io HTML labels, Illustrator symbol references): accepted. Editor-specific or unsupported parts are removed. Where the editor provides a plain-text fallback (draw.io), that fallback is shown instead.
 - **Image file name in upper case (`DIAGRAM.PNG`):** treated the same as lower case.
 - **Participant list with fewer than 2 or more than 9 names, or with empty or duplicate names (after trimming spaces):** refused.
-- **Raster images (PNG, JPEG, GIF, WebP) are also delivered with the protective response instructions.** They are not forced to download, so in-page display is unchanged.
 
 ## Requirements *(mandatory)*
 
@@ -183,21 +164,9 @@ When a facilitator's own legitimate input is refused (for example an unusual mod
 - **FR-017**: An SVG MUST be a well-formed XML document whose top-level element is an SVG drawing; otherwise it is refused. The system MUST remove all active content: scripts, event handlers, embedded foreign content, script links and animations that set links or handlers. It MUST store only its own cleaned serialization of the drawing element. The document prolog MUST be dropped: XML declaration, document type declaration with any entity or attribute definitions, processing instructions, and comments outside the drawing. Each removal MUST be logged as a security event. The original upload is never stored.
 - **FR-018**: Temporary copies of uploaded files MUST be deleted when the request finishes, whether it succeeded or not.
 
-**Delivery protections**
+**Delivery protections (moved to spec 002)**
 
-- **FR-019**: When a game's SVG image is delivered, the response MUST tell the browser to download it rather than render it as a page. It MUST also forbid all script execution and resource loading for that response.
-- **FR-020**: Every response of the application, both the static client and the API, MUST:
-  - forbid the browser from guessing a content type other than the declared one;
-  - forbid embedding in frames;
-  - carry a content security policy.
-- **FR-021**: The content security policy MUST:
-  - allow scripts only from the application's own origin, which blocks inline scripts and inline event handlers;
-  - allow styles from the own origin plus inline styles;
-  - allow images from the own origin, data and in-memory image sources;
-  - allow connections only to the own origin, including its live game connection;
-  - forbid plugin objects;
-  - restrict the document base address to the own origin.
-- **FR-022**: The delivery protections MUST apply in production, where the static client is served by the web server. They MUST also apply to API responses in every environment.
+- **FR-019–FR-022**: moved to `specs/002-delivery-security-headers/` (FR-001–FR-008 there). The numbers FR-019–FR-022 are retired here and stay reserved so existing references remain unambiguous.
 
 **Error handling and logging**
 
@@ -216,7 +185,6 @@ When a facilitator's own legitimate input is refused (for example an unusual mod
 - **Threat Dragon model**: a title, optional descriptive metadata, and one or more diagrams. Each diagram holds elements of five types with geometry, connections, styling and threats.
 - **Diagram element**: a process, data store, actor, data flow or trust boundary. It has an identifier, layout data, limited styling, optional label text and optional threats.
 - **Uploaded image**: a single file whose stored type is determined by its content, and whose claimed type and name must not contradict that content.
-- **Delivery protections**: instructions sent with every response that limit what a browser may do with it (content type, framing, script sources, download vs. display).
 - **Validation result**: either accepted, cleaned input, or a list of problem locations used for the client error and the security log.
 
 ## Success Criteria *(mandatory)*
@@ -234,7 +202,7 @@ When a facilitator's own legitimate input is refused (for example an unusual mod
     - style sheet processing instructions.
 - **SC-002**: 100% of the reference set of legitimate Threat Dragon exports and clean images (PNG, JPEG, GIF, WebP, SVG) are accepted and display the same as before.
 - **SC-003**: After any refused request, the number of stored games and stored files is unchanged (0 orphans).
-- **SC-004**: 100% of checked responses carry the delivery protections. The check covers the application page, API responses, raster image responses and SVG image responses. An injected inline script is blocked by the browser.
+- **SC-004**: moved to `specs/002-delivery-security-headers/` (SC-001 there); the number stays reserved here.
 - **SC-005**: Every refusal of invalid input returns a client error, never a server error, and produces exactly one security log entry.
 - **SC-006**: Facilitators using the creation page see no change in how games are created or displayed, and need no new manual steps.
 
@@ -246,7 +214,6 @@ When a facilitator's own legitimate input is refused (for example an unusual mod
 - SVG drawings are the exception: they are cleaned and the cleaned copy is stored, as in PR #358. Testing showed that strict refusal would reject most SVGs made with common drawing tools (Inkscape, draw.io, Illustrator). Removals are logged, so attempts remain visible.
 - Protection against resource exhaustion (size limits on fields, files, models and diagrams; restricting request formats) is deliberately not part of this feature. This follows the maintainer's review on PR #358 that DoS protection is not a priority at this point.
 - Games stored before this change are not migrated, because current deployments do not keep game data across redeployments.
-- In the development setup, the static client is served by the development server, which needs inline scripts for hot reloading. The content security policy therefore applies there only to API responses.
 - When this feature is merged, PRs #358 and #360 are closed as superseded. Their test cases are carried over, with the expected status changed from server error to client error.
 - The technical design (chosen libraries, code locations) is specified in the implementation plan (`/speckit.plan`). As requested in the PR #358 and #360 reviews, it relies on established libraries for file type and SVG detection.
 
@@ -254,6 +221,7 @@ When a facilitator's own legitimate input is refused (for example an unusual mod
 
 These weaknesses were found in the same analysis but are not addressed here. They remain open and need separate follow-up:
 
+- **Delivery protections** (security response instructions, content security policy, SVG image download delivery): extracted to `specs/002-delivery-security-headers/`, which supersedes this spec's former User Story 3, FR-019–FR-022 and SC-004.
 - **Prototype pollution through in-game actions** (confirmed, high severity). Fixing it requires validating game action input.
 - **Games created through the live game connection, bypassing the creation step** (high severity). Fixing it requires validating game setup in the game definition.
 - **Unvalidated arguments to in-game actions:** out-of-range diagram indexes, and unrestricted editing of threat fields.
