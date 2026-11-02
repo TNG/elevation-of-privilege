@@ -20,7 +20,7 @@ export interface ThreatDragonModel {
     /**
      * A unique identifier for this main threat model object
      */
-    id?: number;
+    id?: number | string;
     /**
      * The original creator or overall owner of the model
      */
@@ -56,28 +56,28 @@ interface Diagram {
   /**
    * The methodology used by the data-flow diagram
    */
-  diagramType: string;
+  diagramType?: string;
   /**
    * The sequence number of the diagram
    */
-  id: number;
+  id?: number | string;
   /**
    * The size of the diagram drawing canvas
    */
-  size: {
+  size?: {
     /**
      * The height of the diagram drawing canvas
      */
-    height: number;
+    height: number | string;
     /**
      * The width of the diagram drawing canvas
      */
-    width: number;
+    width: number | string;
   };
   /**
    * The path to the thumbnail image for the diagram
    */
-  thumbnail: string;
+  thumbnail?: string;
   /**
    * The title of the data-flow diagram
    */
@@ -115,7 +115,7 @@ export interface ThreatDragonComponent {
   /**
    * The component display attributes
    */
-  attrs: {
+  attrs?: {
     /**
      * The component shape attributes
      */
@@ -132,7 +132,7 @@ export interface ThreatDragonComponent {
       /**
        * The component text contents
        */
-      text: string;
+      text?: string;
     };
     /**
      * The component text attributes
@@ -181,6 +181,10 @@ export interface ThreatDragonComponent {
    */
   isEncrypted?: boolean;
   /**
+   * The component flag set if the data flow is over a public network
+   */
+  isPublicNetwork?: boolean;
+  /**
    * The component flag set if the data store uses signatures
    */
   isSigned?: boolean;
@@ -211,6 +215,14 @@ export interface ThreatDragonComponent {
     [k: string]: unknown;
   };
   /**
+   * The data flow protocol
+   */
+  protocol?: string;
+  /**
+   * The component flag set if the actor provides authentication
+   */
+  providesAuthentication?: boolean;
+  /**
    * The component's level of privilege/permissions
    */
   privilegeLevel?: string;
@@ -221,7 +233,7 @@ export interface ThreatDragonComponent {
   /**
    * The component size
    */
-  size: {
+  size?: {
     /**
      * The component height
      */
@@ -294,35 +306,46 @@ export interface ThreatDragonComponent {
      * The vertical value of the curve point
      */
     y: number;
-  };
-  z: number;
+  }[];
+  z?: number;
 }
 
 interface Label {
   /**
    * The label position
    */
-  position: number;
+  position:
+    | number
+    | {
+        /**
+         * The distance along the data flow
+         */
+        distance: number;
+        /**
+         * The label offset
+         */
+        offset?: number | { x: number; y: number };
+      };
   /**
    * The label text attributes
    */
-  attrs: {
+  attrs?: {
     /**
      * The text attributes
      */
-    text: {
+    text?: {
       /**
        * The text size
        */
-      'font-size': string;
+      'font-size'?: string;
       /**
        * The text weight
        */
-      'font-weight': string;
+      'font-weight'?: string;
       /**
        * The text content
        */
-      text: string;
+      text?: string;
     };
   };
 }
@@ -338,11 +361,11 @@ export interface ThreatDragonThreat {
   /**
    * The threat description
    */
-  description: string;
+  description?: string;
   /**
    * The threat mitigation
    */
-  mitigation: string;
+  mitigation?: string;
   /**
    * The threat methodology type
    */
@@ -358,11 +381,11 @@ export interface ThreatDragonThreat {
   /**
    * The threat severity as High, Medium or Low
    */
-  severity: string;
+  severity?: string;
   /**
-   * The threat status as NA, Open or Mitigated
+   * The threat status, e.g. NA, Open, Mitigated or Not Applicable
    */
-  status: Status;
+  status?: string;
   /**
    * The threat ID as a UUID
    */
@@ -370,16 +393,16 @@ export interface ThreatDragonThreat {
   /**
    * The threat title
    */
-  title: string;
+  title?: string;
   /**
    * The threat type, selection according to modelType
    */
-  type: string;
+  type?: string;
 
   // our custom properties
   owner?: string;
   id?: string;
   game?: string;
+  ruleId?: string;
+  $$hashKey?: string;
 }
-
-type Status = 'NA' | 'Open' | 'Mitigated';

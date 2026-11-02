@@ -1,18 +1,20 @@
-import { rename } from 'node:fs/promises';
+import { readFile, rm, writeFile } from 'node:fs/promises';
 
 import {
+  createGameRequestSchema,
   DEFAULT_MODEL,
   escapeMarkdownText,
+  formatIssues,
   GameMode,
   gameName,
   GameState,
-  getImageExtension,
   getSuitDisplayName,
   isSuit,
   logEvent,
+  logSecurityEvent,
   ModelType,
   SetupData,
-  SUITS,
+  threatDragonModelSchema,
   ThreatDragonModel,
   ThreatDragonThreat,
 } from '@eop/shared';
@@ -21,47 +23,95 @@ import send from 'koa-send';
 import { v4 as uuidv4 } from 'uuid';
 
 import { INTERNAL_API_PORT } from './config';
+import { CreateGameError } from './create-game-error';
 import { getDbImagesFolder } from './filesystem';
+import { processImageUpload, type UploadedImage } from './image-upload';
 
 import type { Server, State } from 'boardgame.io';
 import type { IMiddleware } from 'koa-router';
 import * as v from 'valibot';
 import type { GameServer } from './gameServer';
 
-const createGameBodySchema = v.object({
-  startSuit: v.picklist(SUITS),
-  gameMode: v.enum(GameMode),
-  modelType: v.enum(ModelType),
-  modelReference: v.optional(v.string()),
-  turnDuration: v.pipe(v.string(), v.transform(parseInt), v.number()),
-  names: v.array(v.string()),
-  model: v.optional(v.string()),
-});
-
 export const createGame =
   (gameServer: GameServer): IMiddleware =>
   async (ctx) => {
     const spectatorCredential = uuidv4();
+    let matchID: string | undefined;
+    let image: UploadedImage | undefined;
 
     try {
-      // Create game
-      const body = v.parse(createGameBodySchema, ctx.request.body);
+      // 1. Validate all form fields before anything is stored (FR-002)
+      const parsed = v.safeParse(
+        createGameRequestSchema,
+        ctx.request.body ?? {},
+      );
+      if (!parsed.success) {
+        throw new CreateGameError(
+          'invalid_request',
+          formatIssues(parsed.issues),
+        );
+      }
+      const body = parsed.output;
+
+      // 2. Validate the model content before the match is registered
+      let validatedModel: ThreatDragonModel | undefined;
+      switch (body.modelType) {
+        case ModelType.THREAT_DRAGON: {
+          let parsedModel: unknown;
+          try {
+            parsedModel = JSON.parse(body.model ?? '');
+          } catch {
+            throw new CreateGameError('invalid_model_json');
+          }
+          const modelResult = v.safeParse(threatDragonModelSchema, parsedModel);
+          if (!modelResult.success) {
+            throw new CreateGameError(
+              'invalid_model',
+              formatIssues(modelResult.issues, 'model'),
+            );
+          }
+          validatedModel = modelResult.output;
+          break;
+        }
+
+        case ModelType.IMAGE: {
+          const file = ctx.request.files?.model;
+          if (file === undefined || Array.isArray(file)) {
+            throw new CreateGameError('missing_image');
+          }
+          image = await processImageUpload({
+            buffer: await readFile(file.filepath),
+            claimedMimeType: file.mimetype ?? undefined,
+            originalFilename: file.originalFilename ?? undefined,
+          });
+          break;
+        }
+
+        default:
+          break;
+      }
 
       const lobbyClient = new LobbyClient({
         server: `http://localhost:${INTERNAL_API_PORT}`,
       });
 
-      const { matchID } = await lobbyClient.createMatch(gameName, {
-        numPlayers: body.names.length,
-        setupData: {
-          startSuit: body.startSuit,
-          turnDuration: body.turnDuration,
-          gameMode: body.gameMode,
-          modelType: body.modelType,
-          modelReference: body.modelReference,
-          spectatorCredential,
-        } satisfies SetupData,
-      });
+      const { matchID: createdMatchID } = await lobbyClient.createMatch(
+        gameName,
+        {
+          numPlayers: body.names.length,
+          setupData: {
+            startSuit: body.startSuit,
+            turnDuration: body.turnDuration,
+            gameMode: body.gameMode,
+            modelType: body.modelType,
+            modelReference: body.modelReference,
+            spectatorCredential,
+          } satisfies SetupData,
+          // Never announce new games in the public lobby (FR-005)
+          unlisted: true,
+        },
+      );
+      matchID = createdMatchID;
 
       const credentials = [];
 
@@ -78,11 +128,11 @@ export const createGame =
       //model stuff
       switch (body.modelType) {
         case ModelType.THREAT_DRAGON: {
-          // TODO: validation
-          await gameServer.db.setModel(
-            matchID,
-            JSON.parse(body.model as string) as ThreatDragonModel,
-          );
+          if (validatedModel === undefined) {
+            // unreachable: model validation above guarantees the model exists
+            throw new CreateGameError('invalid_model');
+          }
+          await gameServer.db.setModel(matchID, validatedModel);
           break;
         }
 
@@ -92,41 +142,24 @@ export const createGame =
         }
 
         case ModelType.IMAGE: {
-          if (
-            !ctx.request.files ||
-            !ctx.request.files.model ||
-            Array.isArray(ctx.request.files.model)
-          ) {
-            throw Error('A single image needs to be provided');
+          if (image === undefined) {
+            // unreachable: image validation above guarantees the image exists
+            throw new CreateGameError('missing_image');
           }
-
-          if (!ctx.request.files.model.originalFilename) {
-            throw Error('No name specified for the provided image');
-          }
-
-          if (!ctx.request.files.model.mimetype) {
-            throw Error('No mime type specified for the provided image');
-          }
-
-          const extension = getImageExtension(
-            ctx.request.files.model.originalFilename,
-          );
-          if (
-            !(
-              /image\/[a-z+]+$/i.test(ctx.request.files.model.mimetype) &&
-              extension
-            )
-          ) {
-            throw Error('Filetype not supported');
-          }
-
-          await rename(
-            ctx.request.files.model.filepath,
-            `${getDbImagesFolder()}/${matchID}.${extension}`,
+          await writeFile(
+            `${getDbImagesFolder()}/${matchID}.${image.extension}`,
+            image.bytes,
           );
           //use model object to store info about image
-          await gameServer.db.setModel(matchID, { extension });
-
+          await gameServer.db.setModel(matchID, {
+            extension: image.extension,
+          });
+          if (image.removed.length > 0) {
+            logSecurityEvent('svg_sanitized', {
+              matchID,
+              removed: image.removed,
+            });
+          }
           break;
         }
 
@@ -143,10 +176,70 @@ export const createGame =
         spectatorCredential,
       };
     } catch (err) {
-      // Maybe this error could be more specific?
-      const logArguments = err instanceof Error ? [err, err.stack] : [err];
-      console.error(...logArguments);
+      if (err instanceof CreateGameError) {
+        ctx.status = 400;
+        ctx.body =
+          err.issues !== undefined
+            ? { error: err.code, issues: err.issues }
+            : { error: err.code };
+        logSecurityEvent(
+          'create_rejected',
+          err.issues !== undefined
+            ? { code: err.code, issues: err.issues }
+            : { code: err.code },
+        );
+        return;
+      }
+
+      if (matchID !== undefined) {
+        // Roll back the half-created game (FR-003): each cleanup runs in its
+        // own try/catch so a cleanup failure is logged but never masks the
+        // 500 the client receives.
+        try {
+          await gameServer.db.wipe(matchID);
+        } catch (cleanupErr) {
+          logSecurityEvent('create_failed', {
+            matchID,
+            cleanup: 'wipe',
+            error:
+              cleanupErr instanceof Error
+                ? cleanupErr.constructor.name
+                : typeof cleanupErr,
+          });
+        }
+        if (image !== undefined) {
+          try {
+            await rm(`${getDbImagesFolder()}/${matchID}.${image.extension}`, {
+              force: true,
+            });
+          } catch (cleanupErr) {
+            logSecurityEvent('create_failed', {
+              matchID,
+              cleanup: 'image_file',
+              error:
+                cleanupErr instanceof Error
+                  ? cleanupErr.constructor.name
+                  : typeof cleanupErr,
+            });
+          }
+        }
+      }
+
+      logSecurityEvent('create_failed', {
+        matchID,
+        error: err instanceof Error ? err.constructor.name : typeof err,
+      });
       ctx.throw(500);
+    } finally {
+      // Guarantee the formidable temp files are gone in every path (FR-018)
+      const files = ctx.request.files;
+      if (files !== undefined) {
+        await Promise.all(
+          Object.values(files)
+            .flat()
+            .map((file) => rm(file.filepath, { force: true })),
+        );
+      }
     }
   };
 
@@ -182,15 +275,16 @@ export const getImage =
   async (ctx) => {
     const matchID = ctx.params.matchID;
     if (matchID === undefined) {
-      return ctx.throw('Missing required parameter matchID', 400);
+      // http-errors v2 only accepts the status as the first argument
+      return ctx.throw(400, 'Missing required parameter matchID');
     }
 
     const game = await gameServer.db.fetch(matchID, { model: true });
 
     if (!game.model || !('extension' in game.model)) {
       return ctx.throw(
-        'Cannot request image if none is stored, maybe the wrong model type has been set?',
         400,
+        'Cannot request image if none is stored, maybe the wrong model type has been set?',
       );
     }
 

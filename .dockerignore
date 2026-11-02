@@ -1,4 +1,8 @@
 node_modules/
+.git/
 deploy/
 build/
 dist/
+coverage/
+*.log*
+.env*

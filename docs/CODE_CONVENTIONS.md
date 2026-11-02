@@ -24,6 +24,12 @@ Coding guidelines for the Elevation of Privilege project.
 - Use try/catch for async operations
 - Validate user input with Valibot schemas (server)
 - Handle errors gracefully with appropriate logging
+- Request validation must use the shared schemas in
+  `packages/shared/src/schemas/` and report failures with `formatIssues`,
+  so clients receive stable `{ path, expected }` issue entries
+- Never echo submitted values in responses or logs: error bodies and
+  security log entries carry only error codes, field paths and schema
+  expectations (see `contracts/post-game-create.md`)
 
 ## React Components
 

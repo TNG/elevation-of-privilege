@@ -14,7 +14,7 @@ import {
   getModel,
   getPlayerNames,
 } from './endpoints';
-import { getDbImagesFolder } from './filesystem';
+import { getUploadTempFolder } from './filesystem';
 
 import type { SetupData } from '@eop/shared';
 import type { GameServer } from './gameServer';
@@ -32,7 +32,7 @@ const runPublicApi = (gameServer: GameServer): [Koa, Server] => {
     '/create',
     koaBody({
       multipart: true,
-      formidable: { uploadDir: getDbImagesFolder() },
+      formidable: { uploadDir: getUploadTempFolder() },
     }),
     createGame(gameServer),
   );
@@ -63,35 +63,28 @@ const authMiddleware =
   (gameServer: GameServer): Router.Middleware =>
   async (ctx, next) => {
     const authorizationHeader = ctx.header.authorization;
+    let authorized = false;
+
     if (authorizationHeader) {
       try {
         const credentials = auth.parse(authorizationHeader);
 
         if (credentials) {
           if (ctx.params.matchID === undefined) {
-            return ctx.throw('Missing required parameter matchID', 400);
+            // http-errors v2 only accepts the status as the first argument
+            return ctx.throw(400, 'Missing required parameter matchID');
           }
           const game = await gameServer.db.fetch(ctx.params.matchID, {
             metadata: true,
           });
           const metadata = game.metadata;
 
-          if (
-            credentials.name === SPECTATOR &&
+          authorized =
+            (credentials.name === SPECTATOR &&
+              credentials.pass ===
+                (metadata.setupData as SetupData).spectatorCredential) ||
             credentials.pass ===
-              (metadata.setupData as SetupData).spectatorCredential
-          ) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return await next();
-          }
-
-          if (
-            credentials.pass ===
-            metadata.players[Number.parseInt(credentials.name)]?.credentials
-          ) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return await next();
-          }
+              metadata.players[Number.parseInt(credentials.name)]?.credentials;
         }
       } catch (err) {
         console.error(
@@ -101,8 +94,15 @@ const authMiddleware =
       }
     }
 
-    console.log(`Rejecting unauthorized request. Game: ${ctx.params.matchID}`);
-    ctx.throw(403);
+    if (!authorized) {
+      console.log(
+        `Rejecting unauthorized request. Game: ${ctx.params.matchID}`,
+      );
+      ctx.throw(403);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return await next();
   };
 
 export default runPublicApi;

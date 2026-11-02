@@ -4,6 +4,7 @@ import * as fs from 'node:fs';
 
 const DB_SUBFOLDER = `db`;
 const DB_IMAGES_SUBFOLDER = `db-images`;
+const UPLOAD_TEMP_SUBFOLDER = `db-uploads`;
 
 const ensureExists = (subfolder: string): string => {
   const fullPath = path.join(os.tmpdir(), subfolder);
@@ -30,4 +31,8 @@ export const getDbFolder = (): string => {
 
 export const getDbImagesFolder = (): string => {
   return ensureExists(DB_IMAGES_SUBFOLDER);
+};
+
+export const getUploadTempFolder = (): string => {
+  return ensureExists(UPLOAD_TEMP_SUBFOLDER);
 };

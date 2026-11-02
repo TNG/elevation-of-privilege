@@ -39,6 +39,28 @@ Three services on separate network endpoints:
 - Location: OS temporary directory (separate storage for game state and uploads)
 - No external database required
 
+## Game Creation Validation
+
+`POST /game/create` accepts untrusted diagrams and images. All content is
+checked before anything is stored, using these building blocks:
+
+- **Shared valibot schemas** in `packages/shared/src/schemas/`:
+  `createGameRequestSchema` (form fields) and `threatDragonModelSchema`
+  (a strict allowlist for Threat Dragon models, which strips envelope
+  metadata such as `extension` and rejects unknown keys). `formatIssues`
+  reduces validation failures to safe `{ path, expected }` entries.
+- **`apps/server/src/image-upload.ts`**: detects the real image type from
+  the content (`file-type`), enforces that the claimed MIME type and
+  filename extension match it, and sanitizes SVGs with
+  DOMPurify (jsdom) to a canonical serialization.
+
+The server runs these steps in order: validate the request → validate the
+model or process the image in memory → `createMatch` (always `unlisted`, so
+new games never appear in the public lobby) → join the players → store the
+model/image. Any failure after the match is registered wipes the match, its
+model key and its image file, so no half-created game is left behind.
+Uploaded temp files are always deleted.
+
 ## Deployment
 
 ### Production Setup

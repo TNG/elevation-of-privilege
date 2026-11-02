@@ -4,7 +4,9 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./build",
-    "composite": true
+    "composite": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext"
   },
   "include": ["src"],
   "exclude": ["node_modules", "build", "**/*.test.ts"]

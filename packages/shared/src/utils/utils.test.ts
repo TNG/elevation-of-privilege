@@ -1,4 +1,4 @@
-import { it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 import { DEFAULT_GAME_MODE } from './GameMode';
 import { getStartingCard } from './cardDefinitions';
@@ -10,6 +10,7 @@ import {
   getPlayers,
   getValidMoves,
   grammarJoin,
+  logSecurityEvent,
   resolvePlayerName,
   resolvePlayerNames,
 } from './utils';
@@ -172,4 +173,55 @@ it('successfully escapes any malicious markdown text', () => {
   expect(escapeMarkdownText('![Uh oh...]("onerror="alert(\'XSS\'))')).toBe(
     '\\!\\[Uh oh...\\]\\("onerror="alert\\(\'XSS\'\\)\\)',
   );
+});
+
+describe('logSecurityEvent', () => {
+  it('writes a single line with timestamp, event and JSON-encoded fields', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+
+    logSecurityEvent('create_rejected', { code: 'invalid_model' });
+
+    expect(log).toHaveBeenCalledOnce();
+    expect(log).toHaveBeenCalledWith(
+      '2026-01-01T00:00:00.000Z - SECURITY create_rejected {"code":"invalid_model"}',
+    );
+
+    vi.useRealTimers();
+    log.mockRestore();
+  });
+
+  it('JSON-encodes every field value', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    logSecurityEvent('svg_sanitized', {
+      removed: ['script', 'onload'],
+      count: 2,
+    });
+
+    const line = log.mock.calls[0]?.[0] as string;
+    expect(line).toBe(
+      `${new Date(Date.now()).toISOString()} - SECURITY svg_sanitized {"removed":["script","onload"],"count":2}`,
+    );
+
+    log.mockRestore();
+  });
+
+  it('cannot produce a second log line through crafted field values', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    logSecurityEvent('create_rejected', {
+      code: 'line-break\n2026-01-01T00:00:00.000Z - Game created',
+      another: 'carriage\rreturn',
+      third: '2026-01-01T00:00:00.000Z - SECURITY create_rejected {}',
+    });
+
+    expect(log).toHaveBeenCalledOnce();
+    const line = log.mock.calls[0]?.[0] as string;
+    expect(line).not.toMatch(/\r/);
+    // the newlines are encoded inside the JSON string, so the raw line has none
+    expect(line.split('\n')).toHaveLength(1);
+
+    log.mockRestore();
+  });
 });

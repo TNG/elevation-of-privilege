@@ -47,6 +47,14 @@ export class ModelFlatFile extends FlatFile {
     return await this.setItem(key, model);
   }
 
+  async wipe(id: string): Promise<void> {
+    await super.wipe(id);
+    const key = this.getModelKey(id);
+    // @ts-expect-error removeItem is private, ask boardgame.io to make it protected
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    return await this.removeItem(key);
+  }
+
   getModelKey(matchID: string): string {
     return `${matchID}:model`;
   }
