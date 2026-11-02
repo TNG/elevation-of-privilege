@@ -114,7 +114,7 @@ description: "Task list for: Delivery Security Headers and Content Security Poli
 - [x] T015 [P] Slim spec 001 to reflect the extraction (research R8): in `specs/001-harden-create-endpoint/`, replace User Story 3, FR-019–FR-022, SC-004, plan item 5 and tasks T033–T038 with a short pointer to `specs/002-delivery-security-headers/`, so the delivery protections are implemented exactly once
 - [X] T016 [P] Create a changeset with `npx changeset add`: `patch` for `@eop/server` and `@eop/client`; summary "Add security response headers and a content security policy to all responses; deliver SVG images as downloads (extracted from #358/#360 follow-up, supersedes the delivery scope of spec 001)" (file in `.changeset/`)
 - [X] T017 Run `npx turbo run lint`, `npx turbo run test`, `npx turbo run build` and fix every finding (quickstart §4)
-- [ ] T018 Commit with sign-off (`git commit --signoff`); in the PR description record: the supersession of spec 001's delivery scope (T015), the T007/T010 verification outcomes, any helmet default disabled in T012, and the build-guard result from T011
+- [X] T018 Commit with sign-off (`git commit --signoff`); in the PR description record: the supersession of spec 001's delivery scope (T015), the T007/T010 verification outcomes, any helmet default disabled in T012, and the build-guard result from T011
 
 ---
 
