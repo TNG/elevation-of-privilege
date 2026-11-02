@@ -61,6 +61,15 @@ model/image. Any failure after the match is registered wipes the match, its
 model key and its image file, so no half-created game is left behind.
 Uploaded temp files are always deleted.
 
+## Delivery Headers
+
+Every response tells the browser what it may do with it (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` and a strict `Content-Security-Policy`). The instructions are set in two places:
+
+- **API responses (all environments)**: `koa-helmet` is the first middleware in `apps/server/src/publicApi.ts`, before `cors()` and the router, so error responses are covered too. The single policy definition lives in `apps/server/src/config.ts` (`CONTENT_SECURITY_POLICY_DIRECTIVES` / `CONTENT_SECURITY_POLICY_HEADER`) and is fixed by `specs/002-delivery-security-headers/contracts/response-headers.md`; changes require a contract update.
+- **Static client (production only)**: the nginx config `apps/client/nginx/etc/nginx/conf.d/default.conf` adds the three headers with `add_header … always` inside `location /` only, so proxied `/api/` responses keep exactly one copy from Koa. The Vite dev server page carries no headers (hot reload needs inline scripts); its proxied `/api/` responses forward Koa's.
+
+Uploaded SVG game images can never run as pages: `getImage` in `apps/server/src/endpoints.ts` delivers them with `Content-Disposition: attachment` and a `Content-Security-Policy: default-src 'none'` override (route-level `ctx.set` wins over helmet's header for that response). Raster images keep in-page display.
+
 ## Deployment
 
 ### Production Setup

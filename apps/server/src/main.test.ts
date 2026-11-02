@@ -28,7 +28,7 @@ import {
   publicApiServer,
   publicApiServerHandle,
 } from './main';
-import { INTERNAL_API_PORT } from './config';
+import { CONTENT_SECURITY_POLICY_HEADER, INTERNAL_API_PORT } from './config';
 import { getDbImagesFolder, getUploadTempFolder } from './filesystem';
 
 import type { ThreatDragonModel } from '@eop/shared';
@@ -153,6 +153,153 @@ it('retrieve the model for a game', async () => {
     .auth('0', createBody.credentials[0]!);
 
   expect(modelResponse.body).toStrictEqual(parsedGoldenModel);
+});
+
+describe('delivery headers (contracts/response-headers.md, US1)', () => {
+  const createGame = () =>
+    request(publicApiServer.callback())
+      .post('/game/create')
+      .field('startSuit', 'A')
+      .field('gameMode', 'Elevation of Privilege')
+      .field('modelType', 'Default')
+      .field('turnDuration', '5')
+      .field('names[]', ['P1', 'P2', 'P3']);
+
+  const directiveSet = (value: string) =>
+    value
+      .split(';')
+      .map((directive) => directive.trim())
+      .sort();
+
+  const expectDeliveryHeaders = (response: request.Response) => {
+    expect(response.headers['x-content-type-options']).not.toContain(', ');
+    expect(response.headers['x-content-type-options']).toBe('nosniff');
+    expect(response.headers['x-frame-options']).not.toContain(', ');
+    expect(response.headers['x-frame-options']).toBe('DENY');
+    expect(response.headers['content-security-policy']).not.toContain(', ');
+    expect(
+      directiveSet(response.headers['content-security-policy'] ?? ''),
+    ).toStrictEqual(directiveSet(CONTENT_SECURITY_POLICY_HEADER));
+  };
+
+  it('instructs the browser on a successful create response', async () => {
+    const response = await createGame();
+    expect(response.status).toBe(200);
+    expectDeliveryHeaders(response);
+  });
+
+  it('instructs the browser on a successful players response', async () => {
+    const createResponse = await createGame();
+    const createBody = createResponse.body as {
+      game: string;
+      credentials: string[];
+    };
+
+    const playersResponse = await request(publicApiServer.callback())
+      .get(`/game/${createBody.game}/players`)
+      .auth('0', createBody.credentials[0]!);
+
+    expect(playersResponse.status).toBe(200);
+    expectDeliveryHeaders(playersResponse);
+  });
+
+  it('instructs the browser on a 403 error response', async () => {
+    const createResponse = await createGame();
+    const createBody = createResponse.body as { game: string };
+
+    const playersResponse = await request(publicApiServer.callback()).get(
+      `/game/${createBody.game}/players`,
+    );
+
+    expect(playersResponse.status).toBe(403);
+    expectDeliveryHeaders(playersResponse);
+  });
+
+  it('instructs the browser on an unknown route', async () => {
+    const response = await request(publicApiServer.callback()).get(
+      '/no-such-route',
+    );
+
+    expect(response.status).toBe(404);
+    expectDeliveryHeaders(response);
+  });
+});
+
+describe('image delivery (contracts/response-headers.md, US2)', () => {
+  const directiveSet = (value: string) =>
+    value
+      .split(';')
+      .map((directive) => directive.trim())
+      .sort();
+
+  const createImageGame = (buffer: Buffer, filename: string) =>
+    request(publicApiServer.callback())
+      .post('/game/create')
+      .field('startSuit', 'A')
+      .field('gameMode', 'Elevation of Privilege')
+      .field('turnDuration', '5')
+      .field('names[]', ['P1', 'P2'])
+      .field('modelType', ModelType.IMAGE)
+      .attach('model', buffer, {
+        filename,
+        contentType:
+          filename.endsWith('.svg') ? 'image/svg+xml' : 'image/png',
+      });
+
+  it('delivers an uploaded SVG as a download that may run nothing', async () => {
+    const createResponse = await createImageGame(
+      Buffer.from(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="9" height="9"/></svg>',
+      ),
+      'model.svg',
+    );
+    expect(createResponse.status).toBe(200);
+    const createBody = createResponse.body as {
+      game: string;
+      credentials: string[];
+    };
+
+    const imageResponse = await request(publicApiServer.callback())
+      .get(`/game/${createBody.game}/image`)
+      .auth('0', createBody.credentials[0]!);
+
+    expect(imageResponse.status).toBe(200);
+    expect(imageResponse.headers['content-type']).toMatch(/^image\/svg\+xml/);
+    expect(imageResponse.headers['content-disposition']).toMatch(
+      new RegExp(`^attachment; filename="${createBody.game}\\.svg"`),
+    );
+    expect(imageResponse.headers['content-security-policy']).toBe(
+      "default-src 'none'",
+    );
+    expect(imageResponse.headers['access-control-expose-headers']).toBe(
+      'Content-Disposition',
+    );
+  });
+
+  it('keeps an uploaded PNG as an in-page image with the global policy', async () => {
+    const png = readFileSync(
+      path.join(__dirname, '__fixtures__/images/clean.png'),
+    );
+    const createResponse = await createImageGame(png, 'model.png');
+    expect(createResponse.status).toBe(200);
+    const createBody = createResponse.body as {
+      game: string;
+      credentials: string[];
+    };
+
+    const imageResponse = await request(publicApiServer.callback())
+      .get(`/game/${createBody.game}/image`)
+      .auth('0', createBody.credentials[0]!);
+
+    expect(imageResponse.status).toBe(200);
+    expect(imageResponse.headers['content-type']).toMatch(/^image\/png/);
+    expect(imageResponse.headers['content-disposition'] ?? '').not.toMatch(
+      /^attachment/,
+    );
+    expect(
+      directiveSet(imageResponse.headers['content-security-policy'] ?? ''),
+    ).toStrictEqual(directiveSet(CONTENT_SECURITY_POLICY_HEADER));
+  });
 });
 
 describe('game creation validation (contracts/post-game-create.md)', () => {

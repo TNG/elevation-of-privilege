@@ -5,8 +5,10 @@ Carried over unchanged from `specs/001-harden-create-endpoint/contracts/response
 ## Global CSP value
 
 ```text
-default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
+default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
 ```
+
+`font-src 'self' data:` was added during the US3 production check: the client's stylesheet loads its webfont from an inlined `data:application/font-woff` URL, and without an explicit `font-src` the `default-src 'self'` fallback blocked it (a violation is a bug in the policy, not in the client — data-model §4, FR-009).
 
 ## Headers by response
 

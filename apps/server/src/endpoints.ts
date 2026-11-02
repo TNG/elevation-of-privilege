@@ -288,6 +288,15 @@ export const getImage =
       );
     }
 
+    // An SVG may contain script-active content, so it must never run as a
+    // top-level document: deliver it as a download with a policy that allows
+    // nothing (FR-007). Raster images keep in-page display (FR-008).
+    if (game.model.extension === 'svg') {
+      ctx.attachment(`${matchID}.svg`);
+      ctx.set('Content-Security-Policy', "default-src 'none'");
+      ctx.set('Access-Control-Expose-Headers', 'Content-Disposition');
+    }
+
     //send image
     await send(ctx, `${matchID}.${game.model?.extension}`, {
       root: getDbImagesFolder(),

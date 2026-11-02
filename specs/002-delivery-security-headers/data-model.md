@@ -23,15 +23,16 @@ This feature adds no persistent data. The model below defines the delivery rules
 Single definition, exported from `apps/server/src/config.ts` as `CONTENT_SECURITY_POLICY_DIRECTIVES` and rendered into the header value:
 
 ```text
-default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
+default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
 ```
 
 | Directive | Value | Client feature it must keep working (FR-009) |
 |---|---|---|
 | `default-src` | `'self'` | fallback deny-by-default |
 | `script-src` | `'self'` | the single external bundle; blocks inline scripts and inline event handlers (FR-006) |
-| `style-src` | `'self' 'unsafe-inline'` | Bootstrap stylesheet plus runtime-injected inline styles |
+| `style-src` | `'self'` `'unsafe-inline'` | Bootstrap stylesheet plus runtime-injected inline styles |
 | `img-src` | `'self' data: blob:` | card images; inline `data:` icons; uploaded-image previews via `URL.createObjectURL` |
+| `font-src` | `'self' data:` | the webfont inlined as a `data:application/font-woff` URL in the stylesheet (added after the US3 production check found `default-src` blocking it) |
 | `connect-src` | `'self'` | `/api` fetches and the same-origin live game connection (WebSocket) |
 | `object-src` | `'none'` | no plugin content is used |
 | `base-uri` | `'self'` | blocks `<base>` hijacking |
