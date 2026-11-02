@@ -15,6 +15,7 @@ import {
 } from '@eop/shared';
 import { ChangeEvent, FC, useState } from 'react';
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -31,6 +32,8 @@ import {
   Table,
 } from 'reactstrap';
 
+import type { Issue } from '@eop/shared';
+
 import Banner from '../components/banner/banner';
 import CopyButton from '../components/copybutton/copybutton';
 import Footer from '../components/footer/footer';
@@ -39,6 +42,21 @@ import Logo from '../components/logo/logo';
 import '../styles/create.css';
 
 const apiBase = '/api';
+
+/**
+ * A refusal from the create endpoint (contracts/post-game-create.md):
+ * a machine-readable `error` code plus, where applicable, the locations of
+ * the problems. Values are never echoed by the server (FR-023).
+ */
+interface CreationRefusal {
+  error: string;
+  issues: Issue[];
+}
+
+const GENERIC_REFUSAL: CreationRefusal = {
+  error: 'Game could not be created',
+  issues: [],
+};
 
 const Create: FC = () => {
   const [players, setPlayers] = useState(3);
@@ -63,9 +81,13 @@ const Create: FC = () => {
   const [modelReference, setModelReference] = useState<string | undefined>(
     undefined,
   );
+  const [refusal, setRefusal] = useState<CreationRefusal | undefined>(
+    undefined,
+  );
 
   const createGame = async () => {
     setCreating(true);
+    setRefusal(undefined);
     // FormData object (with file if required)
     const formData = new FormData();
 
@@ -88,6 +110,20 @@ const Create: FC = () => {
       method: 'POST',
       body: formData,
     });
+
+    if (!response.ok) {
+      let parsedRefusal: CreationRefusal | undefined;
+      try {
+        parsedRefusal = (await response.json()) as CreationRefusal;
+      } catch {
+        // the body may be empty, e.g. for a 500
+      }
+      setRefusal(
+        parsedRefusal?.error !== undefined ? parsedRefusal : GENERIC_REFUSAL,
+      );
+      setCreating(false);
+      return;
+    }
 
     // TODO: valibot validation
     const r = (await response.json()) as {
@@ -384,6 +420,18 @@ const Create: FC = () => {
           </Col>
         </FormGroup>
         <hr />
+        {refusal !== undefined && (
+          <Alert color="danger">
+            <p>{refusal.error}</p>
+            {refusal.issues.length > 0 && (
+              <ul>
+                {refusal.issues.map((issue) => (
+                  <li key={issue.path}>{issue.path}</li>
+                ))}
+              </ul>
+            )}
+          </Alert>
+        )}
         <Button
           block
           size="lg"

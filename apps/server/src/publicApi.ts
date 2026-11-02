@@ -3,9 +3,10 @@ import cors from '@koa/cors';
 import auth from 'basic-auth';
 import Koa from 'koa';
 import koaBody from 'koa-body';
+import helmet from 'koa-helmet';
 import Router from '@koa/router';
 import type { Server } from 'node:http';
-import { API_PORT } from './config';
+import { API_PORT, CONTENT_SECURITY_POLICY_DIRECTIVES } from './config';
 import {
   createGame,
   downloadThreatDragonModel,
@@ -14,7 +15,7 @@ import {
   getModel,
   getPlayerNames,
 } from './endpoints';
-import { getDbImagesFolder } from './filesystem';
+import { getUploadTempFolder } from './filesystem';
 
 import type { SetupData } from '@eop/shared';
 import type { GameServer } from './gameServer';
@@ -32,7 +33,7 @@ const runPublicApi = (gameServer: GameServer): [Koa, Server] => {
     '/create',
     koaBody({
       multipart: true,
-      formidable: { uploadDir: getDbImagesFolder() },
+      formidable: { uploadDir: getUploadTempFolder() },
     }),
     createGame(gameServer),
   );
@@ -50,6 +51,43 @@ const runPublicApi = (gameServer: GameServer): [Koa, Server] => {
     downloadThreatsMarkdownFile(gameServer),
   );
 
+  // First middleware, before cors() and the router, so every response carries
+  // the delivery headers (FR-003)
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        useDefaults: false,
+        directives: CONTENT_SECURITY_POLICY_DIRECTIVES,
+      },
+      frameguard: { action: 'deny' },
+    }),
+  );
+  // Koa's default error handling (ctx.onerror) removes every response header
+  // before sending the error body, which would strip the headers helmet set.
+  // ctx.onerror restores whatever it finds on err.headers, so snapshot the
+  // delivery headers onto the error before rethrowing (FR-003).
+  app.use(async (ctx, next) => {
+    try {
+      await next();
+    } catch (err) {
+      if (err instanceof Error) {
+        const errWithHeaders = err as Error & {
+          headers?: Record<string, unknown>;
+        };
+        const deliveryHeaders: Record<string, unknown> = {};
+        for (const name of ctx.res.getHeaderNames()) {
+          if (name !== 'etag') {
+            deliveryHeaders[name] = ctx.res.getHeader(name);
+          }
+        }
+        errWithHeaders.headers = {
+          ...(errWithHeaders.headers ?? {}),
+          ...deliveryHeaders,
+        };
+      }
+      throw err;
+    }
+  });
   app.use(cors());
   app.use(router.routes()).use(router.allowedMethods());
   const appHandle = app.listen(API_PORT, () => {
@@ -63,35 +101,28 @@ const authMiddleware =
   (gameServer: GameServer): Router.Middleware =>
   async (ctx, next) => {
     const authorizationHeader = ctx.header.authorization;
+    let authorized = false;
+
     if (authorizationHeader) {
       try {
         const credentials = auth.parse(authorizationHeader);
 
         if (credentials) {
           if (ctx.params.matchID === undefined) {
-            return ctx.throw('Missing required parameter matchID', 400);
+            // http-errors v2 only accepts the status as the first argument
+            return ctx.throw(400, 'Missing required parameter matchID');
           }
           const game = await gameServer.db.fetch(ctx.params.matchID, {
             metadata: true,
           });
           const metadata = game.metadata;
 
-          if (
-            credentials.name === SPECTATOR &&
+          authorized =
+            (credentials.name === SPECTATOR &&
+              credentials.pass ===
+                (metadata.setupData as SetupData).spectatorCredential) ||
             credentials.pass ===
-              (metadata.setupData as SetupData).spectatorCredential
-          ) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return await next();
-          }
-
-          if (
-            credentials.pass ===
-            metadata.players[Number.parseInt(credentials.name)]?.credentials
-          ) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return await next();
-          }
+              metadata.players[Number.parseInt(credentials.name)]?.credentials;
         }
       } catch (err) {
         console.error(
@@ -101,8 +132,15 @@ const authMiddleware =
       }
     }
 
-    console.log(`Rejecting unauthorized request. Game: ${ctx.params.matchID}`);
-    ctx.throw(403);
+    if (!authorized) {
+      console.log(
+        `Rejecting unauthorized request. Game: ${ctx.params.matchID}`,
+      );
+      ctx.throw(403);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return await next();
   };
 
 export default runPublicApi;

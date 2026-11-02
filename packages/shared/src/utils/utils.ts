@@ -51,10 +51,10 @@ export function getComponentName(
   const prefix = component.type.slice(3);
 
   if (component.type === 'tm.Flow') {
-    return `${prefix}: ${component.labels?.[0]?.attrs.text.text}`;
+    return `${prefix}: ${component.labels?.[0]?.attrs?.text?.text}`;
   }
 
-  return `${prefix}: ${component.attrs.text?.text}`;
+  return `${prefix}: ${component.attrs?.text?.text}`;
 }
 
 export function getValidMoves(
@@ -112,6 +112,18 @@ export function asyncSetTimeout<U, F extends () => Promise<U>>(
 export function logEvent(message: string): void {
   const now = new Date(Date.now()).toISOString();
   console.log(`${now} - ${message}`);
+}
+
+/**
+ * Logs a security event with JSON-encoded fields so that request-derived
+ * values can never forge additional log lines (FR-025).
+ */
+export function logSecurityEvent(
+  event: string,
+  fields: Record<string, unknown>,
+): void {
+  const now = new Date(Date.now()).toISOString();
+  console.log(`${now} - SECURITY ${event} ${JSON.stringify(fields)}`);
 }
 
 export function isModelType(value: string): value is ModelType {
