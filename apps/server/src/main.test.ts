@@ -242,8 +242,7 @@ describe('image delivery (contracts/response-headers.md, US2)', () => {
       .field('modelType', ModelType.IMAGE)
       .attach('model', buffer, {
         filename,
-        contentType:
-          filename.endsWith('.svg') ? 'image/svg+xml' : 'image/png',
+        contentType: filename.endsWith('.svg') ? 'image/svg+xml' : 'image/png',
       });
 
   it('delivers an uploaded SVG as a download that may run nothing', async () => {
