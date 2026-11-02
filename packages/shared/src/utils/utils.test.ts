@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 
 import { DEFAULT_GAME_MODE } from './GameMode';
 import { getStartingCard } from './cardDefinitions';
@@ -176,6 +176,11 @@ it('successfully escapes any malicious markdown text', () => {
 });
 
 describe('logSecurityEvent', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
   it('writes a single line with timestamp, event and JSON-encoded fields', () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
@@ -186,13 +191,11 @@ describe('logSecurityEvent', () => {
     expect(log).toHaveBeenCalledWith(
       '2026-01-01T00:00:00.000Z - SECURITY create_rejected {"code":"invalid_model"}',
     );
-
-    vi.useRealTimers();
-    log.mockRestore();
   });
 
   it('JSON-encodes every field value', () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
 
     logSecurityEvent('svg_sanitized', {
       removed: ['script', 'onload'],
@@ -201,10 +204,8 @@ describe('logSecurityEvent', () => {
 
     const line = log.mock.calls[0]?.[0] as string;
     expect(line).toBe(
-      `${new Date(Date.now()).toISOString()} - SECURITY svg_sanitized {"removed":["script","onload"],"count":2}`,
+      '2026-01-01T00:00:00.000Z - SECURITY svg_sanitized {"removed":["script","onload"],"count":2}',
     );
-
-    log.mockRestore();
   });
 
   it('cannot produce a second log line through crafted field values', () => {
@@ -221,7 +222,5 @@ describe('logSecurityEvent', () => {
     expect(line).not.toMatch(/\r/);
     // the newlines are encoded inside the JSON string, so the raw line has none
     expect(line.split('\n')).toHaveLength(1);
-
-    log.mockRestore();
   });
 });
