@@ -43,12 +43,12 @@
     "@vitejs/plugin-react-swc": "^4.2.3",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
-    "jsdom": "^28.1.0",
+    "jsdom": "^29.1.1",
     "nock": "^14.0.10",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.53.1",
-    "vite": "^7.3.3",
+    "vite": "^8.1.4",
     "vitest": "^4.0.17"
   },
   "private": true

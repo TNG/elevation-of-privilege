@@ -328,11 +328,7 @@ interface Label {
 }
 
 type CellType =
-  | 'tm.Process'
-  | 'tm.Store'
-  | 'tm.Actor'
-  | 'tm.Flow'
-  | 'tm.Boundary';
+  'tm.Process' | 'tm.Store' | 'tm.Actor' | 'tm.Flow' | 'tm.Boundary';
 
 export interface ThreatDragonThreat {
   /**
